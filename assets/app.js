@@ -1,9 +1,9 @@
 // assets/app.js
 const seed = [
-  { product: "Disease Model", start: "2024-05-08", expiry: "2026-05-08", plan: "Tier 2", billing: "Paid", status: "Active" },
-  { product: "FarmView with Satellite for 25 CropZones for 1 year", start: "2025-06-17", expiry: "2026-06-17", plan: "Tier 2", billing: "Country Pay", status: "Active" },
-  { product: "Weather Forecast", start: "2025-10-27", expiry: "2026-10-27", plan: "Tier 1", billing: "Paid", status: "Active" },
-  { product: "Client API", start: "2025-12-17", expiry: "2026-12-17", plan: "Tier 2", billing: "Paid", status: "Active" }
+  { product: "Client API", start: "2025-12-17", expiry: "2026-12-17", plan: "Tier 2", billing: "Self Pay", status: "Active", devices: ["device001", "device002"], billingProfile: { billName: "Example Customer", billEmail: "billing@example.com", billAddress: "Main Street 1, City, 12345", billCountry: "Austria", billVat: "", billMethod: "Self Pay" } },
+  { product: "Disease Model", start: "2024-05-08", expiry: "2026-05-08", plan: "Tier 2", billing: "Self Pay", status: "Active" },
+  { product: "FarmView with Satellite for 25 CropZones for 1 year", start: "2025-06-17", expiry: "2026-06-17", plan: "Tier 2", billing: "Self Pay", status: "Active" },
+  { product: "Weather Forecast", start: "2025-10-27", expiry: "2026-10-27", plan: "Tier 1", billing: "Self Pay", status: "Active" },
 ];
 
 // Mock user billing settings
@@ -114,15 +114,45 @@ grid?.addEventListener("click", (e) => {
 
 // --------- MANAGE ---------
 function openManage(idx) {
+  // ensure subscription exists
+  const row = (typeof seed !== 'undefined' ? seed[idx] : null);
+  if (!row) return;
+
+  // keep index for save/delete handlers
   manageIndex = idx;
-  const row = seed[idx];
-  mProduct.value = row.product;
-  mPlan.value = row.plan;
-  mBilling.value = row.billing;
-  mStart.value = row.start;
-  mExpiry.value = row.expiry;
-  mStatus.value = row.status;
-  manageModal?.show();
+
+  // initialize manageWizard so manageRenderStep can find the subscription
+  manageWizard = manageWizard || { step: 1, mode: null, subId: null, selection: {} };
+  manageWizard.subId = idx;            // store index (findSubscription will handle index)
+  manageWizard.step = 1;
+  manageWizard.mode = null;
+  manageWizard.selection = {};
+
+  // populate simple legacy fields if they exist (safe lookups)
+  const mProductEl = document.getElementById('mProduct');
+  const mPlanEl = document.getElementById('mPlan');
+  const mBillingEl = document.getElementById('mBilling');
+  const mStartEl = document.getElementById('mStart');
+  const mExpiryEl = document.getElementById('mExpiry');
+  const mStatusEl = document.getElementById('mStatus');
+
+  if (mProductEl) mProductEl.value = row.product || '';
+  if (mPlanEl) mPlanEl.value = row.plan || row.tier || '';
+  if (mBillingEl) mBillingEl.value = row.billing || '';
+  if (mStartEl) mStartEl.value = row.start || row.startDate || '';
+  if (mExpiryEl) mExpiryEl.value = row.expiry || row.end || row.endDate || '';
+  if (mStatusEl) mStatusEl.value = row.status || '';
+
+  // render wizard content for this subscription
+  try { manageRenderStep(); } catch (e) { console.warn('manageRenderStep failed', e); }
+
+  // show/manage modal safely
+  try {
+    manageModal?.show();
+  } catch (e) {
+    const el = document.getElementById('manageModal');
+    if (el) bootstrap.Modal.getOrCreateInstance(el).show();
+  }
 }
 function saveManage() {
   if (manageIndex === null) return;
@@ -240,6 +270,16 @@ function preloadBillingFromSettings() {
 }
 
 function billingComplete() {
+  // If we're in manage wizard, check the subscription's stored billing profile
+  if (manageWizard && manageWizard.step === 3) {
+    const sub = findSubscription(manageWizard.subId);
+    if (!sub) return false;
+    const subBilling = sub.billingProfile || userBillingProfile;
+    const required = [subBilling.billName, subBilling.billEmail, subBilling.billAddress, subBilling.billCountry];
+    return required.every(v => (v || "").trim().length > 0);
+  }
+  
+  // Otherwise check the wizard form fields
   const required = [billName.value, billEmail.value, billAddress.value, billCountry.value];
   return required.every(v => (v || "").trim().length > 0);
 }
@@ -266,8 +306,8 @@ function buildSummary() {
   const end = apiEnd.value;
 
   // Use computeCost() to derive the current estimate
-  const { tierPrice, devices, devicePrice, total } = computeCost();
-
+  const { tierPrice, devices: devCount, devicePrice, total } = computeCost();
+  
   sumType.textContent = selectedType || "—";
   sumDevices.textContent = devs.length ? devs.join(", ") : "—";
   sumTier.textContent = tier || "—";
@@ -280,6 +320,7 @@ function buildSummary() {
 
 function completePayment() {
   const { devs, tier, start, end, billing, cost } = buildSummary();
+  
   const status = (billing === "Self Pay") ? "Active" : "Pending";
 
   seed.push({
@@ -288,7 +329,16 @@ function completePayment() {
     expiry: end,
     plan: tier,
     billing,
-    status
+    status,
+    devices: devs,
+    billingProfile: {
+      billName: billName.value,
+      billEmail: billEmail.value,
+      billAddress: billAddress.value,
+      billCountry: billCountry.value,
+      billVat: billVat.value,
+      billMethod: billMethod.value
+    }
   });
 
   render();
@@ -342,6 +392,19 @@ document.addEventListener("click", (e) => {
   selectableCards().forEach(c => c.classList.remove("selected"));
   card.classList.add("selected");
   selectedType = subtype; // API/Webhooks/SMS
+  
+  // CHECK FOR DUPLICATE CLIENT API AFTER STEP 1 SELECTION
+  if (selectedType === "API") {
+    const hasClientAPI = seed.some(s => s.product && s.product.includes('Client API'));
+    if (hasClientAPI) {
+      alert('A Client API subscription already exists. Please choose a different product.');
+      selectedType = null;
+      card.classList.remove("selected");
+      updateNextState();
+      return;
+    }
+  }
+  
   updateNextState();
 });
 
@@ -369,6 +432,448 @@ document.addEventListener("input", (e) => {
 // Page buttons
 newBtn?.addEventListener("click", openWizard);
 refreshBtn?.addEventListener("click", render);
+
+// --- Manage modal wizard state & helpers ---
+let manageWizard = {
+  step: 1,
+  mode: null,      // 'add-devices' or 'upgrade-tier'
+  subId: null,
+  selection: {}    // temporary selections (devices/newTier)
+};
+
+//const manageModalEl = document.getElementById('manageModal');
+const manageBackBtn = document.getElementById('manageBackBtn');
+const manageNextBtn = document.getElementById('manageNextBtn');
+const managePayBtn = document.getElementById('managePayBtn');
+
+function findSubscription(id) {
+  if (id === null || typeof id === 'undefined') return null;
+  // numeric index -> direct access
+  const n = Number(id);
+  if (!Number.isNaN(n) && Number.isInteger(n) && n >= 0 && n < seed.length) {
+    return seed[n];
+  }
+  // fallback: search by id property if present
+  return (Array.isArray(seed) ? seed.find(s => String(s.id) === String(id)) : null) || null;
+}
+
+function daysBetween(a, b) {
+  const A = new Date(a), B = new Date(b);
+  const ms = B - A;
+  return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+}
+
+function remainingDaysForSub(sub) {
+  try {
+    const today = new Date();
+    const expiry = new Date(sub.expiry || sub.end || sub.expiryDate || sub.endDate);
+    return Math.max(0, Math.ceil((expiry - today) / (1000 * 60 * 60 * 24)));
+  } catch (e) { return 0; }
+}
+
+function prorataFractionForSub(sub) {
+  const rem = remainingDaysForSub(sub);
+  // use 365-day year for proration
+  return Math.max(0, Math.min(1, rem / 365));
+}
+
+// remove renew event hookup if present to satisfy requirement (no renew +1 year)
+try { mRenew?.removeEventListener?.("click", renewManage); } catch (e) { /* ignore */ }
+
+// Open manage wizard. mode: 'add-devices' | 'upgrade-tier'
+function openManageWizard(subId, mode) {
+  manageWizard.step = 1;
+  manageWizard.mode = mode;
+  manageWizard.subId = subId;
+  manageWizard.selection = {};
+  // show modal
+  const modal = new bootstrap.Modal(manageModalEl);
+  modal.show();
+  manageRenderStep();
+}
+
+function manageRenderStep() {
+  const sub = findSubscription(manageWizard.subId);
+
+  if (!sub) {
+    console.error('manageRenderStep: subscription not found for id', manageWizard.subId);
+    const ov = document.getElementById('manageOverview');
+    if (ov) ov.innerHTML = '<div class="alert alert-warning">Subscription not found.</div>';
+    return;
+  }
+
+  // Update stepchip styling (matching Add Subscription wizard)
+  [1, 2, 3, 4].forEach(n => {
+    const chip = document.getElementById(`manageChip${n}`);
+    if (!chip) return;
+    const isActive = n === manageWizard.step;
+    const isDone = n < manageWizard.step;
+    chip.classList.toggle('active', isActive || isDone);
+  });
+
+  // Show/hide steps
+  [1, 2, 3, 4].forEach(n => {
+    const el = document.getElementById(`manage-step-${n}`);
+    if (el) el.classList.toggle('d-none', n !== manageWizard.step);
+  });
+
+  // Hints
+  const hints = {
+    1: 'Review subscription and choose an action.',
+    2: manageWizard.mode === 'add-devices' ? 'Select devices to add.' : 'Choose new tier.',
+    3: 'Confirm billing details before payment.',
+    4: 'Review changes and complete payment.'
+  };
+  const hintEl = document.getElementById('manageHint');
+  if (hintEl) hintEl.textContent = hints[manageWizard.step] || '';
+
+  // STEP 1: Overview
+  if (manageWizard.step === 1) {
+    const ov = document.getElementById('manageOverview');
+    if (!ov) return;
+    
+    ov.innerHTML = `
+      <h6 class="fw-bold mb-3">Subscription overview</h6>
+      <div class="row mb-4">
+        <div class="col-6">
+          <div class="mb-3">
+            <div class="text-secondary small">Product</div>
+            <div class="fw-semibold">${sub.product || 'Client API'}</div>
+          </div>
+          <div class="mb-3">
+            <div class="text-secondary small">Plan / Tier</div>
+            <div class="fw-semibold">${sub.plan || '—'}</div>
+          </div>
+          <div>
+            <div class="text-secondary small">Devices</div>
+            <div class="fw-semibold">${(sub.devices && sub.devices.length) ? sub.devices.join(', ') : '—'}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="mb-3">
+            <div class="text-secondary small">Start date</div>
+            <div class="fw-semibold">${sub.start || '—'}</div>
+          </div>
+          <div class="mb-3">
+            <div class="text-secondary small">Expiry date</div>
+            <div class="fw-semibold">${sub.expiry || '—'}</div>
+          </div>
+          <div>
+            <div class="text-secondary small">Status</div>
+            <div><span class="badge ${sub.status === 'Active' ? 'text-bg-success' : sub.status === 'Pending' ? 'text-bg-warning' : 'text-bg-secondary'}">${sub.status || '—'}</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex gap-2 pt-2 border-top">
+        <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" id="manageActionAdd">Add devices</button>
+        <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" id="manageActionUpgrade">Upgrade tier</button>
+        <button type="button" class="btn btn-outline-danger btn-sm" id="manageActionDelete">Delete</button>
+      </div>
+    `;
+    
+    const addBtn = document.getElementById('manageActionAdd');
+    const upBtn = document.getElementById('manageActionUpgrade');
+    const delBtn = document.getElementById('manageActionDelete');
+    if (addBtn) addBtn.onclick = () => { manageWizard.mode = 'add-devices'; manageWizard.step = 2; manageRenderStep(); };
+    if (upBtn) upBtn.onclick = () => { manageWizard.mode = 'upgrade-tier'; manageWizard.step = 2; manageRenderStep(); };
+    if (delBtn) delBtn.onclick = () => {
+      const ok = confirm(`Delete subscription "${sub.product}"? (demo only)`);
+      if (ok) {
+        seed.splice(manageWizard.subId, 1);
+        bootstrap.Modal.getInstance(manageModalEl)?.hide();
+        render();
+      }
+    };
+    
+    // Hide Back and Next buttons on step 1
+    manageBackBtn.classList.add('d-none');
+    manageNextBtn.classList.add('d-none');
+  }
+
+  // STEP 2: Action (Add devices OR Upgrade tier)
+  if (manageWizard.step === 2) {
+    const content = document.getElementById('manageActionContent');
+    if (!content) return;
+    
+    content.innerHTML = '';
+    // Show Back and Next buttons on step 2
+    manageBackBtn.classList.remove('d-none');
+    manageNextBtn.classList.remove('d-none');
+    managePayBtn.classList.add('d-none');
+
+    if (manageWizard.mode === 'add-devices') {
+      content.innerHTML = `
+        <h6 class="fw-bold mb-2">Select devices to add</h6>
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="border rounded-3 p-2">
+              <div id="manageDevicesList"></div>
+            </div>
+            <div class="form-text">Select devices to add to this subscription (pro-rated for remaining term).</div>
+          </div>
+          <div class="col-12">
+            <div class="border rounded-3 p-3 bg-body-tertiary">
+              <div id="manageDevicesEstimate" class="text-secondary small"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      const listEl = document.getElementById('manageDevicesList');
+      if (!listEl) return;
+      
+      const existing = sub.devices || [];
+      const checks = document.querySelectorAll('#step2 input[type="checkbox"]');
+      checks.forEach(ch => {
+        const isExisting = existing.includes(ch.value);
+        const div = document.createElement('div');
+        div.className = 'form-check';
+        div.innerHTML = `
+          <input class="form-check-input" type="checkbox" value="${ch.value}" id="manageDev_${ch.value}" ${isExisting ? 'checked disabled' : ''}>
+          <label class="form-check-label" for="manageDev_${ch.value}" style="${isExisting ? 'opacity:0.6;' : ''}">${ch.nextElementSibling?.textContent?.trim() || ch.value}</label>
+        `;
+        listEl.appendChild(div);
+      });
+      
+      listEl.querySelectorAll('input[type="checkbox"]:not([disabled])').forEach(ch => {
+        ch.addEventListener('change', updateManageDevicesEstimate);
+      });
+      updateManageDevicesEstimate();
+    } else if (manageWizard.mode === 'upgrade-tier') {
+      content.innerHTML = `
+        <h6 class="fw-bold mb-2">Select new tier</h6>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label for="manageNewTier" class="form-label fw-semibold">Tier</label>
+            <select id="manageNewTier" class="form-select"></select>
+          </div>
+          <div class="col-12">
+            <div class="border rounded-3 p-3 bg-body-tertiary">
+              <div id="manageUpgradeEstimate" class="text-secondary small"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      const sel = document.getElementById('manageNewTier');
+      if (!sel) return;
+      
+      const currentTier = sub.plan || '';
+      Object.keys(TIER_PRICES).forEach(tier => {
+        const opt = document.createElement('option');
+        opt.value = tier;
+        opt.textContent = `${tier} (${TIER_PRICES[tier]} calls/day/device)`;
+        opt.selected = (tier === currentTier);
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', updateManageUpgradeEstimate);
+      updateManageUpgradeEstimate();
+    }
+  }
+
+  // STEP 3: Billing
+  if (manageWizard.step === 3) {
+    const info = document.getElementById('manageBillingInfo');
+    const val = document.getElementById('manageBillingValidation');
+    
+    // Show Back and Next buttons on step 3
+    manageBackBtn.classList.remove('d-none');
+    manageNextBtn.classList.remove('d-none');
+    managePayBtn.classList.add('d-none');
+    
+    // Preload billing details from subscription's stored billing profile
+    const subBilling = sub.billingProfile || userBillingProfile;
+    
+    if (info) {
+      info.innerHTML = `
+        <div class="text-secondary small mb-3">Billing profile used when this subscription was created. Review and confirm.</div>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="form-label fw-semibold">Billing name</label>
+            <input class="form-control" value="${subBilling.billName || '—'}" disabled />
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label fw-semibold">Billing email</label>
+            <input class="form-control" value="${subBilling.billEmail || '—'}" disabled />
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Address</label>
+            <input class="form-control" value="${subBilling.billAddress || '—'}" disabled />
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Country</label>
+            <input class="form-control" value="${subBilling.billCountry || '—'}" disabled />
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">VAT ID</label>
+            <input class="form-control" value="${subBilling.billVat || '—'}" disabled />
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold">Billing method</label>
+            <input class="form-control" value="${subBilling.billMethod || '—'}" disabled />
+          </div>
+        </div>
+      `;
+    }
+    
+    const complete = billingComplete();
+    if (val) {
+      if (!complete) {
+        val.textContent = 'Current billing profile incomplete. Please update billing settings first.';
+        val.classList.remove('d-none');
+        manageNextBtn.disabled = true;
+      } else {
+        val.classList.add('d-none');
+        manageNextBtn.disabled = false;
+      }
+    }
+  }
+
+  // STEP 4: Summary
+  if (manageWizard.step === 4) {
+    const sum = document.getElementById('manageSummary');
+    if (!sum) return;
+    
+    // Show Back button, hide Next button on step 4
+    manageBackBtn.classList.remove('d-none');
+    manageNextBtn.classList.add('d-none');
+    
+    let html = '<div class="border rounded-3 p-3">';
+    let amount = 0;
+
+    if (manageWizard.mode === 'add-devices') {
+      const checks = Array.from(document.querySelectorAll('#manageDevicesList input[type="checkbox"]:not([disabled])'));
+      const added = checks.filter(ch => ch.checked).map(ch => ch.value);
+      manageWizard.selection.addDevices = added;
+      const fr = prorataFractionForSub(sub);
+      amount = added.length * DEVICE_PRICE * fr;
+      
+      html += `
+        <div class="row g-2 small">
+          <div class="col-4 text-secondary">Action</div><div class="col-8 fw-semibold">Add ${added.length} device(s)</div>
+          <div class="col-4 text-secondary">Cost/device</div><div class="col-8">€${DEVICE_PRICE}</div>
+          <div class="col-4 text-secondary">Proration</div><div class="col-8">${fr.toFixed(2)} remaining</div>
+          <div class="col-4 text-secondary">Total</div><div class="col-8 fw-bold">€${amount.toFixed(2)}</div>
+        </div>
+      `;
+    } else if (manageWizard.mode === 'upgrade-tier') {
+      const newTier = document.getElementById('manageNewTier')?.value;
+      manageWizard.selection.newTier = newTier;
+      const oldPrice = TIER_PRICES[sub.plan] || 0;
+      const newPrice = TIER_PRICES[newTier] || 0;
+      const diff = Math.max(0, newPrice - oldPrice);
+      const fr = prorataFractionForSub(sub);
+      amount = diff * fr;
+      
+      html += `
+        <div class="row g-2 small">
+          <div class="col-4 text-secondary">Action</div><div class="col-8 fw-semibold">Upgrade tier</div>
+          <div class="col-4 text-secondary">Current</div><div class="col-8">${sub.plan}</div>
+          <div class="col-4 text-secondary">New</div><div class="col-8">${newTier}</div>
+          <div class="col-4 text-secondary">Proration</div><div class="col-8">${fr.toFixed(2)} remaining</div>
+          <div class="col-4 text-secondary">Total</div><div class="col-8 fw-bold">€${amount.toFixed(2)}</div>
+        </div>
+      `;
+    }
+    html += '</div>';
+    sum.innerHTML = html;
+    manageWizard.selection.amountDue = amount;
+    
+    // Show Pay button if amount > 0 (billing was already validated in step 3)
+    const showPay = amount > 0;
+    managePayBtn.classList.toggle('d-none', !showPay);
+  }
+
+  // Back button disabled state (only on step 1, which is hidden anyway)
+  manageBackBtn.disabled = (manageWizard.step === 1);
+}
+
+// estimate update helpers
+function updateManageDevicesEstimate() {
+  const checks = Array.from(document.querySelectorAll('#manageDevicesList input[type="checkbox"]:not([disabled])'));
+  const selected = checks.filter(ch => ch.checked).length;
+  const sub = findSubscription(manageWizard.subId);
+  if (!sub) return;
+  
+  const fr = prorataFractionForSub(sub);
+  const remainingDays = remainingDaysForSub(sub);
+  const cost = selected * DEVICE_PRICE * fr;
+  const est = document.getElementById('manageDevicesEstimate');
+  if (est) est.textContent = `Prorated for remaining subscription: €${DEVICE_PRICE}/device/yr × ${selected} devices × ${fr.toFixed(3)} (for remaining ${remainingDays} days) = €${cost.toFixed(2)}`;
+}
+
+function updateManageUpgradeEstimate() {
+  const sub = findSubscription(manageWizard.subId);
+  const sel = document.getElementById('manageNewTier');
+  if (!sel) return;
+  const newTier = sel.value;
+  const curTier = sub.plan || sub.tier || '';
+  let diff = 0;
+  if (newTier && curTier && newTier !== curTier) {
+    diff = Math.max(0, (TIER_PRICES[newTier] || 0) - (TIER_PRICES[curTier] || 0));
+  }
+  const fr = prorataFractionForSub(sub);
+  const cost = diff * fr;
+  document.getElementById('manageUpgradeEstimate').textContent = `Pro‑rata upgrade: €${diff.toFixed(2)} × ${fr.toFixed(3)} = €${cost.toFixed(2)} (remaining term)`;
+}
+
+// navigation handlers
+manageBackBtn?.addEventListener('click', () => {
+  if (manageWizard.step > 1) {
+    manageWizard.step -= 1;
+    manageRenderStep();
+  }
+});
+manageNextBtn?.addEventListener('click', () => {
+  if (manageWizard.step < 4) {
+    // step-specific validation: next from devices should ensure at least one selected for add-devices
+    if (manageWizard.step === 2 && manageWizard.mode === 'add-devices') {
+      const any = Array.from(document.querySelectorAll('#manageDevicesList input[type="checkbox"]:not([disabled])')).some(ch => ch.checked);
+      if (!any) { alert('Select one or more devices to add.'); return; }
+    }
+    if (manageWizard.step === 3 && manageWizard.mode === 'upgrade-tier') {
+      // it's okay to proceed even if tier unchanged; payment will be €0 and Pay button hidden
+    }
+    manageWizard.step += 1;
+    manageRenderStep();
+  }
+});
+
+// Pay & Update
+managePayBtn?.addEventListener('click', () => {
+  const sub = findSubscription(manageWizard.subId);
+  if (!sub) return;
+  const amount = manageWizard.selection.amountDue || 0;
+  // simulate payment success
+  // apply changes
+  if (manageWizard.mode === 'add-devices') {
+    const toAdd = manageWizard.selection.addDevices || [];
+    sub.devices = Array.from(new Set([...(sub.devices || []), ...toAdd]));
+    // update cost stored on subscription if you store it
+    sub.cost = (sub.cost || 0) + amount;
+  } else if (manageWizard.mode === 'upgrade-tier') {
+    const newTier = manageWizard.selection.newTier;
+    if (newTier && newTier !== (sub.plan || sub.tier)) {
+      sub.plan = newTier;
+      sub.cost = (sub.cost || 0) + amount;
+    }
+  }
+  // persist/save if you have persistence (localStorage) or call your existing save routine
+  if (typeof saveSubscriptions === 'function') {
+    saveSubscriptions();
+  } else {
+    // fallback: if seed exists, write to localStorage
+    try {
+      const list = typeof seed !== 'undefined' ? seed : [];
+      localStorage.setItem('subscriptions', JSON.stringify(list));
+    } catch (e) { /* ignore */ }
+  }
+  // close and re-render UI
+  bootstrap.Modal.getInstance(manageModalEl)?.hide();
+  render();
+});
+
+// Expose helper to open manage wizard (wire existing manage row "DETAILS" buttons to call this)
+function openManageAddDevices(subId) { openManageWizard(subId, 'add-devices'); }
+function openManageUpgradeTier(subId) { openManageWizard(subId, 'upgrade-tier'); }
 
 // Helpers
 function bumpTier(cur) {
