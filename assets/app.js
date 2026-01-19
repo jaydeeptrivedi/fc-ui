@@ -16,8 +16,6 @@ const userBillingProfile = {
   billMethod: "Self Pay"
 };
 
-const tierPricePerDeviceEUR = { "Tier 1": 10, "Tier 2": 25, "Tier 3": 50 };
-
 let manageIndex = null;
 let wizardStep = 1;
 let selectedType = null;
@@ -248,16 +246,17 @@ function billingComplete() {
 
 function updateEstimate() {
   const devCount = selectedDevices().length;
-  const tier = apiTier.value;
   if (!devCount) {
     estCost.textContent = "€—";
     estNote.textContent = "Select devices to see an estimate.";
     return;
   }
-  const perDevice = tierPricePerDeviceEUR[tier] || 0;
-  const total = perDevice * devCount;
+
+  // Use computeCost() so tier + per-device pricing is consistent
+  const { tierPrice, devices, devicePrice, total } = computeCost();
+
   estCost.textContent = `€${total}`;
-  estNote.textContent = `${devCount} device(s) × €${perDevice}/device/year (demo)`;
+  estNote.textContent = `€${tierPrice} (tier-price/year) + ${devices} × €${devicePrice} (per-device-price/year) = €${total}`;
 }
 
 function buildSummary() {
@@ -265,21 +264,22 @@ function buildSummary() {
   const tier = apiTier.value;
   const start = apiStart.value;
   const end = apiEnd.value;
-  const perDevice = tierPricePerDeviceEUR[tier] || 0;
-  const cost = devs.length ? perDevice * devs.length : 0;
+
+  // Use computeCost() to derive the current estimate
+  const { tierPrice, devices, devicePrice, total } = computeCost();
 
   sumType.textContent = selectedType || "—";
   sumDevices.textContent = devs.length ? devs.join(", ") : "—";
   sumTier.textContent = tier || "—";
   sumDates.textContent = (start && end) ? `${start} → ${end}` : "—";
   sumBilling.textContent = billMethod.value || "—";
-  sumCost.textContent = devs.length ? `€${cost}` : "€—";
+  sumCost.textContent = devs.length ? `€${total}` : "€—";
 
-  return { devs, tier, start, end, cost, billing: billMethod.value };
+  return { devs, tier, start, end, cost: total, billing: billMethod.value };
 }
 
 function completePayment() {
-  const { devs, tier, start, end, billing } = buildSummary();
+  const { devs, tier, start, end, billing, cost } = buildSummary();
   const status = (billing === "Self Pay") ? "Active" : "Pending";
 
   seed.push({
@@ -293,6 +293,45 @@ function completePayment() {
 
   render();
   wizard?.hide();
+}
+
+// Tier prices (annual) and per-device price (annual)
+const TIER_PRICES = {
+  'Tier 1': 49,
+  'Tier 2': 249,
+  'Tier 3': 499
+};
+const DEVICE_PRICE = 30; // € per device annually
+
+function computeCost() {
+  const tierSelect = document.getElementById('apiTier');
+  let tierPrice = 0;
+
+  if (tierSelect) {
+    const selectedText = (tierSelect.options[tierSelect.selectedIndex]?.text || tierSelect.value || '').toString();
+
+    // Try to find a known tier key inside the visible text or the select value (handles "Tier 2 (500...)" labels)
+    const matchedKey = Object.keys(TIER_PRICES).find(k => selectedText.includes(k));
+    if (matchedKey) {
+      tierPrice = TIER_PRICES[matchedKey];
+    } else if (TIER_PRICES.hasOwnProperty(tierSelect.value)) {
+      tierPrice = TIER_PRICES[tierSelect.value];
+    } else {
+      tierPrice = Number(tierSelect.value) || 0;
+    }
+  }
+
+  // Count selected device checkboxes (uses existing helper)
+  const devices = selectedDevices().length;
+
+  const total = tierPrice + (devices * DEVICE_PRICE);
+
+  return {
+    tierPrice,
+    devices,
+    devicePrice: DEVICE_PRICE,
+    total
+  };
 }
 
 // Type selection
