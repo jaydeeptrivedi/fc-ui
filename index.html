@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" data-page="licenses">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subscription Management</title>
+
+  <!-- Bootstrap (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+
+<body class="bg-light">
+  <!-- Shared topbar injected -->
+  <div id="app-shell"></div>
+
+  <main class="container-fluid">
+    <div class="row">
+      <aside id="sidebar-slot" class="col-auto p-0"></aside>
+
+      <section class="col p-3 p-md-4">
+        <div class="text-uppercase text-secondary small fw-semibold">User Subscriptions</div>
+        <div class="text-secondary small mb-3">List of all Subscriptions that have been purchased</div>
+
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex align-items-center justify-content-between">
+            <h5 class="mb-0 fw-bold">Active Subscriptions</h5>
+
+            <!-- New subscription button aligned on the right -->
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary btn-sm" id="refreshBtn">Refresh</button>
+              <button class="btn btn-primary btn-sm" id="newBtn">+ New Subscription</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th style="min-width: 360px;">Product</th>
+                  <th style="width: 170px;">Start date</th>
+                  <th style="width: 170px;">Expiry date</th>
+                  <th style="width: 140px;" class="text-end"></th>
+                </tr>
+              </thead>
+              <tbody id="grid"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- <div class="text-secondary small mt-3"> 
+          Demo notes: “+ New Subscription” opens a 4-step wizard (type → details → billing → payment). “DETAILS” opens manage modal.
+        </div>-->
+      </section>
+    </div>
+  </main>
+
+  <!-- ADD SUBSCRIPTION WIZARD MODAL -->
+  <div class="modal fade" id="addWizardModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title fw-bold mb-0">Add Subscription</h5>
+            <div class="text-secondary small">Self-serve ordering wizard</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Progress -->
+          <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+            <div class="stepchip" id="chip1">1. Type</div>
+            <div class="flex-grow-1 border-top"></div>
+            <div class="stepchip" id="chip2">2. Details</div>
+            <div class="flex-grow-1 border-top"></div>
+            <div class="stepchip" id="chip3">3. Billing</div>
+            <div class="flex-grow-1 border-top"></div>
+            <div class="stepchip" id="chip4">4. Payment</div>
+          </div>
+
+          <!-- Step 1 -->
+          <div class="wizard-step" id="step1">
+            <h6 class="fw-bold mb-2">Select subscription type</h6>
+            <div class="row g-3">
+              <div class="col-12 col-md-4">
+                <div class="card h-100 selectable" data-subtype="API">
+                  <div class="card-body">
+                    <div class="fw-bold">API Access</div>
+                    <div class="text-secondary small">Tiered usage per device</div>
+                    <div class="mt-2"><span class="badge text-bg-primary">Most used</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="card h-100 selectable" data-subtype="Webhooks">
+                  <div class="card-body">
+                    <div class="fw-bold">Weather Forcast</div>
+                    <div class="text-secondary small">3 day, 7 day forcast data</div>
+                    <!--<div class="mt-2"><span class="badge text-bg-secondary">Beta</span></div>-->
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="card h-100 selectable" data-subtype="SMS">
+                  <div class="card-body">
+                    <div class="fw-bold">Disease Models</div>
+                    <div class="text-secondary small">Custom algorithm for wide range of crops and fruits</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-info small mt-3 mb-0">
+              For this demo, the wizard fully implements <strong>API Access</strong> flow. Other types are placeholders.
+            </div>
+          </div>
+
+          <!-- Step 2: API details -->
+          <div class="wizard-step d-none" id="step2">
+            <h6 class="fw-bold mb-2">Configure API subscription</h6>
+
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label fw-semibold">Devices</label>
+                <div class="border rounded-3 p-2">
+                  <div class="form-check">
+                    <input class="form-check-input device-check" type="checkbox" value="device001" id="dev1">
+                    <label class="form-check-label" for="dev1">device001 (15 min uploads)</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input device-check" type="checkbox" value="device002" id="dev2">
+                    <label class="form-check-label" for="dev2">device002 (5 min uploads)</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input device-check" type="checkbox" value="device003" id="dev3">
+                    <label class="form-check-label" for="dev3">device003 (hourly uploads)</label>
+                  </div>
+                </div>
+                <div class="form-text">Select one or more devices to assign this API subscription to.</div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label for="apiTier" class="form-label fw-semibold">Tier</label>
+                <select id="apiTier" class="form-select">
+                  <option value="Tier 1">Tier 1 (48 calls/day/device)</option>
+                  <option value="Tier 2" selected>Tier 2 (500 calls/day/device)</option>
+                  <option value="Tier 3">Tier 3 (1500 calls/day/device)</option>
+                </select>
+              </div>
+
+              <div class="col-12 col-md-3">
+                <label for="apiStart" class="form-label fw-semibold">Start date</label>
+                <input id="apiStart" type="date" class="form-control"/>
+              </div>
+
+              <div class="col-12 col-md-3">
+                <label for="apiEnd" class="form-label fw-semibold">End date</label>
+                <input id="apiEnd" type="date" class="form-control"/>
+              </div>
+
+              <div class="col-12">
+                <div class="border rounded-3 p-3 bg-body-tertiary">
+                  <div class="d-flex justify-content-between">
+                    <div class="text-secondary small">Estimated cost (demo)</div>
+                    <div class="fw-bold" id="estCost">€—</div>
+                  </div>
+                  <div class="text-secondary small mt-1" id="estNote">Select devices to see an estimate.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Billing -->
+          <div class="wizard-step d-none" id="step3">
+            <h6 class="fw-bold mb-2">Billing details</h6>
+            <div class="text-secondary small mb-3">
+              Billing profile is preloaded from user settings. If required fields are missing, you cannot continue.
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label for="billName" class="form-label fw-semibold">Billing name</label>
+                <input id="billName" class="form-control" placeholder="e.g., John Smith / Org Ltd." />
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="billEmail" class="form-label fw-semibold">Billing email</label>
+                <input id="billEmail" class="form-control" type="email" placeholder="billing@example.com" />
+              </div>
+              <div class="col-12">
+                <label for="billAddress" class="form-label fw-semibold">Address</label>
+                <input id="billAddress" class="form-control" placeholder="Street, City, Postal code" />
+              </div>
+              <div class="col-12 col-md-4">
+                <label for="billCountry" class="form-label fw-semibold">Country</label>
+                <input id="billCountry" class="form-control" placeholder="Country" />
+              </div>
+              <div class="col-12 col-md-4">
+                <label for="billVat" class="form-label fw-semibold">VAT ID (optional)</label>
+                <input id="billVat" class="form-control" placeholder="VAT ID" />
+              </div>
+              <div class="col-12 col-md-4">
+                <label for="billMethod" class="form-label fw-semibold">Preferred billing</label>
+                <select id="billMethod" class="form-select">
+                  <option value="Self Pay">Pay online (card/SEPA)</option>
+                  <option value="HQ Pay">Invoice via HQ</option>
+                  <option value="Country Pay">Invoice via Country team</option>
+                  <option value="Organization Pay">Invoice via Organization</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="alert alert-warning small mt-3 mb-0 d-none" id="billingGate">
+              Billing profile is incomplete. Please fill required fields to proceed.
+            </div>
+          </div>
+
+          <!-- Step 4: Payment -->
+          <div class="wizard-step d-none" id="step4">
+            <h6 class="fw-bold mb-2">Payment</h6>
+            <div class="border rounded-3 p-3">
+              <div class="fw-semibold mb-2">Order summary</div>
+              <div class="row g-2 small">
+                <div class="col-4 text-secondary">Type</div><div class="col-8" id="sumType">—</div>
+                <div class="col-4 text-secondary">Devices</div><div class="col-8" id="sumDevices">—</div>
+                <div class="col-4 text-secondary">Tier</div><div class="col-8" id="sumTier">—</div>
+                <div class="col-4 text-secondary">Dates</div><div class="col-8" id="sumDates">—</div>
+                <div class="col-4 text-secondary">Billing</div><div class="col-8" id="sumBilling">—</div>
+                <div class="col-4 text-secondary">Estimated</div><div class="col-8 fw-semibold" id="sumCost">€—</div>
+              </div>
+            </div>
+
+            <div class="alert alert-info small mt-3">
+              Demo payment: clicking <strong>Pay & Activate</strong> will create the subscription in the grid and mark it Active (or Pending if invoiced).
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="me-auto small text-secondary" id="wizardHint"></div>
+          <button class="btn btn-outline-secondary" id="backBtn" type="button">Back</button>
+          <button class="btn btn-primary" id="nextBtn" type="button">Next</button>
+          <button class="btn btn-success d-none" id="payBtn" type="button">Pay & Activate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGE (DETAILS) MODAL -->
+  <div class="modal fade" id="manageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Subscription Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12 col-lg-7">
+              <div class="border rounded-3 p-3">
+                <div class="text-uppercase text-secondary small fw-semibold mb-2">Manage Subscription</div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Product</label>
+                  <input id="mProduct" class="form-control" disabled />
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Plan / Tier</label>
+                  <select id="mPlan" class="form-select">
+                    <option value="Tier 1">Tier 1</option>
+                    <option value="Tier 2">Tier 2</option>
+                    <option value="Tier 3">Tier 3</option>
+                    <option value="Custom">Custom</option>
+                  </select>
+                </div>
+
+              <div class="mb-3">
+                  <label class="form-label fw-semibold">Billing type</label>
+                  <select id="mBilling" class="form-select">
+                    <option value="Self Pay">Self Pay</option>
+                  </select>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-semibold">Start date</label>
+                    <input id="mStart" type="date" class="form-control"/>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-semibold">Expiry date</label>
+                    <input id="mExpiry" type="date" class="form-control"/>
+                  </div>
+                </div>
+
+              <!--  <div class="mt-3">
+                  <label class="form-label fw-semibold">Status</label>
+                  <select id="mStatus" class="form-select">
+                    <option value="Active">Active</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                    <option value="Expired">Expired</option>
+                  </select>-->
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-5">
+              <div class="border rounded-3 p-3 h-100">
+                <div class="text-uppercase text-secondary small fw-semibold mb-2">Quick actions</div>
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-outline-primary btn-sm" id="mRenew" type="button">Renew +1 year</button>
+                  <button class="btn btn-outline-primary btn-sm" id="mUpgrade" type="button">Upgrade tier</button>
+                  <button class="btn btn-outline-danger btn-sm" id="mCancel" type="button">Cancel</button>
+                </div>
+
+                <hr>
+                <button class="btn btn-outline-danger btn-sm" id="mDelete" type="button">Delete</button>
+
+                <div class="text-secondary small mt-3">
+                  Demo manage updates row values and saves when you click <em>Save</em>.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Close</button>
+          <button class="btn btn-primary" id="mSave" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Shared layout + page logic -->
+  <script src="./assets/layout.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
