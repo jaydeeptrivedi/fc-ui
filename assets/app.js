@@ -1,9 +1,9 @@
 // assets/app.js
 const seed = [
-  { product: "Client API", start: "2025-12-17", expiry: "2026-12-17", plan: "Tier 2", billing: "Self Pay", status: "Active", devices: ["device001", "device002"], billingProfile: { billName: "Example Customer", billEmail: "billing@example.com", billAddress: "Main Street 1, City, 12345", billCountry: "Austria", billVat: "", billMethod: "Self Pay" } },
-  { product: "Disease Model", start: "2024-05-08", expiry: "2026-05-08", plan: "Tier 2", billing: "Self Pay", status: "Active" },
-  { product: "FarmView with Satellite for 25 CropZones for 1 year", start: "2025-06-17", expiry: "2026-06-17", plan: "Tier 2", billing: "Self Pay", status: "Active" },
-  { product: "Weather Forecast", start: "2025-10-27", expiry: "2026-10-27", plan: "Tier 1", billing: "Self Pay", status: "Active" },
+  { product: "Client API", start: "2025-12-17", expiry: "2026-12-17", plan: "Tier 1", billing: "Self Pay", status: "Active", devices: ["device001", "device002"], billingProfile: { billName: "Example Customer", billEmail: "billing@example.com", billAddress: "Main Street 1, City, 12345", billCountry: "Austria", billVat: "", billMethod: "Self Pay" } },
+  { product: "Disease Model", start: "2024-05-08", expiry: "2026-05-08", plan: "Some Plan", billing: "Self Pay", status: "Active" },
+  { product: "FarmView with Satellite for 25 CropZones for 1 year", start: "2025-06-17", expiry: "2026-06-17", plan: "Some Plan", billing: "Self Pay", status: "Active" },
+  { product: "Weather Forecast", start: "2025-10-27", expiry: "2026-10-27", plan: "Some Plan", billing: "Self Pay", status: "Active" },
 ];
 
 // Mock user billing settings
@@ -86,6 +86,7 @@ function render() {
                     : row.status === "Pending" ? "text-bg-warning"
                     : row.status === "Cancelled" ? "text-bg-danger"
                     : "text-bg-secondary";
+    const isClientAPI = row.product && row.product.includes('Client API');
     return `
       <tr>
         <td>
@@ -98,7 +99,7 @@ function render() {
         <td>${escapeHtml(row.start)}</td>
         <td>${escapeHtml(row.expiry)}</td>
         <td class="text-end">
-          <button class="btn btn-primary btn-sm" type="button" data-action="details" data-idx="${idx}">DETAILS</button>
+          <button class="btn btn-primary btn-sm" type="button" data-action="details" data-idx="${idx}" ${!isClientAPI ? 'disabled' : ''}>MANAGE</button>
         </td>
       </tr>
     `;
