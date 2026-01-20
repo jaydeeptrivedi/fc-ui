@@ -521,7 +521,7 @@ function manageRenderStep() {
   // Hints
   const hints = {
     1: 'Review subscription and choose an action.',
-    2: manageWizard.mode === 'add-devices' ? 'Select devices to add.' : 'Choose new tier.',
+    2: manageWizard.mode === 'add-devices' ? 'Select devices to add.' : manageWizard.mode === 'upgrade-tier' ? 'Choose new tier.' : 'Review API quota usage for today.',
     3: 'Confirm billing details before payment.',
     4: 'Review changes and complete payment.'
   };
@@ -568,15 +568,18 @@ function manageRenderStep() {
       <div class="d-flex gap-2 pt-2 border-top">
         <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" id="manageActionAdd">Add devices</button>
         <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" id="manageActionUpgrade">Upgrade tier</button>
+        <button type="button" class="btn btn-outline-info btn-sm flex-grow-1" id="manageActionQuota">Check Quota</button>
         <button type="button" class="btn btn-outline-danger btn-sm" id="manageActionDelete">Delete</button>
       </div>
     `;
     
     const addBtn = document.getElementById('manageActionAdd');
     const upBtn = document.getElementById('manageActionUpgrade');
+    const quotaBtn = document.getElementById('manageActionQuota');
     const delBtn = document.getElementById('manageActionDelete');
     if (addBtn) addBtn.onclick = () => { manageWizard.mode = 'add-devices'; manageWizard.step = 2; manageRenderStep(); };
     if (upBtn) upBtn.onclick = () => { manageWizard.mode = 'upgrade-tier'; manageWizard.step = 2; manageRenderStep(); };
+    if (quotaBtn) quotaBtn.onclick = () => { manageWizard.mode = 'check-quota'; manageWizard.step = 2; manageRenderStep(); };
     if (delBtn) delBtn.onclick = () => {
       const ok = confirm(`Delete subscription "${sub.product}"? (demo only)`);
       if (ok) {
@@ -591,87 +594,136 @@ function manageRenderStep() {
     manageNextBtn.classList.add('d-none');
   }
 
-  // STEP 2: Action (Add devices OR Upgrade tier)
+  // STEP 2: Action (Add devices OR Upgrade tier OR Check Quota)
   if (manageWizard.step === 2) {
     const content = document.getElementById('manageActionContent');
     if (!content) return;
     
     content.innerHTML = '';
-    // Show Back and Next buttons on step 2
-    manageBackBtn.classList.remove('d-none');
-    manageNextBtn.classList.remove('d-none');
-    managePayBtn.classList.add('d-none');
+    
+    if (manageWizard.mode === 'check-quota') {
+      // Show Back button only for Quota view (no Next button)
+      manageBackBtn.classList.remove('d-none');
+      manageNextBtn.classList.add('d-none');
+      managePayBtn.classList.add('d-none');
+      
+      const tier = sub.plan || 'Tier 2';
+      const maxCallsPerDay = TIER_PRICES[tier] ? (tier === 'Tier 1' ? 48 : tier === 'Tier 2' ? 500 : 1500) : 500;
+      const devices = sub.devices || [];
+      
+      content.innerHTML = `
+        <h6 class="fw-bold mb-3">API Quota Usage</h6>
+        <div class="text-secondary small mb-3">Current usage for today (${isoDate(new Date())})</div>
+        <div id="quotaList" class="border rounded-3 p-3"></div>
+      `;
+      
+      const quotaList = document.getElementById('quotaList');
+      if (quotaList) {
+        devices.forEach(device => {
+          // Demo: random usage between 0 and 80% of max
+          const used = Math.floor(Math.random() * (maxCallsPerDay * 0.8));
+          const percentage = Math.round((used / maxCallsPerDay) * 100);
+          const progressBarClass = percentage > 80 ? 'bg-danger' : percentage > 50 ? 'bg-warning' : 'bg-success';
+          
+          const row = document.createElement('div');
+          row.className = 'mb-3 pb-3 border-bottom';
+          row.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="fw-semibold">${device}</div>
+              <div class="small text-secondary">${used} / ${maxCallsPerDay}</div>
+            </div>
+            <div class="progress" style="height: 8px;">
+              <div class="progress-bar ${progressBarClass}" role="progressbar" style="width: ${percentage}%;" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="small text-secondary mt-1">${percentage}% of daily limit used</div>
+          `;
+          quotaList.appendChild(row);
+        });
+      }
+    } else {
+      // Show Back and Next buttons on step 2 (for add-devices and upgrade-tier)
+      manageBackBtn.classList.remove('d-none');
+      manageNextBtn.classList.remove('d-none');
+      managePayBtn.classList.add('d-none');
 
-    if (manageWizard.mode === 'add-devices') {
-      content.innerHTML = `
-        <h6 class="fw-bold mb-2">Select devices to add</h6>
-        <div class="row g-3">
-          <div class="col-12">
-            <div class="border rounded-3 p-2">
-              <div id="manageDevicesList"></div>
+      if (manageWizard.mode === 'add-devices') {
+        content.innerHTML = `
+          <h6 class="fw-bold mb-2">Select devices to add</h6>
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="border rounded-3 p-2">
+                <div id="manageDevicesList"></div>
+              </div>
+              <div class="form-text">Select devices to add to this subscription (pro-rated for remaining term).</div>
             </div>
-            <div class="form-text">Select devices to add to this subscription (pro-rated for remaining term).</div>
-          </div>
-          <div class="col-12">
-            <div class="border rounded-3 p-3 bg-body-tertiary">
-              <div id="manageDevicesEstimate" class="text-secondary small"></div>
+            <div class="col-12">
+              <div class="border rounded-3 p-3 bg-body-tertiary">
+                <div id="manageDevicesEstimate" class="text-secondary small"></div>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-      const listEl = document.getElementById('manageDevicesList');
-      if (!listEl) return;
-      
-      const existing = sub.devices || [];
-      const checks = document.querySelectorAll('#step2 input[type="checkbox"]');
-      checks.forEach(ch => {
-        const isExisting = existing.includes(ch.value);
-        const div = document.createElement('div');
-        div.className = 'form-check';
-        div.innerHTML = `
-          <input class="form-check-input" type="checkbox" value="${ch.value}" id="manageDev_${ch.value}" ${isExisting ? 'checked disabled' : ''}>
-          <label class="form-check-label" for="manageDev_${ch.value}" style="${isExisting ? 'opacity:0.6;' : ''}">${ch.nextElementSibling?.textContent?.trim() || ch.value}</label>
         `;
-        listEl.appendChild(div);
-      });
-      
-      listEl.querySelectorAll('input[type="checkbox"]:not([disabled])').forEach(ch => {
-        ch.addEventListener('change', updateManageDevicesEstimate);
-      });
-      updateManageDevicesEstimate();
-    } else if (manageWizard.mode === 'upgrade-tier') {
-      content.innerHTML = `
-        <h6 class="fw-bold mb-2">Select new tier</h6>
-        <div class="row g-3">
-          <div class="col-12 col-md-6">
-            <label for="manageNewTier" class="form-label fw-semibold">Tier</label>
-            <select id="manageNewTier" class="form-select"></select>
-          </div>
-          <div class="col-12">
-            <div class="border rounded-3 p-3 bg-body-tertiary">
-              <div id="manageUpgradeEstimate" class="text-secondary small"></div>
+        const listEl = document.getElementById('manageDevicesList');
+        if (!listEl) return;
+        
+        const existing = sub.devices || [];
+        const checks = document.querySelectorAll('#step2 input[type="checkbox"]');
+        checks.forEach(ch => {
+          const isExisting = existing.includes(ch.value);
+          const div = document.createElement('div');
+          div.className = 'form-check';
+          div.innerHTML = `
+            <input class="form-check-input" type="checkbox" value="${ch.value}" id="manageDev_${ch.value}" ${isExisting ? 'checked disabled' : ''}>
+            <label class="form-check-label" for="manageDev_${ch.value}" style="${isExisting ? 'opacity:0.6;' : ''}">${ch.nextElementSibling?.textContent?.trim() || ch.value}</label>
+          `;
+          listEl.appendChild(div);
+        });
+        
+        listEl.querySelectorAll('input[type="checkbox"]:not([disabled])').forEach(ch => {
+          ch.addEventListener('change', updateManageDevicesEstimate);
+        });
+        updateManageDevicesEstimate();
+      } else if (manageWizard.mode === 'upgrade-tier') {
+        content.innerHTML = `
+          <h6 class="fw-bold mb-2">Select new tier</h6>
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label for="manageNewTier" class="form-label fw-semibold">Tier</label>
+              <select id="manageNewTier" class="form-select"></select>
+            </div>
+            <div class="col-12">
+              <div class="border rounded-3 p-3 bg-body-tertiary">
+                <div id="manageUpgradeEstimate" class="text-secondary small"></div>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-      const sel = document.getElementById('manageNewTier');
-      if (!sel) return;
-      
-      const currentTier = sub.plan || '';
-      Object.keys(TIER_PRICES).forEach(tier => {
-        const opt = document.createElement('option');
-        opt.value = tier;
-        opt.textContent = `${tier} (${TIER_PRICES[tier]} calls/day/device)`;
-        opt.selected = (tier === currentTier);
-        sel.appendChild(opt);
-      });
-      sel.addEventListener('change', updateManageUpgradeEstimate);
-      updateManageUpgradeEstimate();
+        `;
+        const sel = document.getElementById('manageNewTier');
+        if (!sel) return;
+        
+        const currentTier = sub.plan || '';
+        Object.keys(TIER_PRICES).forEach(tier => {
+          const opt = document.createElement('option');
+          opt.value = tier;
+          opt.textContent = `${tier} (${TIER_PRICES[tier]} calls/day/device)`;
+          opt.selected = (tier === currentTier);
+          sel.appendChild(opt);
+        });
+        sel.addEventListener('change', updateManageUpgradeEstimate);
+        updateManageUpgradeEstimate();
+      }
     }
   }
 
-  // STEP 3: Billing
+  // STEP 3: Billing (only for add-devices and upgrade-tier)
   if (manageWizard.step === 3) {
+    // Skip step 3 entirely for check-quota mode
+    if (manageWizard.mode === 'check-quota') {
+      manageWizard.step = 1;
+      manageRenderStep();
+      return;
+    }
+
     const info = document.getElementById('manageBillingInfo');
     const val = document.getElementById('manageBillingValidation');
     
@@ -728,8 +780,15 @@ function manageRenderStep() {
     }
   }
 
-  // STEP 4: Summary
+  // STEP 4: Summary (only for add-devices and upgrade-tier)
   if (manageWizard.step === 4) {
+    // Skip step 4 entirely for check-quota mode
+    if (manageWizard.mode === 'check-quota') {
+      manageWizard.step = 1;
+      manageRenderStep();
+      return;
+    }
+
     const sum = document.getElementById('manageSummary');
     if (!sum) return;
     
@@ -783,7 +842,7 @@ function manageRenderStep() {
     managePayBtn.classList.toggle('d-none', !showPay);
   }
 
-  // Back button disabled state (only on step 1, which is hidden anyway)
+  // Back button disabled state
   manageBackBtn.disabled = (manageWizard.step === 1);
 }
 
