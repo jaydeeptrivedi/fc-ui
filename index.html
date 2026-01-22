@@ -49,7 +49,8 @@
         </div>
 
         <div class="text-secondary small mt-3"> 
-          Demo notes: <i>Only API Subscription type and related flows are implemented in this demo. Other types are placeholders. <b>Delete</b> the existing API subscription via "Manage Modal > Delete Button" to test adding a new one.</i> 
+          Demo notes: <i>Only API Subscription type and related flows are implemented in this demo. Other types are placeholders. <b>Delete</b> the existing API subscription via "Manage Modal > Delete Button" to test adding a new one.
+          Promo codes <b>"EARLYBIRD15"</b> and <b>"SUMMER25"</b> give 15% and 25% discounts respectively.</i> 
         </div>
       </section>
     </div>
@@ -227,7 +228,30 @@
                 <div class="col-4 text-secondary">Tier</div><div class="col-8" id="sumTier">—</div>
                 <div class="col-4 text-secondary">Dates</div><div class="col-8" id="sumDates">—</div>
                 <div class="col-4 text-secondary">Billing</div><div class="col-8" id="sumBilling">—</div>
-                <div class="col-4 text-secondary">Estimated</div><div class="col-8 fw-semibold" id="sumCost">€—</div>
+                <div class="col-4 text-secondary">Subtotal</div><div class="col-8 fw-semibold" id="sumCost">€—</div>
+              </div>
+            </div>
+
+            <!-- Promo Code Section -->
+            <div class="row g-3 mt-3">
+              <div class="col-12 col-md-8">
+                <label for="promoCode" class="form-label fw-semibold">Promo code (optional)</label>
+                <input id="promoCode" class="form-control" type="text" placeholder="Enter promo code" autocomplete="off" />
+                <div class="form-text small">Enter a valid promo code to get a discount.</div>
+                <div id="promoError" class="alert alert-danger small mt-2 d-none"></div>
+                <div id="promoSuccess" class="alert alert-success small mt-2 d-none"></div>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold">&nbsp;</label>
+                <button type="button" class="btn btn-outline-primary w-100" id="applyPromoBtn">Apply</button>
+              </div>
+            </div>
+
+            <!-- Final Invoice -->
+            <div class="border rounded-3 p-3 mt-3 bg-body-tertiary">
+              <div class="row g-2 small">
+                <div class="col-6 text-secondary">Discount (promo)</div><div class="col-6 text-end" id="sumDiscount">€0.00</div>
+                <div class="col-6 fw-semibold">Total</div><div class="col-6 text-end fw-bold" id="sumFinalCost">€—</div>
               </div>
             </div>
 
@@ -292,6 +316,29 @@
           <div class="wizard-step d-none" id="manage-step-4">
             <h6 class="fw-bold mb-2">Review changes</h6>
             <div id="manageSummary"></div>
+
+            <!-- Promo Code Section -->
+            <div class="row g-3 mt-3">
+              <div class="col-12 col-md-8">
+                <label for="managePromoCode" class="form-label fw-semibold">Promo code (optional)</label>
+                <input id="managePromoCode" class="form-control" type="text" placeholder="Enter promo code" autocomplete="off" />
+                <div class="form-text small">Enter a valid promo code to get a discount on this update.</div>
+                <div id="managePromoError" class="alert alert-danger small mt-2 d-none"></div>
+                <div id="managePromoSuccess" class="alert alert-success small mt-2 d-none"></div>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold">&nbsp;</label>
+                <button type="button" class="btn btn-outline-primary w-100" id="manageApplyPromoBtn">Apply</button>
+              </div>
+            </div>
+
+            <!-- Final Invoice -->
+            <div class="border rounded-3 p-3 mt-3 bg-body-tertiary">
+              <div class="row g-2 small">
+                <div class="col-6 text-secondary">Discount (promo)</div><div class="col-6 text-end" id="manageDiscount">€0.00</div>
+                <div class="col-6 fw-semibold">Total</div><div class="col-6 text-end fw-bold" id="manageFinalCost">€—</div>
+              </div>
+            </div>
           </div>
         </div>
 

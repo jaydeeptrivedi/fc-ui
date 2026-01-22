@@ -201,6 +201,8 @@ function openWizard() {
 function resetWizard() {
   wizardStep = 1;
   selectedType = null;
+  currentPromoCode = null;
+  currentDiscount = 0;
 
   selectableCards().forEach(c => c.classList.remove("selected"));
   deviceChecks().forEach(ch => ch.checked = false);
@@ -209,6 +211,15 @@ function resetWizard() {
   apiStart.value = isoDate(today);
   apiEnd.value = isoDate(addYears(today, 1));
   apiTier.value = "Tier 2";
+  
+  // Clear promo code input and messages
+  const promoInput = document.getElementById('promoCode');
+  const promoError = document.getElementById('promoError');
+  const promoSuccess = document.getElementById('promoSuccess');
+  if (promoInput) promoInput.value = '';
+  if (promoError) promoError.classList.add('d-none');
+  if (promoSuccess) promoSuccess.classList.add('d-none');
+  
   updateEstimate();
 
   setStep(1);
@@ -339,7 +350,9 @@ function completePayment() {
       billCountry: billCountry.value,
       billVat: billVat.value,
       billMethod: billMethod.value
-    }
+    },
+    cost: Math.max(0, cost - (currentDiscount ? calculateDiscount(cost, currentDiscount) : 0)),
+    discountApplied: currentPromoCode || null
   });
 
   render();
@@ -353,6 +366,19 @@ const TIER_PRICES = {
   'Tier 3': 499
 };
 const DEVICE_PRICE = 30; // € per device annually
+
+// Promo codes database with discount percentages (0-100)
+const PROMO_CODES = {
+  'WELCOME10': { discount: 10, description: '10% off first subscription' },
+  'LAUNCH20': { discount: 20, description: '20% off all subscriptions' },
+  'EARLYBIRD15': { discount: 15, description: '15% early adopter discount' },
+  'SUMMER25': { discount: 25, description: '25% summer promotion' },
+  'SAVE30': { discount: 30, description: '30% special offer' }
+};
+
+// Track current promo code state
+let currentPromoCode = null;
+let currentDiscount = 0;
 
 function computeCost() {
   const tierSelect = document.getElementById('apiTier');
@@ -385,6 +411,94 @@ function computeCost() {
   };
 }
 
+// Promo code validation and discount functions
+function validatePromoCode(code) {
+  const upperCode = (code || '').trim().toUpperCase();
+  if (!upperCode) {
+    return { valid: false, message: 'Promo code cannot be empty.' };
+  }
+  if (!PROMO_CODES.hasOwnProperty(upperCode)) {
+    return { valid: false, message: `Promo code "${code}" is not valid.` };
+  }
+  const promo = PROMO_CODES[upperCode];
+  return { valid: true, code: upperCode, discount: promo.discount, description: promo.description, message: `✓ Promo code applied: ${promo.description}` };
+}
+
+function calculateDiscount(subtotal, discountPercent) {
+  return (subtotal * discountPercent) / 100;
+}
+
+function updateFinalCost(wizardMode = 'add', subtotalOverride = null) {
+  const promoInput = wizardMode === 'manage' ? document.getElementById('managePromoCode') : document.getElementById('promoCode');
+  const errorEl = wizardMode === 'manage' ? document.getElementById('managePromoError') : document.getElementById('promoError');
+  const successEl = wizardMode === 'manage' ? document.getElementById('managePromoSuccess') : document.getElementById('promoSuccess');
+  const discountEl = wizardMode === 'manage' ? document.getElementById('manageDiscount') : document.getElementById('sumDiscount');
+  const finalCostEl = wizardMode === 'manage' ? document.getElementById('manageFinalCost') : document.getElementById('sumFinalCost');
+
+  let subtotal = subtotalOverride !== null ? subtotalOverride : 0;
+  let discountAmount = 0;
+  let finalCost = 0;
+
+  if (subtotalOverride === null) {
+    if (wizardMode === 'manage') {
+      // For manage wizard, get the amount due from the summary
+      subtotal = manageWizard.selection.amountDue || 0;
+    } else {
+      // For add wizard, get cost from computeCost
+      const { total } = computeCost();
+      subtotal = total || 0;
+    }
+  }
+
+  // Calculate discount if promo code is set
+  if (currentPromoCode && currentDiscount > 0) {
+    discountAmount = calculateDiscount(subtotal, currentDiscount);
+  }
+
+  finalCost = Math.max(0, subtotal - discountAmount);
+
+  // Update UI
+  if (discountEl) discountEl.textContent = `€${discountAmount.toFixed(2)}`;
+  if (finalCostEl) finalCostEl.textContent = `€${finalCost.toFixed(2)}`;
+
+  // Store for later use
+  if (wizardMode === 'manage') {
+    manageWizard.selection.discount = discountAmount;
+    manageWizard.selection.finalCost = finalCost;
+  }
+}
+
+function applyPromoCodeToWizard(wizardMode = 'add') {
+  const promoInput = wizardMode === 'manage' ? document.getElementById('managePromoCode') : document.getElementById('promoCode');
+  const errorEl = wizardMode === 'manage' ? document.getElementById('managePromoError') : document.getElementById('promoError');
+  const successEl = wizardMode === 'manage' ? document.getElementById('managePromoSuccess') : document.getElementById('promoSuccess');
+
+  const code = promoInput?.value || '';
+  const result = validatePromoCode(code);
+
+  // Clear messages
+  if (errorEl) errorEl.classList.add('d-none');
+  if (successEl) successEl.classList.add('d-none');
+
+  if (!result.valid) {
+    if (errorEl) {
+      errorEl.textContent = result.message;
+      errorEl.classList.remove('d-none');
+    }
+    currentPromoCode = null;
+    currentDiscount = 0;
+  } else {
+    if (successEl) {
+      successEl.textContent = result.message;
+      successEl.classList.remove('d-none');
+    }
+    currentPromoCode = result.code;
+    currentDiscount = result.discount;
+  }
+
+  updateFinalCost(wizardMode);
+}
+
 // Type selection
 document.addEventListener("click", (e) => {
   const card = e.target.closest(".selectable");
@@ -414,9 +528,18 @@ backBtn?.addEventListener("click", () => { if (wizardStep > 1) setStep(wizardSte
 nextBtn?.addEventListener("click", () => {
   if (wizardStep === 1) { if (!selectedType) return; setStep(2); return; }
   if (wizardStep === 2) { setStep(3); return; }
-  if (wizardStep === 3) { if (!billingComplete()) return; buildSummary(); setStep(4); return; }
+  if (wizardStep === 3) { 
+    if (!billingComplete()) return; 
+    buildSummary(); 
+    updateFinalCost('add'); 
+    setStep(4); 
+    return; 
+  }
 });
 payBtn?.addEventListener("click", completePayment);
+
+// Promo code button for add wizard
+document.getElementById('applyPromoBtn')?.addEventListener('click', () => applyPromoCodeToWizard('add'));
 
 // Gating & estimate updates
 document.addEventListener("change", (e) => {
@@ -487,6 +610,19 @@ function openManageWizard(subId, mode) {
   manageWizard.mode = mode;
   manageWizard.subId = subId;
   manageWizard.selection = {};
+  
+  // Reset promo code state
+  currentPromoCode = null;
+  currentDiscount = 0;
+  
+  // Clear promo code input and messages
+  const managePromoInput = document.getElementById('managePromoCode');
+  const managePromoError = document.getElementById('managePromoError');
+  const managePromoSuccess = document.getElementById('managePromoSuccess');
+  if (managePromoInput) managePromoInput.value = '';
+  if (managePromoError) managePromoError.classList.add('d-none');
+  if (managePromoSuccess) managePromoSuccess.classList.add('d-none');
+  
   // show modal
   const modal = new bootstrap.Modal(manageModalEl);
   modal.show();
@@ -837,6 +973,9 @@ function manageRenderStep() {
     sum.innerHTML = html;
     manageWizard.selection.amountDue = amount;
     
+    // Initialize final cost display for manage wizard
+    updateFinalCost('manage');
+    
     // Show Pay button if amount > 0 (billing was already validated in step 3)
     const showPay = amount > 0;
     managePayBtn.classList.toggle('d-none', !showPay);
@@ -901,7 +1040,7 @@ manageNextBtn?.addEventListener('click', () => {
 managePayBtn?.addEventListener('click', () => {
   const sub = findSubscription(manageWizard.subId);
   if (!sub) return;
-  const amount = manageWizard.selection.amountDue || 0;
+  const amount = (manageWizard.selection.finalCost !== undefined) ? manageWizard.selection.finalCost : (manageWizard.selection.amountDue || 0);
   // simulate payment success
   // apply changes
   if (manageWizard.mode === 'add-devices') {
@@ -909,11 +1048,13 @@ managePayBtn?.addEventListener('click', () => {
     sub.devices = Array.from(new Set([...(sub.devices || []), ...toAdd]));
     // update cost stored on subscription if you store it
     sub.cost = (sub.cost || 0) + amount;
+    sub.discountApplied = currentPromoCode || null;
   } else if (manageWizard.mode === 'upgrade-tier') {
     const newTier = manageWizard.selection.newTier;
     if (newTier && newTier !== (sub.plan || sub.tier)) {
       sub.plan = newTier;
       sub.cost = (sub.cost || 0) + amount;
+      sub.discountApplied = currentPromoCode || null;
     }
   }
   // persist/save if you have persistence (localStorage) or call your existing save routine
@@ -930,6 +1071,9 @@ managePayBtn?.addEventListener('click', () => {
   bootstrap.Modal.getInstance(manageModalEl)?.hide();
   render();
 });
+
+// Promo code button for manage wizard
+document.getElementById('manageApplyPromoBtn')?.addEventListener('click', () => applyPromoCodeToWizard('manage'));
 
 // Expose helper to open manage wizard (wire existing manage row "DETAILS" buttons to call this)
 function openManageAddDevices(subId) { openManageWizard(subId, 'add-devices'); }
