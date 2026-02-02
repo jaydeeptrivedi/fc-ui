@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Your Profile - FC Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body class="bg-light">
+  <!-- Shared topbar -->
+  <div id="app-shell"></div>
+
+  <main class="container-fluid">
+    <div class="row min-vh-100">
+      <div class="col-12 d-flex align-items-center justify-content-center p-3">
+        <div class="w-100" style="max-width: 600px;">
+          
+          <!-- PROFILE COMPLETION WIZARD -->
+          <div class="card shadow-sm">
+            <div class="card-header bg-white">
+              <div>
+                <h5 class="card-title fw-bold mb-0">Complete Your Profile</h5>
+                <div class="text-secondary small">Verify and update your information</div>
+              </div>
+            </div>
+
+            <div class="card-body p-4">
+              <!-- Progress Steps -->
+              <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
+                <div class="stepchip" id="chip1">1. Category</div>
+                <div class="flex-grow-1 border-top"></div>
+                <div class="stepchip" id="chip2">2. Security</div>
+                <div class="flex-grow-1 border-top"></div>
+                <div class="stepchip" id="chip3">3. Location</div>
+              </div>
+
+              <!-- Step 1: Category & Focus -->
+              <div class="wizard-step" id="step1">
+                <h6 class="fw-bold mb-4">Verify Your Professional Profile</h6>
+                <p class="text-secondary small mb-3">Ensure your category and focus area are correct</p>
+                
+                <form id="form-step1">
+                  <div class="mb-3">
+                    <label for="profile-category" class="form-label fw-semibold">What Best Describes You *</label>
+                    <select class="form-select" id="profile-category" required>
+                      <option value="">Select a category</option>
+                      <option value="agriculture">Agriculture</option>
+                      <option value="technology">Technology</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="finance">Finance</option>
+                      <option value="retail">Retail</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="profile-focus" class="form-label fw-semibold">Focus Area *</label>
+                    <select class="form-select" id="profile-focus" required>
+                      <option value="">Select focus area</option>
+                      <option value="farmer">Farmer / Producer</option>
+                      <option value="consultant">Consultant</option>
+                      <option value="researcher">Researcher</option>
+                      <option value="business">Business Owner</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div id="step1-error" class="alert alert-danger small mb-3 d-none"></div>
+                </form>
+              </div>
+
+              <!-- Step 2: Password Strength -->
+              <div class="wizard-step" id="step2" style="display: none;">
+                <h6 class="fw-bold mb-4">Ensure Strong Password</h6>
+                <p class="text-secondary small mb-3">Update your password to meet security standards</p>
+                
+                <form id="form-step2">
+                  <div class="alert alert-info small mb-3">
+                    Update your password to ensure strong account security.
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="profile-password" class="form-label fw-semibold">New Password *</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" id="profile-password" placeholder="Enter new password" required />
+                      <button class="btn btn-outline-secondary" type="button" id="profile-toggle-password" title="Show password">👁️</button>
+                    </div>
+                  </div>
+
+                  <!-- Password Strength Guidelines -->
+                  <div id="password-strength" class="mb-4 p-3 border border-light-subtle rounded bg-light" style="display: none;">
+                    <div class="text-secondary small fw-semibold mb-3">Password Requirements</div>
+                    <div class="password-guideline d-flex align-items-center gap-2 mb-2">
+                      <span id="profile-check-length" class="badge bg-light text-dark fw-bold">✗</span>
+                      <span class="small">10 to 30 characters</span>
+                    </div>
+                    <div class="password-guideline d-flex align-items-center gap-2 mb-2">
+                      <span id="profile-check-upper" class="badge bg-light text-dark fw-bold">✗</span>
+                      <span class="small">One Uppercase Letter</span>
+                    </div>
+                    <div class="password-guideline d-flex align-items-center gap-2 mb-2">
+                      <span id="profile-check-lower" class="badge bg-light text-dark fw-bold">✗</span>
+                      <span class="small">One Lowercase Letter</span>
+                    </div>
+                    <div class="password-guideline d-flex align-items-center gap-2">
+                      <span id="profile-check-number" class="badge bg-light text-dark fw-bold">✗</span>
+                      <span class="small">One Number</span>
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label for="profile-confirm-password" class="form-label fw-semibold">Confirm Password *</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" id="profile-confirm-password" placeholder="Re-enter password" required />
+                      <button class="btn btn-outline-secondary" type="button" id="profile-toggle-confirm" title="Show password">👁️</button>
+                    </div>
+                  </div>
+
+                  <div id="step2-error" class="alert alert-danger small mb-3 d-none"></div>
+                </form>
+              </div>
+
+              <!-- Step 3: Location & Language -->
+              <div class="wizard-step" id="step3" style="display: none;">
+                <h6 class="fw-bold mb-4">Location & Language</h6>
+                <p class="text-secondary small mb-3">Confirm your location and preferred language</p>
+                
+                <form id="form-step3">
+                  <div class="mb-3">
+                    <label for="profile-country" class="form-label fw-semibold">Country *</label>
+                    <select class="form-select" id="profile-country" required>
+                      <option value="">Select country</option>
+                      <option value="austria">Austria</option>
+                      <option value="germany">Germany</option>
+                      <option value="france">France</option>
+                      <option value="italy">Italy</option>
+                      <option value="spain">Spain</option>
+                      <option value="uk">United Kingdom</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="profile-language" class="form-label fw-semibold">Language *</label>
+                    <select class="form-select" id="profile-language" required>
+                      <option value="">Select language</option>
+                      <option value="english">English</option>
+                      <option value="german">German</option>
+                      <option value="french">French</option>
+                      <option value="italian">Italian</option>
+                      <option value="spanish">Spanish</option>
+                    </select>
+                  </div>
+
+                  <div id="step3-error" class="alert alert-danger small mb-3 d-none"></div>
+                  <div id="step3-success" class="alert alert-success small mb-3 d-none"></div>
+                </form>
+              </div>
+            </div>
+
+            <div class="card-footer bg-white d-flex align-items-center justify-content-between">
+              <div class="small text-secondary" id="wizardHint"></div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary" id="backBtn" type="button" style="display: none;">Back</button>
+                <button class="btn btn-primary" id="nextBtn" type="button">Next</button>
+                <button class="btn btn-success d-none" id="submitBtn" type="button">Save Profile</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Auth utilities -->
+  <script src="./assets/auth.js"></script>
+
+  <!-- Shared layout -->
+  <script src="./assets/layout.js"></script>
+
+  <!-- Profile completion logic -->
+  <script>
+    let currentStep = 1;
+    let currentUser = null;
+    let updatedData = {};
+
+    document.addEventListener('DOMContentLoaded', function() {
+      currentUser = getCurrentUser();
+      
+      if (!currentUser) {
+        window.location.href = './signin.html';
+        return;
+      }
+
+      // Load current user data into form
+      loadCurrentData();
+
+      document.getElementById('nextBtn').addEventListener('click', handleNext);
+      document.getElementById('backBtn').addEventListener('click', handleBack);
+      document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+
+      // Password field listeners
+      document.getElementById('profile-password').addEventListener('input', function() {
+        const password = this.value;
+        if (password) {
+          document.getElementById('password-strength').style.display = 'block';
+          updatePasswordStrength();
+        } else {
+          document.getElementById('password-strength').style.display = 'none';
+        }
+      });
+
+      // Trigger initial update if password field has value (prefilled)
+      const profilePassword = document.getElementById('profile-password');
+      if (profilePassword && profilePassword.value) {
+        document.getElementById('password-strength').style.display = 'block';
+        updatePasswordStrength();
+      }
+
+      document.getElementById('profile-toggle-password').addEventListener('click', function() {
+        const input = document.getElementById('profile-password');
+        input.type = input.type === 'password' ? 'text' : 'password';
+        this.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
+      });
+
+      document.getElementById('profile-toggle-confirm').addEventListener('click', function() {
+        const input = document.getElementById('profile-confirm-password');
+        input.type = input.type === 'password' ? 'text' : 'password';
+        this.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
+      });
+
+      updateUI();
+    });
+
+    function loadCurrentData() {
+      document.getElementById('profile-category').value = currentUser.category || '';
+      document.getElementById('profile-focus').value = currentUser.focus || '';
+      document.getElementById('profile-country').value = currentUser.country || 'austria';
+      document.getElementById('profile-language').value = currentUser.language || 'english';
+    }
+
+    function updatePasswordStrength() {
+      const password = document.getElementById('profile-password').value;
+      
+      updateCheckmark('profile-check-length', password.length >= 10 && password.length <= 30);
+      updateCheckmark('profile-check-upper', /[A-Z]/.test(password));
+      updateCheckmark('profile-check-lower', /[a-z]/.test(password));
+      updateCheckmark('profile-check-number', /[0-9]/.test(password));
+    }
+
+    function updateCheckmark(id, isValid) {
+      const element = document.getElementById(id);
+      if (isValid) {
+        element.classList.remove('bg-light', 'text-dark');
+        element.classList.add('bg-success', 'text-white');
+        element.textContent = '✓';
+      } else {
+        element.classList.remove('bg-success', 'text-white');
+        element.classList.add('bg-light', 'text-dark');
+        element.textContent = '✗';
+      }
+    }
+
+    function handleNext() {
+      if (!validateStep(currentStep)) return;
+      
+      saveStepData();
+      currentStep++;
+      updateUI();
+    }
+
+    function handleBack() {
+      currentStep--;
+      updateUI();
+    }
+
+    function handleSubmit() {
+      if (!validateStep(currentStep)) return;
+      
+      saveStepData();
+      updateProfile();
+    }
+
+    function validateStep(step) {
+      const errorIds = ['step1-error', 'step2-error', 'step3-error'];
+      if (errorIds[step - 1]) {
+        document.getElementById(errorIds[step - 1]).classList.add('d-none');
+      }
+
+      if (step === 1) {
+        const category = document.getElementById('profile-category').value;
+        const focus = document.getElementById('profile-focus').value;
+
+        if (!category || !focus) {
+          showError('step1', 'Please select both category and focus area');
+          return false;
+        }
+        return true;
+      }
+
+      if (step === 2) {
+        const password = document.getElementById('profile-password').value;
+        const confirm = document.getElementById('profile-confirm-password').value;
+
+        // Both fields are required
+        if (!password || !confirm) {
+          showError('step2', 'Please fill both password fields');
+          return false;
+        }
+
+        if (password.length < 10 || password.length > 30) {
+          showError('step2', 'Password must be 10-30 characters');
+          return false;
+        }
+
+        if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+          showError('step2', 'Password must include uppercase, lowercase, and number');
+          return false;
+        }
+
+        if (password !== confirm) {
+          showError('step2', 'Passwords do not match');
+          return false;
+        }
+        return true;
+      }
+
+      if (step === 3) {
+        const country = document.getElementById('profile-country').value;
+        const language = document.getElementById('profile-language').value;
+
+        if (!country || !language) {
+          showError('step3', 'Please select both country and language');
+          return false;
+        }
+        return true;
+      }
+
+      return true;
+    }
+
+    function saveStepData() {
+      if (currentStep === 1) {
+        updatedData.category = document.getElementById('profile-category').value;
+        updatedData.focus = document.getElementById('profile-focus').value;
+      } else if (currentStep === 2) {
+        const password = document.getElementById('profile-password').value;
+        updatedData.password = password;
+      } else if (currentStep === 3) {
+        updatedData.country = document.getElementById('profile-country').value;
+        updatedData.language = document.getElementById('profile-language').value;
+      }
+    }
+
+    function updateProfile() {
+      // Update current user in storage
+      const users = JSON.parse(localStorage.getItem('fc_users')) || [];
+      const userIndex = users.findIndex(u => u.id === currentUser.id);
+
+      if (userIndex > -1) {
+        users[userIndex] = { ...users[userIndex], ...updatedData };
+        localStorage.setItem('fc_users', JSON.stringify(users));
+        localStorage.setItem('fc_currentUser', JSON.stringify(users[userIndex]));
+
+        document.getElementById('step3-success').textContent = 'Profile updated successfully! Redirecting to dashboard...';
+        document.getElementById('step3-success').classList.remove('d-none');
+
+        setTimeout(() => {
+          window.location.href = './index.html';
+        }, 2000);
+      }
+    }
+
+    function updateUI() {
+      // Hide all steps
+      document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
+      document.getElementById(`step${currentStep}`).style.display = 'block';
+
+      // Update chips
+      for (let i = 1; i <= 3; i++) {
+        const chip = document.getElementById(`chip${i}`);
+        chip.classList.remove('active');
+        if (i < currentStep) {
+          chip.classList.add('bg-success', 'text-white');
+        } else if (i === currentStep) {
+          chip.classList.add('bg-primary', 'text-white');
+        } else {
+          chip.classList.remove('bg-success', 'bg-primary', 'text-white');
+        }
+      }
+
+      // Update buttons
+      document.getElementById('backBtn').style.display = currentStep > 1 ? 'block' : 'none';
+      document.getElementById('nextBtn').style.display = currentStep < 3 ? 'block' : 'none';
+      document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 3);
+
+      // Update hints
+      const hints = ['Verify your professional profile', 'Ensure account security', 'Set your location and language'];
+      document.getElementById('wizardHint').textContent = hints[currentStep - 1];
+    }
+
+    function showError(step, message) {
+      const errorEl = document.getElementById(`${step}-error`);
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.classList.remove('d-none');
+      }
+    }
+  </script>
+</body>
+</html>

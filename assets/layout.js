@@ -16,18 +16,22 @@ function seedDemoData() {
         username: 'janedoe_admin',
         password: 'SecurePass123',
         type: 'organization',
+        category: 'agriculture',
+        focus: 'farmer',
+        country: 'austria',
+        language: 'english',
         organization: {
           name: 'abc Corporation',
-          website: 'https://abc.example.com',
-          industry: 'technology',
-          companySize: '11-50'
+          category: 'agriculture',
+          focus: 'farmer'
         },
         primaryContact: {
           firstName: 'Jane',
           lastName: 'Doe',
           email: 'jane.doe@abc.com',
           username: 'janedoe_admin',
-          phone: '+1 (555) 123-4567'
+          country: 'austria',
+          language: 'english'
         },
         role: 'admin',
         createdAt: new Date().toISOString(),
@@ -41,6 +45,10 @@ function seedDemoData() {
         username: 'johnsmith_dev',
         password: 'Password123',
         type: 'individual',
+        category: 'agriculture',
+        focus: 'farmer',
+        country: 'austria',
+        language: 'english',
         createdAt: new Date().toISOString(),
         isVerified: true
       }

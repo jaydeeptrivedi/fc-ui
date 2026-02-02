@@ -21,218 +21,219 @@
             <div class="card-header bg-white">
               <div>
                 <h5 class="card-title fw-bold mb-0">Create Account</h5>
-                <div class="text-secondary small">Choose your account type and complete registration</div>
+                <div class="text-secondary small">Complete your registration in 4 simple steps</div>
               </div>
             </div>
 
             <div class="card-body p-4">
               <!-- Progress Steps -->
               <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
-                <div class="stepchip" id="chip1">1. Type</div>
+                <div class="stepchip" id="chip1">1. Category</div>
                 <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip2">2. Details</div>
+                <div class="stepchip" id="chip2">2. Password</div>
                 <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip3">3. Confirm</div>
+                <div class="stepchip" id="chip3">3. Details</div>
+                <div class="flex-grow-1 border-top"></div>
+                <div class="stepchip" id="chip4">4. Terms</div>
               </div>
 
-              <!-- Step 1: Account Type Selection -->
+              <!-- Step 1: Category & Account Type -->
               <div class="wizard-step" id="step1">
-                <h6 class="fw-bold mb-3">Choose account type</h6>
-                <div class="row g-3">
-                  <div class="col-12 col-md-6">
-                    <div class="card h-100 selectable" data-regtype="individual">
-                      <div class="card-body text-center">
-                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">👤</div>
-                        <h6 class="fw-bold">Individual</h6>
-                        <p class="text-secondary small mb-0">For individual users & customers</p>
-                      </div>
-                    </div>
+                <h6 class="fw-bold mb-4">Tell Us About Yourself</h6>
+                <p class="text-secondary small mb-3">Select the Category and Focus that best fits how you work</p>
+                
+                <form id="form-step1">
+                  <div class="mb-3">
+                    <label for="category" class="form-label fw-semibold">What Best Describes You *</label>
+                    <select class="form-select" id="category" required>
+                      <option value="">Select a category</option>
+                      <option value="agriculture">Agriculture</option>
+                      <option value="technology">Technology</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="finance">Finance</option>
+                      <option value="retail">Retail</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
-                  <div class="col-12 col-md-6">
-                    <div class="card h-100 selectable" data-regtype="organization">
-                      <div class="card-body text-center">
-                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🏢</div>
-                        <h6 class="fw-bold">Organization</h6>
-                        <p class="text-secondary small mb-0">For organisations & companies</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              <!-- Step 2: Details (Individual) -->
-              <div class="wizard-step d-none" id="step2-individual">
-                <div class="alert alert-info small mb-3">
-                  <strong>📧 Email Verification Required</strong><br/>
-                  A verification link will be sent to your email address. You must verify your email after completing registration to sign in successfully.
-                </div>
-                <h6 class="fw-bold mb-3">Personal Information</h6>
-                <form id="form-individual">
-                  <div class="row g-3">
-                    <div class="col-12 col-md-6">
-                      <label for="indiv-firstName" class="form-label fw-semibold">First Name *</label>
-                      <input type="text" class="form-control" id="indiv-firstName" placeholder="John" required />
-                    </div>
-                    <div class="col-12 col-md-6">
-                      <label for="indiv-lastName" class="form-label fw-semibold">Last Name *</label>
-                      <input type="text" class="form-control" id="indiv-lastName" placeholder="Doe" required />
-                    </div>
-                    <div class="col-12">
-                      <label for="indiv-email" class="form-label fw-semibold">Email Address *</label>
-                      <input type="email" class="form-control" id="indiv-email" placeholder="john@example.com" required />
-                    </div>
-                    <div class="col-12">
-                      <label for="indiv-username" class="form-label fw-semibold">Username *</label>
-                      <input type="text" class="form-control" id="indiv-username" placeholder="Choose a unique username" required />
-                      <div class="form-text">3-20 characters, letters, numbers, and underscores only</div>
-                    </div>
-                    <div class="col-12">
-                      <label for="indiv-password" class="form-label fw-semibold">Password *</label>
-                      <input type="password" class="form-control" id="indiv-password" placeholder="Min 8 chars, 1 uppercase, 1 lowercase, 1 number" required />
-                      <div class="form-text">Must be at least 8 characters with uppercase, lowercase, and numbers</div>
-                    </div>
-                    <div class="col-12">
-                      <label for="indiv-confirmPassword" class="form-label fw-semibold">Confirm Password *</label>
-                      <input type="password" class="form-control" id="indiv-confirmPassword" placeholder="Re-enter your password" required />
-                    </div>
+                  <div class="mb-3">
+                    <label for="focus" class="form-label fw-semibold">Focus Area *</label>
+                    <select class="form-select" id="focus" required>
+                      <option value="">Select focus area</option>
+                      <option value="farmer">Farmer / Producer</option>
+                      <option value="consultant">Consultant</option>
+                      <option value="researcher">Researcher</option>
+                      <option value="business">Business Owner</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
+
+                  <div class="mb-3">
+                    <label for="step1-username" class="form-label fw-semibold">Username *</label>
+                    <input type="text" class="form-control" id="step1-username" placeholder="choose_your_username" required />
+                    <div class="form-text">3-20 characters, letters, numbers, and underscores only</div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="step1-email" class="form-label fw-semibold">Email Address *</label>
+                    <input type="email" class="form-control" id="step1-email" placeholder="your@email.com" required />
+                    <div class="form-text">We'll send a verification link to this email address</div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="accountType" class="form-label fw-semibold">Account Type *</label>
+                    <select class="form-select" id="accountType" required>
+                      <option value="">Select account type</option>
+                      <option value="individual">Individual User</option>
+                      <option value="organization">Organization</option>
+                    </select>
+                  </div>
+
+                  <div id="step1-error" class="alert alert-danger small mb-3 d-none"></div>
                 </form>
               </div>
 
-              <!-- Step 2: Details (Organization) -->
-              <div class="wizard-step d-none" id="step2-organization">
-                <div class="alert alert-info small mb-3">
-                  <strong>📧 Email Verification Required</strong><br/>
-                  A verification link will be sent to the primary contact's email. Email verification is required after registration to sign in successfully.
-                </div>
-                <h6 class="fw-bold mb-3">Organization Information</h6>
-                <form id="form-organization">
-                  <div class="row g-3">
-                    <div class="col-12">
-                      <label for="org-name" class="form-label fw-semibold">Organization Name *</label>
-                      <input type="text" class="form-control" id="org-name" placeholder="abc Corporation" required />
-                    </div>
-                    <div class="col-12">
-                      <label for="org-website" class="form-label fw-semibold">Website *</label>
-                      <input type="url" class="form-control" id="org-website" placeholder="https://example.com" required />
-                    </div>
-                    <div class="col-12 col-md-6">
-                      <label for="org-industry" class="form-label fw-semibold">Industry *</label>
-                      <select class="form-select" id="org-industry" required>
-                        <option value="">-- Select Industry --</option>
-                        <option value="technology">Technology</option>
-                        <option value="finance">Finance</option>
-                        <option value="healthcare">Healthcare</option>
-                        <option value="retail">Retail</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-                    <div class="col-12 col-md-6">
-                      <label for="org-size" class="form-label fw-semibold">Company Size *</label>
-                      <select class="form-select" id="org-size" required>
-                        <option value="">-- Select Size --</option>
-                        <option value="1-10">1-10 employees</option>
-                        <option value="11-50">11-50 employees</option>
-                        <option value="51-200">51-200 employees</option>
-                        <option value="201+">201+ employees</option>
-                      </select>
+              <!-- Step 2: Password -->
+              <div class="wizard-step" id="step2" style="display: none;">
+                <h6 class="fw-bold mb-4">Create Password</h6>
+                
+                <form id="form-step2">
+                  <div class="mb-3">
+                    <label for="step2-password" class="form-label fw-semibold">Password *</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" id="step2-password" placeholder="Enter password" required />
+                      <button class="btn btn-outline-secondary" type="button" id="step2-toggle-password" title="Show password">👁️</button>
                     </div>
                   </div>
 
-                  <h6 class="fw-bold mt-4 mb-3">Primary Contact</h6>
-                  <div class="row g-3">
-                    <div class="col-12 col-md-6">
-                      <label for="org-contactFirstName" class="form-label fw-semibold">First Name *</label>
-                      <input type="text" class="form-control" id="org-contactFirstName" placeholder="Jane" required />
-                    </div>
-                    <div class="col-12 col-md-6">
-                      <label for="org-contactLastName" class="form-label fw-semibold">Last Name *</label>
-                      <input type="text" class="form-control" id="org-contactLastName" placeholder="Smith" required />
-                    </div>
-                    <div class="col-12">
-                      <label for="org-contactEmail" class="form-label fw-semibold">Email Address *</label>
-                      <input type="email" class="form-control" id="org-contactEmail" placeholder="jane@company.com" required />
-                    </div>
-                    <div class="col-12">
-                      <label for="org-username" class="form-label fw-semibold">Username *</label>
-                      <input type="text" class="form-control" id="org-username" placeholder="Choose a unique username" required />
-                      <div class="form-text">3-20 characters, letters, numbers, and underscores only</div>
-                    </div>
-                    <div class="col-12">
-                      <label for="org-contactPhone" class="form-label fw-semibold">Phone Number *</label>
-                      <input type="tel" class="form-control" id="org-contactPhone" placeholder="+1 (555) 123-4567" required />
-                    </div>
-                    <div class="col-12">
-                      <label for="org-password" class="form-label fw-semibold">Password *</label>
-                      <input type="password" class="form-control" id="org-password" placeholder="Min 8 chars, 1 uppercase, 1 lowercase, 1 number" required />
-                      <div class="form-text">Must be at least 8 characters with uppercase, lowercase, and numbers</div>
-                    </div>
-                    <div class="col-12">
-                      <label for="org-confirmPassword" class="form-label fw-semibold">Confirm Password *</label>
-                      <input type="password" class="form-control" id="org-confirmPassword" placeholder="Re-enter your password" required />
+                  <div class="mb-4">
+                    <label for="step2-confirm-password" class="form-label fw-semibold">Confirm Password *</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" id="step2-confirm-password" placeholder="Confirm password" required />
+                      <button class="btn btn-outline-secondary" type="button" id="step2-toggle-confirm" title="Show password">👁️</button>
                     </div>
                   </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div id="password-strength" class="mb-3">
+                        <div class="text-secondary small fw-semibold mb-2">Password Guidelines</div>
+                        <div class="password-guideline d-flex align-items-center gap-2 mb-2">
+                          <span id="check-length" class="badge bg-light text-dark">✗</span>
+                          <span class="small">10 to 30 characters</span>
+                        </div>
+                        <div class="password-guideline d-flex align-items-center gap-2 mb-2">
+                          <span id="check-upper" class="badge bg-light text-dark">✗</span>
+                          <span class="small">One Uppercase Letter</span>
+                        </div>
+                        <div class="password-guideline d-flex align-items-center gap-2 mb-2">
+                          <span id="check-lower" class="badge bg-light text-dark">✗</span>
+                          <span class="small">One Lowercase Letter</span>
+                        </div>
+                        <div class="password-guideline d-flex align-items-center gap-2">
+                          <span id="check-number" class="badge bg-light text-dark">✗</span>
+                          <span class="small">One Number</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="step2-error" class="alert alert-danger small mb-3 d-none"></div>
                 </form>
               </div>
 
-              <!-- Step 3: Review (Individual) -->
-              <div class="wizard-step d-none" id="step3-individual">
-                <h6 class="fw-bold mb-3">Review Your Information</h6>
-                <div class="border rounded-3 p-3 bg-body-tertiary">
-                  <div class="row g-2 small">
-                    <div class="col-4 text-secondary">Name</div><div class="col-8 fw-semibold" id="review-indiv-name">—</div>
-                    <div class="col-4 text-secondary">Email</div><div class="col-8" id="review-indiv-email">—</div>
+              <!-- Step 3: Personal Details -->
+              <div class="wizard-step" id="step3" style="display: none;">
+                <h6 class="fw-bold mb-4">Personal Details</h6>
+                
+                <form id="form-step3">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="step3-firstName" class="form-label fw-semibold">First Name *</label>
+                      <input type="text" class="form-control" id="step3-firstName" placeholder="John" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="step3-lastName" class="form-label fw-semibold">Last Name *</label>
+                      <input type="text" class="form-control" id="step3-lastName" placeholder="Doe" required />
+                    </div>
                   </div>
-                </div>
 
-                <div class="form-check mt-3">
-                  <input class="form-check-input" type="checkbox" id="indiv-terms" required />
-                  <label class="form-check-label" for="indiv-terms">
-                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a> *
-                  </label>
-                </div>
+                  <div class="mb-3">
+                    <label for="step3-country" class="form-label fw-semibold">Country *</label>
+                    <select class="form-select" id="step3-country" required>
+                      <option value="austria" selected>Austria</option>
+                      <option value="germany">Germany</option>
+                      <option value="france">France</option>
+                      <option value="italy">Italy</option>
+                      <option value="spain">Spain</option>
+                      <option value="uk">United Kingdom</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
 
-                <div id="indiv-error" class="alert alert-danger small mt-3 d-none"></div>
-                <div id="indiv-success" class="alert alert-success small mt-3 d-none"></div>
+                  <div class="mb-3">
+                    <label for="step3-language" class="form-label fw-semibold">Language *</label>
+                    <select class="form-select" id="step3-language" required>
+                      <option value="english" selected>English</option>
+                      <option value="german">German</option>
+                      <option value="french">French</option>
+                      <option value="italian">Italian</option>
+                      <option value="spanish">Spanish</option>
+                    </select>
+                  </div>
+
+                  <div id="step3-error" class="alert alert-danger small mb-3 d-none"></div>
+                </form>
               </div>
 
-              <!-- Step 3: Review (Organization) -->
-              <div class="wizard-step d-none" id="step3-organization">
-                <h6 class="fw-bold mb-3">Review Your Information</h6>
-                <div class="border rounded-3 p-3 bg-body-tertiary">
-                  <div class="row g-2 small mb-3">
-                    <div class="col-4 text-secondary">Organization</div><div class="col-8 fw-semibold" id="review-org-name">—</div>
-                    <div class="col-4 text-secondary">Contact</div><div class="col-8" id="review-org-contact">—</div>
-                    <div class="col-4 text-secondary">Email</div><div class="col-8" id="review-org-email">—</div>
+              <!-- Step 4: Terms & Conditions -->
+              <div class="wizard-step" id="step4" style="display: none;">
+                <h6 class="fw-bold mb-4">Terms & Conditions</h6>
+                
+                <form id="form-step4">
+                  <div class="alert alert-light border mb-4 p-3" style="max-height: 250px; overflow-y: auto;">
+                    <h6 class="fw-bold mb-2">FC Platform Terms & Conditions</h6>
+                    <p class="small mb-2"><strong>1. Acceptance of Terms</strong><br>By creating an account, you agree to these terms and conditions.</p>
+                    <p class="small mb-2"><strong>2. User Responsibilities</strong><br>You are responsible for maintaining the confidentiality of your account credentials.</p>
+                    <p class="small mb-2"><strong>3. Usage Policy</strong><br>You agree to use this platform in compliance with all applicable laws and regulations.</p>
+                    <p class="small mb-2"><strong>4. Data Privacy</strong><br>Your personal data will be processed according to our privacy policy.</p>
+                    <p class="small"><strong>5. Limitation of Liability</strong><br>The FC Platform is provided "as is" without warranties of any kind.</p>
                   </div>
-                </div>
 
-                <div class="form-check mt-3">
-                  <input class="form-check-input" type="checkbox" id="org-terms" required />
-                  <label class="form-check-label" for="org-terms">
-                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a> *
-                  </label>
-                </div>
+                  <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="step4-terms" required />
+                    <label class="form-check-label" for="step4-terms">
+                      I have read and agree to the Terms & Conditions
+                    </label>
+                  </div>
 
-                <div id="org-error" class="alert alert-danger small mt-3 d-none"></div>
-                <div id="org-success" class="alert alert-success small mt-3 d-none"></div>
+                  <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" id="step4-privacy" required />
+                    <label class="form-check-label" for="step4-privacy">
+                      I agree to the Privacy Policy
+                    </label>
+                  </div>
+
+                  <div id="step4-error" class="alert alert-danger small mb-3 d-none"></div>
+                  <div id="step4-success" class="alert alert-success small mb-3 d-none"></div>
+                </form>
               </div>
             </div>
 
             <div class="card-footer bg-white d-flex align-items-center justify-content-between">
               <div class="small text-secondary" id="wizardHint"></div>
               <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary" id="backBtn" type="button">Back</button>
+                <button class="btn btn-outline-secondary" id="backBtn" type="button" style="display: none;">Back</button>
                 <button class="btn btn-primary" id="nextBtn" type="button">Next</button>
-                <button class="btn btn-success d-none" id="registerBtn" type="button">Create Account</button>
+                <button class="btn btn-success d-none" id="submitBtn" type="button">Complete Registration</button>
               </div>
             </div>
           </div>
 
           <div class="text-center small text-secondary mt-3">
-            Already have an account? <a href="./signin.html" class="fw-semibold">Sign in here</a>
+            <p class="mb-2">Already have an account?</p>
+            <a href="./signin.html" class="text-decoration-none">Sign in here</a>
           </div>
-
         </div>
       </div>
     </div>
@@ -241,277 +242,256 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Shared layout -->
-  <script src="./assets/layout.js"></script>
-
   <!-- Auth utilities -->
   <script src="./assets/auth.js"></script>
 
-  <!-- Registration wizard logic -->
+  <!-- Shared layout -->
+  <script src="./assets/layout.js"></script>
+
+  <!-- Registration logic -->
   <script>
     let currentStep = 1;
-    let selectedType = null;
+    let formData = {};
 
     document.addEventListener('DOMContentLoaded', function() {
-      initializeWizard();
-    });
+      document.getElementById('nextBtn').addEventListener('click', handleNext);
+      document.getElementById('backBtn').addEventListener('click', handleBack);
+      document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+      
+      // Add password strength listener
+      const passwordInput = document.getElementById('step2-password');
+      if (passwordInput) {
+        passwordInput.addEventListener('input', updatePasswordStrength);
+      }
 
-    function initializeWizard() {
-      const typeCards = document.querySelectorAll('[data-regtype]');
-      const backBtn = document.getElementById('backBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const registerBtn = document.getElementById('registerBtn');
-
-      // Type selection
-      typeCards.forEach(card => {
-        card.addEventListener('click', function() {
-          typeCards.forEach(c => c.classList.remove('selected'));
-          this.classList.add('selected');
-          selectedType = this.dataset.regtype;
-        });
+      // Password visibility toggles
+      document.getElementById('step2-toggle-password').addEventListener('click', function() {
+        const input = document.getElementById('step2-password');
+        input.type = input.type === 'password' ? 'text' : 'password';
+        this.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
       });
 
-      backBtn.addEventListener('click', previousStep);
-      nextBtn.addEventListener('click', nextStep);
-      registerBtn.addEventListener('click', submitRegistration);
+      document.getElementById('step2-toggle-confirm').addEventListener('click', function() {
+        const input = document.getElementById('step2-confirm-password');
+        input.type = input.type === 'password' ? 'text' : 'password';
+        this.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
+      });
 
-      updateWizardUI();
+      prefillDemoData();
+      updateUI();
+    });
+
+    function prefillDemoData() {
+      document.getElementById('category').value = 'agriculture';
+      document.getElementById('focus').value = 'farmer';
+      document.getElementById('step1-username').value = 'johnsmith_dev';
+      document.getElementById('step1-email').value = 'john.smith@example.com';
+      document.getElementById('accountType').value = 'individual';
+      
+      document.getElementById('step2-password').value = 'Password123';
+      document.getElementById('step2-confirm-password').value = 'Password123';
+      
+      document.getElementById('step3-firstName').value = 'John';
+      document.getElementById('step3-lastName').value = 'Smith';
+      document.getElementById('step3-country').value = 'austria';
+      document.getElementById('step3-language').value = 'english';
+      
+      // Update password strength display for prefilled password
+      updatePasswordStrength();
     }
 
-    function nextStep() {
-      if (validateCurrentStep()) {
-        if (currentStep === 1 && !selectedType) {
-          alert('Please select an account type');
-          return;
-        }
-        
-        if (currentStep === 2) {
-          populateReview();
-        }
-        
-        currentStep++;
-        updateWizardUI();
-        
-        // Prefill forms on step 2
-        if (currentStep === 2) {
-          prefillForm();
-        }
+    function updatePasswordStrength() {
+      const password = document.getElementById('step2-password').value;
+      
+      updateCheckmark('check-length', password.length >= 10 && password.length <= 30);
+      updateCheckmark('check-upper', /[A-Z]/.test(password));
+      updateCheckmark('check-lower', /[a-z]/.test(password));
+      updateCheckmark('check-number', /[0-9]/.test(password));
+    }
+
+    function updateCheckmark(id, isValid) {
+      const element = document.getElementById(id);
+      if (isValid) {
+        element.classList.remove('bg-light', 'text-dark');
+        element.classList.add('bg-success', 'text-white');
+        element.textContent = '✓';
+      } else {
+        element.classList.remove('bg-success', 'text-white');
+        element.classList.add('bg-light', 'text-dark');
+        element.textContent = '✗';
       }
     }
 
-    function previousStep() {
-      if (currentStep > 1) {
-        currentStep--;
-        updateWizardUI();
-      }
+    function handleNext() {
+      if (!validateStep(currentStep)) return;
+      
+      saveStepData();
+      currentStep++;
+      updateUI();
     }
 
-    function validateCurrentStep() {
-      if (currentStep === 1) return true;
-      
-      const formId = selectedType === 'individual' ? 'form-individual' : 'form-organization';
-      const form = document.getElementById(formId);
-      
-      if (!form) return true;
-      
-      const inputs = form.querySelectorAll('input[required], select[required]');
-      for (let input of inputs) {
-        if (!input.value) {
-          alert(`Please fill in all required fields`);
+    function handleBack() {
+      currentStep--;
+      updateUI();
+    }
+
+    function handleSubmit() {
+      if (!document.getElementById('step4-terms').checked || !document.getElementById('step4-privacy').checked) {
+        showError('step4', 'You must accept both terms and privacy policy');
+        return;
+      }
+
+      saveStepData();
+      submitRegistration();
+    }
+
+    function validateStep(step) {
+      const errorIds = ['step1-error', 'step2-error', 'step3-error'];
+      if (errorIds[step - 1]) {
+        document.getElementById(errorIds[step - 1]).classList.add('d-none');
+      }
+
+      if (step === 1) {
+        const category = document.getElementById('category').value;
+        const focus = document.getElementById('focus').value;
+        const username = document.getElementById('step1-username').value.trim();
+        const email = document.getElementById('step1-email').value.trim();
+        const accountType = document.getElementById('accountType').value;
+
+        if (!category || !focus || !username || !email || !accountType) {
+          showError('step1', 'All fields are required');
           return false;
         }
-        
-        if (input.type === 'email' && !isValidEmail(input.value)) {
-          alert('Please enter a valid email address');
+
+        if (!isValidUsername(username)) {
+          showError('step1', 'Username must be 3-20 characters (letters, numbers, underscores only)');
           return false;
         }
+
+        if (!isValidEmail(email)) {
+          showError('step1', 'Please enter a valid email address');
+          return false;
+        }
+        return true;
       }
-      
-      // Validate passwords match
-      const passwordField = form.querySelector('input[id$="-password"]');
-      const confirmField = form.querySelector('input[id$="-confirmPassword"]');
-      
-      if (passwordField && confirmField && passwordField.value !== confirmField.value) {
-        alert('Passwords do not match');
-        return false;
+
+      if (step === 2) {
+        const password = document.getElementById('step2-password').value;
+        const confirm = document.getElementById('step2-confirm-password').value;
+
+        if (!password || !confirm) {
+          showError('step2', 'Both password fields are required');
+          return false;
+        }
+
+        if (password.length < 10 || password.length > 30) {
+          showError('step2', 'Password must be 10-30 characters');
+          return false;
+        }
+
+        if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+          showError('step2', 'Password must include uppercase, lowercase, and number');
+          return false;
+        }
+
+        if (password !== confirm) {
+          showError('step2', 'Passwords do not match');
+          return false;
+        }
+        return true;
       }
-      
-      if (passwordField && !isValidPassword(passwordField.value)) {
-        alert('Password must be at least 8 characters with uppercase, lowercase, and numbers');
-        return false;
+
+      if (step === 3) {
+        const firstName = document.getElementById('step3-firstName').value;
+        const lastName = document.getElementById('step3-lastName').value;
+
+        if (!firstName || !lastName) {
+          showError('step3', 'First and last names are required');
+          return false;
+        }
+        return true;
       }
-      
+
       return true;
     }
 
-    function populateReview() {
-      if (selectedType === 'individual') {
-        const firstName = document.getElementById('indiv-firstName').value;
-        const lastName = document.getElementById('indiv-lastName').value;
-        const email = document.getElementById('indiv-email').value;
-        
-        document.getElementById('review-indiv-name').textContent = `${firstName} ${lastName}`;
-        document.getElementById('review-indiv-email').textContent = email;
-      } else {
-        const orgName = document.getElementById('org-name').value;
-        const contactFirstName = document.getElementById('org-contactFirstName').value;
-        const contactLastName = document.getElementById('org-contactLastName').value;
-        const email = document.getElementById('org-contactEmail').value;
-        
-        document.getElementById('review-org-name').textContent = orgName;
-        document.getElementById('review-org-contact').textContent = `${contactFirstName} ${contactLastName}`;
-        document.getElementById('review-org-email').textContent = email;
-      }
-    }
-
-    function prefillForm() {
-      if (selectedType === 'individual') {
-        // Prefill individual form
-        document.getElementById('indiv-firstName').value = 'John';
-        document.getElementById('indiv-lastName').value = 'Smith';
-        document.getElementById('indiv-email').value = 'john.smith@example.com';
-        document.getElementById('indiv-username').value = 'john_smith';
-        document.getElementById('indiv-password').value = 'Password123';
-        document.getElementById('indiv-confirmPassword').value = 'Password123';
-      } else {
-        // Prefill organization form
-        document.getElementById('org-name').value = 'abc Corporation';
-        document.getElementById('org-website').value = 'https://abc.example.com';
-        document.getElementById('org-industry').value = 'technology';
-        document.getElementById('org-size').value = '11-50';
-        document.getElementById('org-contactFirstName').value = 'Jane';
-        document.getElementById('org-contactLastName').value = 'Doe';
-        document.getElementById('org-contactEmail').value = 'jane.doe@abc.com';
-        document.getElementById('org-username').value = 'janedoe_admin';
-        document.getElementById('org-contactPhone').value = '+1 (555) 123-4567';
-        document.getElementById('org-password').value = 'SecurePass123';
-        document.getElementById('org-confirmPassword').value = 'SecurePass123';
+    function saveStepData() {
+      if (currentStep === 1) {
+        formData.category = document.getElementById('category').value;
+        formData.focus = document.getElementById('focus').value;
+        formData.username = document.getElementById('step1-username').value.trim();
+        formData.email = document.getElementById('step1-email').value.trim();
+        formData.accountType = document.getElementById('accountType').value;
+      } else if (currentStep === 2) {
+        formData.password = document.getElementById('step2-password').value;
+      } else if (currentStep === 3) {
+        formData.firstName = document.getElementById('step3-firstName').value;
+        formData.lastName = document.getElementById('step3-lastName').value;
+        formData.country = document.getElementById('step3-country').value;
+        formData.language = document.getElementById('step3-language').value;
       }
     }
 
     function submitRegistration() {
-      const termsCheckbox = selectedType === 'individual' 
-        ? document.getElementById('indiv-terms')
-        : document.getElementById('org-terms');
-      
-      if (!termsCheckbox.checked) {
-        alert('You must agree to the terms and conditions');
-        return;
-      }
-
-      if (selectedType === 'individual') {
-        submitIndividualRegistration();
-      } else {
-        submitOrganizationRegistration();
-      }
-    }
-
-    function submitIndividualRegistration() {
-      const firstName = document.getElementById('indiv-firstName').value;
-      const lastName = document.getElementById('indiv-lastName').value;
-      const email = document.getElementById('indiv-email').value;
-      const password = document.getElementById('indiv-password').value;
-
       const userData = {
-        firstName,
-        lastName,
-        email,
-        password
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+        category: formData.category,
+        focus: formData.focus,
+        country: formData.country,
+        language: formData.language
       };
 
-      const result = storeUser(userData, 'individual');
+      const result = storeUser(userData, formData.accountType);
 
       if (result.success) {
-        document.getElementById('indiv-success').textContent = `Success! Welcome ${firstName}! A verification link has been sent to your email. Redirecting to sign in...`;
-        document.getElementById('indiv-success').classList.remove('d-none');
-        setTimeout(() => window.location.href = './signin.html', 2500);
+        document.getElementById('step4-success').textContent = `Registration successful! Redirecting to sign in...`;
+        document.getElementById('step4-success').classList.remove('d-none');
+        setTimeout(() => {
+          window.location.href = 'signin.html?verified=true';
+        }, 2000);
       } else {
-        document.getElementById('indiv-error').textContent = result.message;
-        document.getElementById('indiv-error').classList.remove('d-none');
+        showError('step4', result.message);
       }
     }
 
-    function submitOrganizationRegistration() {
-      const orgName = document.getElementById('org-name').value;
-      const website = document.getElementById('org-website').value;
-      const industry = document.getElementById('org-industry').value;
-      const companySize = document.getElementById('org-size').value;
-      const contactFirstName = document.getElementById('org-contactFirstName').value;
-      const contactLastName = document.getElementById('org-contactLastName').value;
-      const contactEmail = document.getElementById('org-contactEmail').value;
-      const contactPhone = document.getElementById('org-contactPhone').value;
-      const password = document.getElementById('org-password').value;
-
-      const orgData = {
-        organization: {
-          name: orgName,
-          website,
-          industry,
-          companySize
-        },
-        primaryContact: {
-          firstName: contactFirstName,
-          lastName: contactLastName,
-          email: contactEmail,
-          phone: contactPhone
-        },
-        password,
-        role: 'admin'
-      };
-
-      const result = storeUser(orgData, 'organization');
-
-      if (result.success) {
-        document.getElementById('org-success').textContent = `Success! Organization registered! A verification link has been sent to ${contactEmail}. Redirecting to sign in...`;
-        document.getElementById('org-success').classList.remove('d-none');
-        setTimeout(() => window.location.href = './signin.html', 2500);
-      } else {
-        document.getElementById('org-error').textContent = result.message;
-        document.getElementById('org-error').classList.remove('d-none');
-      }
-    }
-
-    function updateWizardUI() {
+    function updateUI() {
       // Hide all steps
-      document.querySelectorAll('.wizard-step').forEach(step => step.classList.add('d-none'));
-      
-      // Show current step
-      if (currentStep === 1) {
-        document.getElementById('step1').classList.remove('d-none');
-      } else if (currentStep === 2) {
-        const stepId = selectedType === 'individual' ? 'step2-individual' : 'step2-organization';
-        document.getElementById(stepId).classList.remove('d-none');
-      } else if (currentStep === 3) {
-        const stepId = selectedType === 'individual' ? 'step3-individual' : 'step3-organization';
-        document.getElementById(stepId).classList.remove('d-none');
-      }
+      document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
+      document.getElementById(`step${currentStep}`).style.display = 'block';
 
-      // Update step chips
-      for (let i = 1; i <= 3; i++) {
+      // Update chips
+      for (let i = 1; i <= 4; i++) {
         const chip = document.getElementById(`chip${i}`);
+        chip.classList.remove('active');
         if (i < currentStep) {
-          chip.classList.add('active');
+          chip.classList.add('bg-success', 'text-white');
+        } else if (i === currentStep) {
+          chip.classList.add('bg-primary', 'text-white');
         } else {
-          chip.classList.remove('active');
+          chip.classList.remove('bg-success', 'bg-primary', 'text-white');
         }
       }
 
-      // Update buttons - Fixed visibility logic
-      const backBtn = document.getElementById('backBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const registerBtn = document.getElementById('registerBtn');
+      // Update buttons
+      document.getElementById('backBtn').style.display = currentStep > 1 ? 'block' : 'none';
+      document.getElementById('nextBtn').style.display = currentStep < 4 ? 'block' : 'none';
+      document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 4);
 
-      backBtn.classList.toggle('d-none', currentStep === 1);
-      nextBtn.classList.toggle('d-none', currentStep === 3);
-      registerBtn.classList.toggle('d-none', currentStep !== 3);
+      // Update hints
+      const hints = ['Select category and account type', 'Create a strong password', 'Enter your personal details', 'Accept terms to complete'];
+      document.getElementById('wizardHint').textContent = hints[currentStep - 1];
+    }
 
-      // Update hint
-      const hints = {
-        1: 'Select the account type that best fits your needs',
-        2: 'Fill in your information to create your account',
-        3: 'Review your information and create your account'
-      };
-      document.getElementById('wizardHint').textContent = hints[currentStep];
+    function showError(step, message) {
+      const errorEl = document.getElementById(`${step}-error`);
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.classList.remove('d-none');
+      }
     }
   </script>
 </body>
