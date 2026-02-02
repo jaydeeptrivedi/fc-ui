@@ -1,4 +1,8 @@
 // assets/layout.js
+
+// Clear localStorage on every page load (hard refresh or navigation)
+localStorage.clear();
+
 (function() {
   const page = document.documentElement.getAttribute('data-page') || '';
   const shell = document.getElementById('app-shell');

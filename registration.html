@@ -82,6 +82,11 @@
                       <input type="email" class="form-control" id="indiv-email" placeholder="john@example.com" required />
                     </div>
                     <div class="col-12">
+                      <label for="indiv-username" class="form-label fw-semibold">Username *</label>
+                      <input type="text" class="form-control" id="indiv-username" placeholder="Choose a unique username" required />
+                      <div class="form-text">3-20 characters, letters, numbers, and underscores only</div>
+                    </div>
+                    <div class="col-12">
                       <label for="indiv-password" class="form-label fw-semibold">Password *</label>
                       <input type="password" class="form-control" id="indiv-password" placeholder="Min 8 chars, 1 uppercase, 1 lowercase, 1 number" required />
                       <div class="form-text">Must be at least 8 characters with uppercase, lowercase, and numbers</div>
@@ -147,6 +152,11 @@
                     <div class="col-12">
                       <label for="org-contactEmail" class="form-label fw-semibold">Email Address *</label>
                       <input type="email" class="form-control" id="org-contactEmail" placeholder="jane@company.com" required />
+                    </div>
+                    <div class="col-12">
+                      <label for="org-username" class="form-label fw-semibold">Username *</label>
+                      <input type="text" class="form-control" id="org-username" placeholder="Choose a unique username" required />
+                      <div class="form-text">3-20 characters, letters, numbers, and underscores only</div>
                     </div>
                     <div class="col-12">
                       <label for="org-contactPhone" class="form-label fw-semibold">Phone Number *</label>
@@ -360,6 +370,7 @@
         document.getElementById('indiv-firstName').value = 'John';
         document.getElementById('indiv-lastName').value = 'Smith';
         document.getElementById('indiv-email').value = 'john.smith@example.com';
+        document.getElementById('indiv-username').value = 'john_smith';
         document.getElementById('indiv-password').value = 'Password123';
         document.getElementById('indiv-confirmPassword').value = 'Password123';
       } else {
@@ -371,6 +382,7 @@
         document.getElementById('org-contactFirstName').value = 'Jane';
         document.getElementById('org-contactLastName').value = 'Doe';
         document.getElementById('org-contactEmail').value = 'jane.doe@abc.com';
+        document.getElementById('org-username').value = 'janedoe_admin';
         document.getElementById('org-contactPhone').value = '+1 (555) 123-4567';
         document.getElementById('org-password').value = 'SecurePass123';
         document.getElementById('org-confirmPassword').value = 'SecurePass123';

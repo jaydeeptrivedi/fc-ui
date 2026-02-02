@@ -33,13 +33,13 @@
 
               <form id="signin-form">
                 <div class="mb-3">
-                  <label for="signin-email" class="form-label fw-semibold">Email Address *</label>
+                  <label for="signin-username" class="form-label fw-semibold">Username *</label>
                   <input 
-                    type="email" 
+                    type="text" 
                     class="form-control" 
-                    id="signin-email" 
-                    placeholder="your@email.com"
-                    value="john.smith@example.com"
+                    id="signin-username" 
+                    placeholder="Enter your username"
+                    value="john_smith"
                     required 
                   />
                 </div>
@@ -126,7 +126,7 @@
     });
 
     function handleSignIn() {
-      const email = document.getElementById('signin-email').value.trim();
+      const username = document.getElementById('signin-username').value.trim();
       const password = document.getElementById('signin-password').value;
       const errorContainer = document.getElementById('signin-error');
       const successContainer = document.getElementById('signin-success');
@@ -136,13 +136,8 @@
       successContainer.classList.add('d-none');
 
       // Validation
-      if (!email) {
-        showError('Email is required', errorContainer);
-        return;
-      }
-
-      if (!isValidEmail(email)) {
-        showError('Please enter a valid email address', errorContainer);
+      if (!username) {
+        showError('Username is required', errorContainer);
         return;
       }
 
@@ -155,17 +150,20 @@
       try {
         const users = JSON.parse(localStorage.getItem('fc_users')) || [];
         
-        // Find user by email
-        const user = users.find(u => u.email === email);
+        // Find user by username (check both direct username and primaryContact username for organizations)
+        const user = users.find(u => 
+          u.username === username || 
+          (u.primaryContact && u.primaryContact.username === username)
+        );
 
         if (!user) {
-          showError('Email or password is incorrect', errorContainer);
+          showError('Username or password is incorrect', errorContainer);
           return;
         }
 
         // Check password (in production, this would be verified on server)
         if (user.password !== password) {
-          showError('Email or password is incorrect', errorContainer);
+          showError('Username or password is incorrect', errorContainer);
           return;
         }
 
@@ -178,7 +176,8 @@
         // Sign in successful
         localStorage.setItem('fc_currentUser', JSON.stringify(user));
         
-        successContainer.textContent = `Welcome back, ${user.firstName || 'User'}! Redirecting to dashboard...`;
+        const displayName = user.firstName || (user.primaryContact && user.primaryContact.firstName) || 'User';
+        successContainer.textContent = `Welcome back, ${displayName}! Redirecting to dashboard...`;
         successContainer.classList.remove('d-none');
 
         setTimeout(() => {

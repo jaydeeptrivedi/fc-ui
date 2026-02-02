@@ -41,6 +41,15 @@ function isValidUrl(url) {
 }
 
 /**
+ * Validate username format
+ * Requirements: 3-20 characters, letters, numbers, and underscores only
+ */
+function isValidUsername(username) {
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  return usernameRegex.test(username);
+}
+
+/**
  * Sanitize input to prevent XSS
  */
 function sanitizeInput(input) {
@@ -56,9 +65,15 @@ function storeUser(userData, type) {
   try {
     const users = JSON.parse(localStorage.getItem('fc_users')) || [];
     
-    // Check if user already exists
-    if (users.some(u => u.email === userData.email)) {
+    // Check if email already exists
+    if (users.some(u => u.email === userData.email || (u.primaryContact && u.primaryContact.email === userData.email))) {
       return { success: false, message: 'Email already registered.' };
+    }
+
+    // Check if username already exists
+    const username = userData.username || (userData.primaryContact && userData.primaryContact.username);
+    if (username && users.some(u => u.username === username || (u.primaryContact && u.primaryContact.username === username))) {
+      return { success: false, message: 'Username already taken.' };
     }
     
     // Add user with type and timestamp

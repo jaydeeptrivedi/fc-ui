@@ -33,6 +33,7 @@ function handleIndividualRegistration() {
   const firstName = document.getElementById('indiv-firstName').value.trim();
   const lastName = document.getElementById('indiv-lastName').value.trim();
   const email = document.getElementById('indiv-email').value.trim();
+  const username = document.getElementById('indiv-username').value.trim();
   const password = document.getElementById('indiv-password').value;
   const confirmPassword = document.getElementById('indiv-confirmPassword').value;
   const termsCheckbox = document.getElementById('indiv-terms');
@@ -44,7 +45,7 @@ function handleIndividualRegistration() {
   if (successContainer) successContainer.style.display = 'none';
 
   // Validation
-  const validation = validateIndividualForm(firstName, lastName, email, password, confirmPassword, termsCheckbox);
+  const validation = validateIndividualForm(firstName, lastName, email, username, password, confirmPassword, termsCheckbox);
   
   if (!validation.valid) {
     showError(validation.message, errorContainer);
@@ -57,6 +58,7 @@ function handleIndividualRegistration() {
       firstName: sanitizeInput(firstName),
       lastName: sanitizeInput(lastName),
       email: sanitizeInput(email),
+      username: sanitizeInput(username),
       password: password // In production, this should be hashed before storage
     };
 
@@ -65,13 +67,13 @@ function handleIndividualRegistration() {
     if (result.success) {
       // Show success message
       if (successContainer) {
-        successContainer.innerHTML = `<strong>Success!</strong> Welcome ${firstName}! You're all set. Redirecting to dashboard...`;
+        successContainer.innerHTML = `<strong>Success!</strong> Welcome ${firstName}! You're all set. Redirecting to sign in...`;
         successContainer.style.display = 'block';
       }
       
       // Redirect after a short delay to show the success message
       setTimeout(() => {
-        redirectToDashboard();
+        window.location.href = 'signin.html?verified=true';
       }, 2000);
     } else {
       showError(result.message, errorContainer);
@@ -85,7 +87,7 @@ function handleIndividualRegistration() {
 /**
  * Validate individual registration form
  */
-function validateIndividualForm(firstName, lastName, email, password, confirmPassword, termsCheckbox) {
+function validateIndividualForm(firstName, lastName, email, username, password, confirmPassword, termsCheckbox) {
   // Check empty fields
   if (!firstName) {
     return { valid: false, message: 'First name is required.' };
@@ -102,6 +104,18 @@ function validateIndividualForm(firstName, lastName, email, password, confirmPas
   // Validate email format
   if (!isValidEmail(email)) {
     return { valid: false, message: 'Please enter a valid email address.' };
+  }
+
+  if (!username) {
+    return { valid: false, message: 'Username is required.' };
+  }
+
+  // Validate username format (3-20 chars, alphanumeric + underscore only)
+  if (!isValidUsername(username)) {
+    return { 
+      valid: false, 
+      message: 'Username must be 3-20 characters (letters, numbers, and underscores only).' 
+    };
   }
 
   if (!password) {

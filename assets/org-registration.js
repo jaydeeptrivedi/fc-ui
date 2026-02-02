@@ -39,6 +39,7 @@ function handleOrganizationRegistration() {
   const contactFirstName = document.getElementById('org-contact-firstName').value.trim();
   const contactLastName = document.getElementById('org-contact-lastName').value.trim();
   const contactEmail = document.getElementById('org-contact-email').value.trim();
+  const username = document.getElementById('org-username').value.trim();
   const contactPhone = document.getElementById('org-contact-phone').value.trim();
 
   // Credentials
@@ -56,7 +57,7 @@ function handleOrganizationRegistration() {
   // Validation
   const validation = validateOrganizationForm(
     orgName, website, industry, companySize,
-    contactFirstName, contactLastName, contactEmail, contactPhone,
+    contactFirstName, contactLastName, contactEmail, username, contactPhone,
     password, confirmPassword, termsCheckbox
   );
 
@@ -78,6 +79,7 @@ function handleOrganizationRegistration() {
         firstName: sanitizeInput(contactFirstName),
         lastName: sanitizeInput(contactLastName),
         email: sanitizeInput(contactEmail),
+        username: sanitizeInput(username),
         phone: sanitizeInput(contactPhone)
       },
       password: password, // In production, hash before storage
@@ -92,14 +94,14 @@ function handleOrganizationRegistration() {
         successContainer.innerHTML = `
           <strong>Success!</strong> Organization registered successfully!<br/>
           Welcome ${contactFirstName}! A verification link has been sent to ${contactEmail}.<br/>
-          Redirecting to dashboard...
+          Redirecting to sign in...
         `;
         successContainer.style.display = 'block';
       }
 
       // Redirect after a short delay
       setTimeout(() => {
-        redirectToDashboard();
+        window.location.href = 'signin.html?verified=true';
       }, 3000);
     } else {
       showError(result.message, errorContainer);
@@ -114,7 +116,7 @@ function handleOrganizationRegistration() {
  * Validate organization registration form
  */
 function validateOrganizationForm(orgName, website, industry, companySize, 
-                                  contactFirstName, contactLastName, contactEmail, contactPhone,
+                                  contactFirstName, contactLastName, contactEmail, username, contactPhone,
                                   password, confirmPassword, termsCheckbox) {
   
   // Organization details validation
@@ -157,6 +159,18 @@ function validateOrganizationForm(orgName, website, industry, companySize,
 
   if (!isValidEmail(contactEmail)) {
     return { valid: false, message: 'Please enter a valid email address for primary contact.' };
+  }
+
+  if (!username) {
+    return { valid: false, message: 'Username is required.' };
+  }
+
+  // Validate username format (3-20 chars, alphanumeric + underscore only)
+  if (!isValidUsername(username)) {
+    return { 
+      valid: false, 
+      message: 'Username must be 3-20 characters (letters, numbers, and underscores only).' 
+    };
   }
 
   if (!contactPhone) {
