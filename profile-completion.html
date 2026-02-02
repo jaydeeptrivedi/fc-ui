@@ -28,42 +28,31 @@
             <div class="card-body p-4">
               <!-- Progress Steps -->
               <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
-                <div class="stepchip" id="chip1">1. Category</div>
+                <div class="stepchip" id="chip1">1. Email</div>
                 <div class="flex-grow-1 border-top"></div>
                 <div class="stepchip" id="chip2">2. Security</div>
                 <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip3">3. Location</div>
+                <div class="stepchip" id="chip3">3. Category</div>
+                <div class="flex-grow-1 border-top"></div>
+                <div class="stepchip" id="chip4">4. Farm</div>
+                <div class="flex-grow-1 border-top"></div>
+                <div class="stepchip" id="chip5">5. Location</div>
               </div>
 
-              <!-- Step 1: Category & Focus -->
-              <div class="wizard-step" id="step1">
-                <h6 class="fw-bold mb-4">Verify Your Professional Profile</h6>
-                <p class="text-secondary small mb-3">Ensure your category and focus area are correct</p>
+              <!-- Step 1: Email Verification -->
+              <div class="wizard-step" id="step1" style="display: block;">
+                <h6 class="fw-bold mb-4">Verify Email Address</h6>
+                <p class="text-secondary small mb-3">Confirm your email address</p>
                 
                 <form id="form-step1">
-                  <div class="mb-3">
-                    <label for="profile-category" class="form-label fw-semibold">What Best Describes You *</label>
-                    <select class="form-select" id="profile-category" required>
-                      <option value="">Select a category</option>
-                      <option value="agriculture">Agriculture</option>
-                      <option value="technology">Technology</option>
-                      <option value="healthcare">Healthcare</option>
-                      <option value="finance">Finance</option>
-                      <option value="retail">Retail</option>
-                      <option value="other">Other</option>
-                    </select>
+                  <div class="alert alert-info small mb-3">
+                    Please verify your email address. A confirmation link will be sent to your email.
                   </div>
 
                   <div class="mb-3">
-                    <label for="profile-focus" class="form-label fw-semibold">Focus Area *</label>
-                    <select class="form-select" id="profile-focus" required>
-                      <option value="">Select focus area</option>
-                      <option value="farmer">Farmer / Producer</option>
-                      <option value="consultant">Consultant</option>
-                      <option value="researcher">Researcher</option>
-                      <option value="business">Business Owner</option>
-                      <option value="other">Other</option>
-                    </select>
+                    <label for="profile-email" class="form-label fw-semibold">Email Address *</label>
+                    <input type="email" class="form-control" id="profile-email" placeholder="your@email.com" required />
+                    <div class="form-text">We'll send a verification link to this address</div>
                   </div>
 
                   <div id="step1-error" class="alert alert-danger small mb-3 d-none"></div>
@@ -121,12 +110,127 @@
                 </form>
               </div>
 
-              <!-- Step 3: Location & Language -->
+              <!-- Step 3: Category & Focus -->
               <div class="wizard-step" id="step3" style="display: none;">
+                <h6 class="fw-bold mb-4">Verify Your Professional Profile</h6>
+                <p class="text-secondary small mb-3">Ensure your category and focus area are correct</p>
+                
+                <form id="form-step3">
+                  <div class="mb-3">
+                    <label for="profile-category" class="form-label fw-semibold">What Best Describes You *</label>
+                    <select class="form-select" id="profile-category" required>
+                      <option value="">Select a category</option>
+                      <option value="agriculture">Agriculture</option>
+                      <option value="technology">Technology</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="finance">Finance</option>
+                      <option value="retail">Retail</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="profile-focus" class="form-label fw-semibold">Focus Area *</label>
+                    <select class="form-select" id="profile-focus" required>
+                      <option value="">Select focus area</option>
+                      <option value="farmer">Farmer / Producer</option>
+                      <option value="consultant">Consultant</option>
+                      <option value="researcher">Researcher</option>
+                      <option value="business">Business Owner</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div id="step3-error" class="alert alert-danger small mb-3 d-none"></div>
+                </form>
+              </div>
+
+              <!-- Step 3: Category & Focus -->
+              <div class="wizard-step" id="step3" style="display: none;">
+                <h6 class="fw-bold mb-4">Verify Your Professional Profile</h6>
+                <p class="text-secondary small mb-3">Ensure your category and focus area are correct</p>
+                
+                <form id="form-step3">
+                  <div class="mb-3">
+                    <label for="profile-category" class="form-label fw-semibold">What Best Describes You *</label>
+                    <select class="form-select" id="profile-category" required>
+                      <option value="">Select a category</option>
+                      <option value="agriculture">Agriculture</option>
+                      <option value="technology">Technology</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="finance">Finance</option>
+                      <option value="retail">Retail</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="profile-focus" class="form-label fw-semibold">Focus Area *</label>
+                    <select class="form-select" id="profile-focus" required>
+                      <option value="">Select focus area</option>
+                      <option value="farmer">Farmer / Producer</option>
+                      <option value="consultant">Consultant</option>
+                      <option value="researcher">Researcher</option>
+                      <option value="business">Business Owner</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div id="step3-error" class="alert alert-danger small mb-3 d-none"></div>
+                </form>
+              </div>
+
+              <!-- Step 4: Farm Details -->
+              <div class="wizard-step" id="step4" style="display: none;">
+                <h6 class="fw-bold mb-4">Farm Operations Details</h6>
+                <p class="text-secondary small mb-3">Tell us more about your farming operations</p>
+                
+                <form id="form-step4">
+                  <div class="mb-3">
+                    <label for="profile-crops" class="form-label fw-semibold">Crops/Fruits Grown *</label>
+                    <input type="text" class="form-control" id="profile-crops" placeholder="e.g., Wheat, Rice, Apples, Tomatoes" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="profile-farm-size" class="form-label fw-semibold">Farm Size Range *</label>
+                    <select class="form-select" id="profile-farm-size" required>
+                      <option value="">Select farm size</option>
+                      <option value="small">Small (< 5 hectares)</option>
+                      <option value="medium">Medium (5-20 hectares)</option>
+                      <option value="large">Large (20-50 hectares)</option>
+                      <option value="xlarge">Extra Large (> 50 hectares)</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="profile-irrigation" class="form-label fw-semibold">Irrigation System *</label>
+                    <select class="form-select" id="profile-irrigation" required>
+                      <option value="">Select irrigation method</option>
+                      <option value="yes">Yes, I use irrigation</option>
+                      <option value="no">No, rain-fed farming</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="profile-pest-management" class="form-label fw-semibold">Pest Management Practice *</label>
+                    <select class="form-select" id="profile-pest-management" required>
+                      <option value="">Select pest management approach</option>
+                      <option value="organic">Organic</option>
+                      <option value="conventional">Conventional</option>
+                      <option value="integrated">Integrated (Mixed)</option>
+                    </select>
+                  </div>
+
+                  <div id="step4-error" class="alert alert-danger small mb-3 d-none"></div>
+                </form>
+              </div>
+
+              <!-- Step 5: Location & Language -->
+              <div class="wizard-step" id="step5" style="display: none;">
                 <h6 class="fw-bold mb-4">Location & Language</h6>
                 <p class="text-secondary small mb-3">Confirm your location and preferred language</p>
                 
-                <form id="form-step3">
+                <form id="form-step5">
                   <div class="mb-3">
                     <label for="profile-country" class="form-label fw-semibold">Country *</label>
                     <select class="form-select" id="profile-country" required>
@@ -153,8 +257,8 @@
                     </select>
                   </div>
 
-                  <div id="step3-error" class="alert alert-danger small mb-3 d-none"></div>
-                  <div id="step3-success" class="alert alert-success small mb-3 d-none"></div>
+                  <div id="step5-error" class="alert alert-danger small mb-3 d-none"></div>
+                  <div id="step5-success" class="alert alert-success small mb-3 d-none"></div>
                 </form>
               </div>
             </div>
@@ -237,6 +341,7 @@
     });
 
     function loadCurrentData() {
+      document.getElementById('profile-email').value = currentUser.email || '';
       document.getElementById('profile-category').value = currentUser.category || '';
       document.getElementById('profile-focus').value = currentUser.focus || '';
       document.getElementById('profile-country').value = currentUser.country || 'austria';
@@ -286,17 +391,21 @@
     }
 
     function validateStep(step) {
-      const errorIds = ['step1-error', 'step2-error', 'step3-error'];
+      const errorIds = ['step1-error', 'step2-error', 'step3-error', 'step4-error', 'step5-error'];
       if (errorIds[step - 1]) {
         document.getElementById(errorIds[step - 1]).classList.add('d-none');
       }
 
       if (step === 1) {
-        const category = document.getElementById('profile-category').value;
-        const focus = document.getElementById('profile-focus').value;
+        const email = document.getElementById('profile-email').value.trim();
 
-        if (!category || !focus) {
-          showError('step1', 'Please select both category and focus area');
+        if (!email) {
+          showError('step1', 'Email address is required');
+          return false;
+        }
+
+        if (!isValidEmail(email)) {
+          showError('step1', 'Please enter a valid email address');
           return false;
         }
         return true;
@@ -330,11 +439,35 @@
       }
 
       if (step === 3) {
+        const category = document.getElementById('profile-category').value;
+        const focus = document.getElementById('profile-focus').value;
+
+        if (!category || !focus) {
+          showError('step3', 'Please select both category and focus area');
+          return false;
+        }
+        return true;
+      }
+
+      if (step === 4) {
+        const crops = document.getElementById('profile-crops').value;
+        const farmSize = document.getElementById('profile-farm-size').value;
+        const irrigation = document.getElementById('profile-irrigation').value;
+        const pestManagement = document.getElementById('profile-pest-management').value;
+
+        if (!crops || !farmSize || !irrigation || !pestManagement) {
+          showError('step4', 'Please fill in all farm operation details');
+          return false;
+        }
+        return true;
+      }
+
+      if (step === 5) {
         const country = document.getElementById('profile-country').value;
         const language = document.getElementById('profile-language').value;
 
         if (!country || !language) {
-          showError('step3', 'Please select both country and language');
+          showError('step5', 'Please select both country and language');
           return false;
         }
         return true;
@@ -345,33 +478,47 @@
 
     function saveStepData() {
       if (currentStep === 1) {
-        updatedData.category = document.getElementById('profile-category').value;
-        updatedData.focus = document.getElementById('profile-focus').value;
+        updatedData.email = document.getElementById('profile-email').value.trim();
       } else if (currentStep === 2) {
         const password = document.getElementById('profile-password').value;
         updatedData.password = password;
       } else if (currentStep === 3) {
+        updatedData.category = document.getElementById('profile-category').value;
+        updatedData.focus = document.getElementById('profile-focus').value;
+      } else if (currentStep === 4) {
+        updatedData.crops = document.getElementById('profile-crops').value;
+        updatedData.farmSize = document.getElementById('profile-farm-size').value;
+        updatedData.irrigation = document.getElementById('profile-irrigation').value;
+        updatedData.pestManagement = document.getElementById('profile-pest-management').value;
+      } else if (currentStep === 5) {
         updatedData.country = document.getElementById('profile-country').value;
         updatedData.language = document.getElementById('profile-language').value;
       }
     }
 
     function updateProfile() {
-      // Update current user in storage
-      const users = JSON.parse(localStorage.getItem('fc_users')) || [];
-      const userIndex = users.findIndex(u => u.id === currentUser.id);
+      try {
+        // Update current user in storage
+        const users = JSON.parse(localStorage.getItem('fc_users')) || [];
+        const userIndex = users.findIndex(u => u.id === currentUser.id);
 
-      if (userIndex > -1) {
-        users[userIndex] = { ...users[userIndex], ...updatedData };
-        localStorage.setItem('fc_users', JSON.stringify(users));
-        localStorage.setItem('fc_currentUser', JSON.stringify(users[userIndex]));
+        if (userIndex > -1) {
+          users[userIndex] = { ...users[userIndex], ...updatedData };
+          localStorage.setItem('fc_users', JSON.stringify(users));
+          localStorage.setItem('fc_currentUser', JSON.stringify(users[userIndex]));
 
-        document.getElementById('step3-success').textContent = 'Profile updated successfully! Redirecting to dashboard...';
-        document.getElementById('step3-success').classList.remove('d-none');
+          document.getElementById('step5-success').textContent = 'Profile updated successfully! Redirecting to dashboard...';
+          document.getElementById('step5-success').classList.remove('d-none');
 
-        setTimeout(() => {
-          window.location.href = './index.html';
-        }, 2000);
+          setTimeout(() => {
+            window.location.href = './index.html';
+          }, 2000);
+        } else {
+          showError('step5', 'Error: User not found in database');
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        showError('step5', 'Error saving profile. Please try again.');
       }
     }
 
@@ -381,7 +528,7 @@
       document.getElementById(`step${currentStep}`).style.display = 'block';
 
       // Update chips
-      for (let i = 1; i <= 3; i++) {
+      for (let i = 1; i <= 5; i++) {
         const chip = document.getElementById(`chip${i}`);
         chip.classList.remove('active');
         if (i < currentStep) {
@@ -395,11 +542,11 @@
 
       // Update buttons
       document.getElementById('backBtn').style.display = currentStep > 1 ? 'block' : 'none';
-      document.getElementById('nextBtn').style.display = currentStep < 3 ? 'block' : 'none';
-      document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 3);
+      document.getElementById('nextBtn').style.display = currentStep < 5 ? 'block' : 'none';
+      document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 5);
 
       // Update hints
-      const hints = ['Verify your professional profile', 'Ensure account security', 'Set your location and language'];
+      const hints = ['Verify your email address', 'Ensure account security', 'Verify your professional profile', 'Share your farm details', 'Set your location and language'];
       document.getElementById('wizardHint').textContent = hints[currentStep - 1];
     }
 

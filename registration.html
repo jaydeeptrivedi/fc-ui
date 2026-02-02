@@ -32,9 +32,11 @@
                 <div class="flex-grow-1 border-top"></div>
                 <div class="stepchip" id="chip2">2. Password</div>
                 <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip3">3. Details</div>
+                <div class="stepchip" id="chip3">3. Farm</div>
                 <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip4">4. Terms</div>
+                <div class="stepchip" id="chip4">4. Details</div>
+                <div class="flex-grow-1 border-top"></div>
+                <div class="stepchip" id="chip5">5. Terms</div>
               </div>
 
               <!-- Step 1: Category & Account Type -->
@@ -142,25 +144,70 @@
                 </form>
               </div>
 
-              <!-- Step 3: Personal Details -->
+              <!-- Step 3: Farm Operations -->
               <div class="wizard-step" id="step3" style="display: none;">
-                <h6 class="fw-bold mb-4">Personal Details</h6>
+                <h6 class="fw-bold mb-4">Farm Operations Details</h6>
+                <p class="text-secondary small mb-3">Tell us more about your farming operations</p>
                 
                 <form id="form-step3">
+                  <div class="mb-3">
+                    <label for="step3-crops" class="form-label fw-semibold">Crops/Fruits Grown *</label>
+                    <input type="text" class="form-control" id="step3-crops" placeholder="e.g., Wheat, Rice, Apples, Tomatoes" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="step3-farm-size" class="form-label fw-semibold">Farm Size Range *</label>
+                    <select class="form-select" id="step3-farm-size" required>
+                      <option value="">Select farm size</option>
+                      <option value="small">Small (< 5 hectares)</option>
+                      <option value="medium">Medium (5-20 hectares)</option>
+                      <option value="large">Large (20-50 hectares)</option>
+                      <option value="xlarge">Extra Large (> 50 hectares)</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="step3-irrigation" class="form-label fw-semibold">Irrigation System *</label>
+                    <select class="form-select" id="step3-irrigation" required>
+                      <option value="">Select irrigation method</option>
+                      <option value="yes">Yes, I use irrigation</option>
+                      <option value="no">No, rain-fed farming</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="step3-pest-management" class="form-label fw-semibold">Pest Management Practice *</label>
+                    <select class="form-select" id="step3-pest-management" required>
+                      <option value="">Select pest management approach</option>
+                      <option value="organic">Organic</option>
+                      <option value="conventional">Conventional</option>
+                      <option value="integrated">Integrated (Mixed)</option>
+                    </select>
+                  </div>
+
+                  <div id="step3-error" class="alert alert-danger small mb-3 d-none"></div>
+                </form>
+              </div>
+
+              <!-- Step 4: Personal Details -->
+              <div class="wizard-step" id="step4" style="display: none;">
+                <h6 class="fw-bold mb-4">Personal Details</h6>
+                
+                <form id="form-step4">
                   <div class="row">
                     <div class="col-md-6 mb-3">
-                      <label for="step3-firstName" class="form-label fw-semibold">First Name *</label>
-                      <input type="text" class="form-control" id="step3-firstName" placeholder="John" required />
+                      <label for="step4-firstName" class="form-label fw-semibold">First Name *</label>
+                      <input type="text" class="form-control" id="step4-firstName" placeholder="John" required />
                     </div>
                     <div class="col-md-6 mb-3">
-                      <label for="step3-lastName" class="form-label fw-semibold">Last Name *</label>
-                      <input type="text" class="form-control" id="step3-lastName" placeholder="Doe" required />
+                      <label for="step4-lastName" class="form-label fw-semibold">Last Name *</label>
+                      <input type="text" class="form-control" id="step4-lastName" placeholder="Doe" required />
                     </div>
                   </div>
 
                   <div class="mb-3">
-                    <label for="step3-country" class="form-label fw-semibold">Country *</label>
-                    <select class="form-select" id="step3-country" required>
+                    <label for="step4-country" class="form-label fw-semibold">Country *</label>
+                    <select class="form-select" id="step4-country" required>
                       <option value="austria" selected>Austria</option>
                       <option value="germany">Germany</option>
                       <option value="france">France</option>
@@ -172,8 +219,8 @@
                   </div>
 
                   <div class="mb-3">
-                    <label for="step3-language" class="form-label fw-semibold">Language *</label>
-                    <select class="form-select" id="step3-language" required>
+                    <label for="step4-language" class="form-label fw-semibold">Language *</label>
+                    <select class="form-select" id="step4-language" required>
                       <option value="english" selected>English</option>
                       <option value="german">German</option>
                       <option value="french">French</option>
@@ -182,15 +229,15 @@
                     </select>
                   </div>
 
-                  <div id="step3-error" class="alert alert-danger small mb-3 d-none"></div>
+                  <div id="step4-error" class="alert alert-danger small mb-3 d-none"></div>
                 </form>
               </div>
 
-              <!-- Step 4: Terms & Conditions -->
-              <div class="wizard-step" id="step4" style="display: none;">
+              <!-- Step 5: Terms & Conditions -->
+              <div class="wizard-step" id="step5" style="display: none;">
                 <h6 class="fw-bold mb-4">Terms & Conditions</h6>
                 
-                <form id="form-step4">
+                <form id="form-step5">
                   <div class="alert alert-light border mb-4 p-3" style="max-height: 250px; overflow-y: auto;">
                     <h6 class="fw-bold mb-2">FC Platform Terms & Conditions</h6>
                     <p class="small mb-2"><strong>1. Acceptance of Terms</strong><br>By creating an account, you agree to these terms and conditions.</p>
@@ -201,21 +248,21 @@
                   </div>
 
                   <div class="form-check mb-4">
-                    <input class="form-check-input" type="checkbox" id="step4-terms" required />
-                    <label class="form-check-label" for="step4-terms">
+                    <input class="form-check-input" type="checkbox" id="step5-terms" required />
+                    <label class="form-check-label" for="step5-terms">
                       I have read and agree to the Terms & Conditions
                     </label>
                   </div>
 
                   <div class="form-check mb-4">
-                    <input class="form-check-input" type="checkbox" id="step4-privacy" required />
-                    <label class="form-check-label" for="step4-privacy">
+                    <input class="form-check-input" type="checkbox" id="step5-privacy" required />
+                    <label class="form-check-label" for="step5-privacy">
                       I agree to the Privacy Policy
                     </label>
                   </div>
 
-                  <div id="step4-error" class="alert alert-danger small mb-3 d-none"></div>
-                  <div id="step4-success" class="alert alert-success small mb-3 d-none"></div>
+                  <div id="step5-error" class="alert alert-danger small mb-3 d-none"></div>
+                  <div id="step5-success" class="alert alert-success small mb-3 d-none"></div>
                 </form>
               </div>
             </div>
@@ -284,17 +331,20 @@
     function prefillDemoData() {
       document.getElementById('category').value = 'agriculture';
       document.getElementById('focus').value = 'farmer';
-      document.getElementById('step1-username').value = 'johnsmith_dev';
-      document.getElementById('step1-email').value = 'john.smith@example.com';
       document.getElementById('accountType').value = 'individual';
       
       document.getElementById('step2-password').value = 'Password123';
       document.getElementById('step2-confirm-password').value = 'Password123';
       
-      document.getElementById('step3-firstName').value = 'John';
-      document.getElementById('step3-lastName').value = 'Smith';
-      document.getElementById('step3-country').value = 'austria';
-      document.getElementById('step3-language').value = 'english';
+      document.getElementById('step3-crops').value = 'Wheat, Rice';
+      document.getElementById('step3-farm-size').value = 'medium';
+      document.getElementById('step3-irrigation').value = 'yes';
+      document.getElementById('step3-pest-management').value = 'organic';
+      
+      document.getElementById('step4-firstName').value = 'John';
+      document.getElementById('step4-lastName').value = 'Smith';
+      document.getElementById('step4-country').value = 'austria';
+      document.getElementById('step4-language').value = 'english';
       
       // Update password strength display for prefilled password
       updatePasswordStrength();
@@ -336,8 +386,8 @@
     }
 
     function handleSubmit() {
-      if (!document.getElementById('step4-terms').checked || !document.getElementById('step4-privacy').checked) {
-        showError('step4', 'You must accept both terms and privacy policy');
+      if (!document.getElementById('step5-terms').checked || !document.getElementById('step5-privacy').checked) {
+        showError('step5', 'You must accept both terms and privacy policy');
         return;
       }
 
@@ -346,7 +396,7 @@
     }
 
     function validateStep(step) {
-      const errorIds = ['step1-error', 'step2-error', 'step3-error'];
+      const errorIds = ['step1-error', 'step2-error', 'step3-error', 'step4-error', 'step5-error'];
       if (errorIds[step - 1]) {
         document.getElementById(errorIds[step - 1]).classList.add('d-none');
       }
@@ -402,11 +452,24 @@
       }
 
       if (step === 3) {
-        const firstName = document.getElementById('step3-firstName').value;
-        const lastName = document.getElementById('step3-lastName').value;
+        const crops = document.getElementById('step3-crops').value;
+        const farmSize = document.getElementById('step3-farm-size').value;
+        const irrigation = document.getElementById('step3-irrigation').value;
+        const pestManagement = document.getElementById('step3-pest-management').value;
+
+        if (!crops || !farmSize || !irrigation || !pestManagement) {
+          showError('step3', 'Please fill in all farm operation details');
+          return false;
+        }
+        return true;
+      }
+
+      if (step === 4) {
+        const firstName = document.getElementById('step4-firstName').value;
+        const lastName = document.getElementById('step4-lastName').value;
 
         if (!firstName || !lastName) {
-          showError('step3', 'First and last names are required');
+          showError('step4', 'First and last names are required');
           return false;
         }
         return true;
@@ -425,10 +488,15 @@
       } else if (currentStep === 2) {
         formData.password = document.getElementById('step2-password').value;
       } else if (currentStep === 3) {
-        formData.firstName = document.getElementById('step3-firstName').value;
-        formData.lastName = document.getElementById('step3-lastName').value;
-        formData.country = document.getElementById('step3-country').value;
-        formData.language = document.getElementById('step3-language').value;
+        formData.crops = document.getElementById('step3-crops').value;
+        formData.farmSize = document.getElementById('step3-farm-size').value;
+        formData.irrigation = document.getElementById('step3-irrigation').value;
+        formData.pestManagement = document.getElementById('step3-pest-management').value;
+      } else if (currentStep === 4) {
+        formData.firstName = document.getElementById('step4-firstName').value;
+        formData.lastName = document.getElementById('step4-lastName').value;
+        formData.country = document.getElementById('step4-country').value;
+        formData.language = document.getElementById('step4-language').value;
       }
     }
 
@@ -442,19 +510,23 @@
         category: formData.category,
         focus: formData.focus,
         country: formData.country,
-        language: formData.language
+        language: formData.language,
+        crops: formData.crops,
+        farmSize: formData.farmSize,
+        irrigation: formData.irrigation,
+        pestManagement: formData.pestManagement
       };
 
       const result = storeUser(userData, formData.accountType);
 
       if (result.success) {
-        document.getElementById('step4-success').textContent = `Registration successful! Redirecting to sign in...`;
-        document.getElementById('step4-success').classList.remove('d-none');
+        document.getElementById('step5-success').textContent = `Registration successful! Redirecting to sign in...`;
+        document.getElementById('step5-success').classList.remove('d-none');
         setTimeout(() => {
           window.location.href = 'signin.html?verified=true';
         }, 2000);
       } else {
-        showError('step4', result.message);
+        showError('step5', result.message);
       }
     }
 
@@ -464,7 +536,7 @@
       document.getElementById(`step${currentStep}`).style.display = 'block';
 
       // Update chips
-      for (let i = 1; i <= 4; i++) {
+      for (let i = 1; i <= 5; i++) {
         const chip = document.getElementById(`chip${i}`);
         chip.classList.remove('active');
         if (i < currentStep) {
@@ -478,11 +550,11 @@
 
       // Update buttons
       document.getElementById('backBtn').style.display = currentStep > 1 ? 'block' : 'none';
-      document.getElementById('nextBtn').style.display = currentStep < 4 ? 'block' : 'none';
-      document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 4);
+      document.getElementById('nextBtn').style.display = currentStep < 5 ? 'block' : 'none';
+      document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 5);
 
       // Update hints
-      const hints = ['Select category and account type', 'Create a strong password', 'Enter your personal details', 'Accept terms to complete'];
+      const hints = ['Select category and account type', 'Create a strong password', 'Share your farm details', 'Enter your personal details', 'Accept terms to complete'];
       document.getElementById('wizardHint').textContent = hints[currentStep - 1];
     }
 

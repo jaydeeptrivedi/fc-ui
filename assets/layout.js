@@ -1,12 +1,8 @@
 // assets/layout.js
 
-// Seed demo data for testing (preserve current user if already logged in)
+// Seed demo data for testing (ensure demo accounts always exist)
 function seedDemoData() {
-  const currentUserJson = localStorage.getItem('fc_currentUser');
-  const usersJson = localStorage.getItem('fc_users');
-  
-  // Only seed if no users exist yet
-  if (!usersJson) {
+  try {
     const demoUsers = [
       {
         id: 'user_org_demo',
@@ -54,12 +50,28 @@ function seedDemoData() {
       }
     ];
 
-    localStorage.setItem('fc_users', JSON.stringify(demoUsers));
-  }
-  
-  // Restore current user if it was cleared
-  if (currentUserJson && !localStorage.getItem('fc_currentUser')) {
-    localStorage.setItem('fc_currentUser', currentUserJson);
+    const usersJson = localStorage.getItem('fc_users');
+    let users = usersJson ? JSON.parse(usersJson) : [];
+    
+    // Ensure demo accounts exist - replace them if they exist, add if missing
+    const demoIds = ['user_org_demo', 'user_individual_demo'];
+    demoIds.forEach(demoId => {
+      const existingIndex = users.findIndex(u => u.id === demoId);
+      const demoUser = demoUsers.find(u => u.id === demoId);
+      
+      if (existingIndex >= 0) {
+        // Replace existing demo user with fresh data
+        users[existingIndex] = demoUser;
+      } else {
+        // Add new demo user if missing
+        users.push(demoUser);
+      }
+    });
+    
+    localStorage.setItem('fc_users', JSON.stringify(users));
+    console.log('Demo users ensured - all demo accounts are available with correct credentials');
+  } catch (error) {
+    console.error('Error seeding demo data:', error);
   }
 }
 
