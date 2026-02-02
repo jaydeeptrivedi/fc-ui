@@ -7,11 +7,14 @@
   shell.innerHTML = `
     <nav class="navbar navbar-expand topbar-brand navbar-dark sticky-top">
       <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="./index.html">
           <span class="brand-badge">FC</span>
           <span>Platform</span>
         </a>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 align-items-center">
+          <a class="btn btn-sm btn-outline-light" href="./registration.html" title="Create Account">
+            <span style="font-size: 14px;">+ Sign Up</span>
+          </a>
           <button class="btn btn-sm btn-outline-light" type="button" title="Notifications">🔔</button>
           <button class="btn btn-sm btn-outline-light" type="button" title="Profile">👤</button>
           <button class="btn btn-sm btn-outline-light" type="button" title="Settings">⚙️</button>
