@@ -79,7 +79,7 @@ function storeUser(userData, type) {
     // Add user with type and timestamp
     const newUser = {
       ...userData,
-      type, // 'individual' or 'organization'
+      type, // 'individual', 'organization', or 'team_member'
       id: 'user_' + Date.now(),
       createdAt: new Date().toISOString(),
       isVerified: false
