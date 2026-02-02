@@ -220,7 +220,7 @@
           </div>
 
           <div class="text-center small text-secondary mt-3">
-            Already have an account? <a href="./index.html" class="fw-semibold">Sign in here</a>
+            Already have an account? <a href="./signin.html" class="fw-semibold">Sign in here</a>
           </div>
 
         </div>
@@ -410,9 +410,9 @@
       const result = storeUser(userData, 'individual');
 
       if (result.success) {
-        document.getElementById('indiv-success').textContent = `Success! Welcome ${firstName}! Redirecting...`;
+        document.getElementById('indiv-success').textContent = `Success! Welcome ${firstName}! A verification link has been sent to your email. Redirecting to sign in...`;
         document.getElementById('indiv-success').classList.remove('d-none');
-        setTimeout(() => window.location.href = './index.html', 2000);
+        setTimeout(() => window.location.href = './signin.html', 2500);
       } else {
         document.getElementById('indiv-error').textContent = result.message;
         document.getElementById('indiv-error').classList.remove('d-none');
@@ -450,9 +450,9 @@
       const result = storeUser(orgData, 'organization');
 
       if (result.success) {
-        document.getElementById('org-success').textContent = `Success! Organization registered! Redirecting...`;
+        document.getElementById('org-success').textContent = `Success! Organization registered! A verification link has been sent to ${contactEmail}. Redirecting to sign in...`;
         document.getElementById('org-success').classList.remove('d-none');
-        setTimeout(() => window.location.href = './index.html', 2000);
+        setTimeout(() => window.location.href = './signin.html', 2500);
       } else {
         document.getElementById('org-error').textContent = result.message;
         document.getElementById('org-error').classList.remove('d-none');
