@@ -152,7 +152,8 @@
                 <form id="form-step3">
                   <div class="mb-3">
                     <label for="step3-crops" class="form-label fw-semibold">Crops/Fruits Grown *</label>
-                    <input type="text" class="form-control" id="step3-crops" placeholder="e.g., Wheat, Rice, Apples, Tomatoes" required />
+                    <input type="text" class="form-control" id="step3-crops" placeholder="Search and select crops, or add your own..." required style="display: none;" />
+                    <small class="form-text d-block mt-2">Select from suggestions or type to add custom crops. Press Enter or comma to add.</small>
                   </div>
 
                   <div class="mb-3">
@@ -295,6 +296,9 @@
   <!-- Shared layout -->
   <script src="./assets/layout.js"></script>
 
+  <!-- Multi-Tag Input Component -->
+  <script src="./assets/multi-tag.js"></script>
+
   <!-- Registration logic -->
   <script>
     let currentStep = 1;
@@ -304,6 +308,10 @@
       document.getElementById('nextBtn').addEventListener('click', handleNext);
       document.getElementById('backBtn').addEventListener('click', handleBack);
       document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+      
+      // Initialize multi-tag input for crops
+      const cropsTagInput = new MultiTagInput('#step3-crops', COMMON_CROPS);
+      window.cropsTagInput = cropsTagInput; // Store for later access
       
       // Add password strength listener
       const passwordInput = document.getElementById('step2-password');
@@ -336,7 +344,13 @@
       document.getElementById('step2-password').value = 'Password123';
       document.getElementById('step2-confirm-password').value = 'Password123';
       
-      document.getElementById('step3-crops').value = 'Wheat, Rice';
+      // Set crops using the multi-tag component
+      if (window.cropsTagInput) {
+        window.cropsTagInput.setTags(['Wheat', 'Rice']);
+      } else {
+        document.getElementById('step3-crops').value = 'Wheat, Rice';
+      }
+      
       document.getElementById('step3-farm-size').value = 'medium';
       document.getElementById('step3-irrigation').value = 'yes';
       document.getElementById('step3-pest-management').value = 'organic';

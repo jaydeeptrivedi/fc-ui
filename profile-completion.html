@@ -188,7 +188,8 @@
                 <form id="form-step4">
                   <div class="mb-3">
                     <label for="profile-crops" class="form-label fw-semibold">Crops/Fruits Grown *</label>
-                    <input type="text" class="form-control" id="profile-crops" placeholder="e.g., Wheat, Rice, Apples, Tomatoes" required />
+                    <input type="text" class="form-control" id="profile-crops" placeholder="Search and select crops, or add your own..." required style="display: none;" />
+                    <small class="form-text d-block mt-2">Select from suggestions or type to add custom crops. Press Enter or comma to add.</small>
                   </div>
 
                   <div class="mb-3">
@@ -286,6 +287,9 @@
   <!-- Shared layout -->
   <script src="./assets/layout.js"></script>
 
+  <!-- Multi-Tag Input Component -->
+  <script src="./assets/multi-tag.js"></script>
+
   <!-- Profile completion logic -->
   <script>
     let currentStep = 1;
@@ -299,6 +303,10 @@
         window.location.href = './signin.html';
         return;
       }
+
+      // Initialize multi-tag input for crops
+      const cropsTagInput = new MultiTagInput('#profile-crops', COMMON_CROPS);
+      window.cropsTagInput = cropsTagInput; // Store for later access
 
       // Load current user data into form
       loadCurrentData();
@@ -346,6 +354,22 @@
       document.getElementById('profile-focus').value = currentUser.focus || '';
       document.getElementById('profile-country').value = currentUser.country || 'austria';
       document.getElementById('profile-language').value = currentUser.language || 'english';
+      
+      // Load crops using multi-tag component if available
+      if (currentUser.crops) {
+        if (window.cropsTagInput) {
+          const cropsArray = typeof currentUser.crops === 'string' 
+            ? currentUser.crops.split(',').map(c => c.trim()).filter(c => c)
+            : Array.isArray(currentUser.crops) ? currentUser.crops : [];
+          window.cropsTagInput.setTags(cropsArray);
+        } else {
+          document.getElementById('profile-crops').value = currentUser.crops || '';
+        }
+      }
+      
+      document.getElementById('profile-farm-size').value = currentUser.farmSize || '';
+      document.getElementById('profile-irrigation').value = currentUser.irrigation || '';
+      document.getElementById('profile-pest-management').value = currentUser.pestManagement || '';
     }
 
     function updatePasswordStrength() {
