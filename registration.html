@@ -26,60 +26,33 @@
             </div>
 
             <div class="card-body p-4">
-              <!-- Progress Steps -->
+              <!-- Progress Steps (4 steps) -->
               <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
-                <div class="stepchip" id="chip1">1. Category</div>
+                <div class="stepchip" id="chip1">1. Account</div>
                 <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip2">2. Password</div>
+                <div class="stepchip" id="chip2">2. Profile</div>
                 <div class="flex-grow-1 border-top"></div>
                 <div class="stepchip" id="chip3">3. Farm</div>
                 <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip4">4. Details</div>
-                <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip5">5. Terms</div>
+                <div class="stepchip" id="chip4">4. Terms</div>
               </div>
 
-              <!-- Step 1: Category & Account Type -->
+              <!-- Step 1: Account Setup (Email, Username, Password) -->
               <div class="wizard-step" id="step1">
-                <h6 class="fw-bold mb-4">Tell Us About Yourself</h6>
-                <p class="text-secondary small mb-3">Select the Category and Focus that best fits how you work</p>
+                <h6 class="fw-bold mb-4">Create Your Account</h6>
+                <p class="text-secondary small mb-3">Set up your login credentials and account type</p>
                 
                 <form id="form-step1">
                   <div class="mb-3">
-                    <label for="category" class="form-label fw-semibold">What Best Describes You *</label>
-                    <select class="form-select" id="category" required>
-                      <option value="">Select a category</option>
-                      <option value="agriculture">Agriculture</option>
-                      <option value="technology">Technology</option>
-                      <option value="healthcare">Healthcare</option>
-                      <option value="finance">Finance</option>
-                      <option value="retail">Retail</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="focus" class="form-label fw-semibold">Focus Area *</label>
-                    <select class="form-select" id="focus" required>
-                      <option value="">Select focus area</option>
-                      <option value="farmer">Farmer / Producer</option>
-                      <option value="consultant">Consultant</option>
-                      <option value="researcher">Researcher</option>
-                      <option value="business">Business Owner</option>
-                      <option value="other">Other</option>
-                    </select>
+                    <label for="step1-email" class="form-label fw-semibold">Email Address *</label>
+                    <input type="email" class="form-control" id="step1-email" placeholder="your@email.com" required />
+                    <div class="form-text">We'll send a verification link to this email address</div>
                   </div>
 
                   <div class="mb-3">
                     <label for="step1-username" class="form-label fw-semibold">Username *</label>
                     <input type="text" class="form-control" id="step1-username" placeholder="choose_your_username" required />
                     <div class="form-text">3-20 characters, letters, numbers, and underscores only</div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="step1-email" class="form-label fw-semibold">Email Address *</label>
-                    <input type="email" class="form-control" id="step1-email" placeholder="your@email.com" required />
-                    <div class="form-text">We'll send a verification link to this email address</div>
                   </div>
 
                   <div class="mb-3">
@@ -91,28 +64,21 @@
                     </select>
                   </div>
 
-                  <div id="step1-error" class="alert alert-danger small mb-3 d-none"></div>
-                </form>
-              </div>
+                  <hr class="my-4" />
 
-              <!-- Step 2: Password -->
-              <div class="wizard-step" id="step2" style="display: none;">
-                <h6 class="fw-bold mb-4">Create Password</h6>
-                
-                <form id="form-step2">
                   <div class="mb-3">
-                    <label for="step2-password" class="form-label fw-semibold">Password *</label>
+                    <label for="step1-password" class="form-label fw-semibold">Password *</label>
                     <div class="input-group">
-                      <input type="password" class="form-control" id="step2-password" placeholder="Enter password" required />
-                      <button class="btn btn-outline-secondary" type="button" id="step2-toggle-password" title="Show password">👁️</button>
+                      <input type="password" class="form-control" id="step1-password" placeholder="Enter password" required />
+                      <button class="btn btn-outline-secondary" type="button" id="step1-toggle-password" title="Show password">👁️</button>
                     </div>
                   </div>
 
                   <div class="mb-4">
-                    <label for="step2-confirm-password" class="form-label fw-semibold">Confirm Password *</label>
+                    <label for="step1-confirm-password" class="form-label fw-semibold">Confirm Password *</label>
                     <div class="input-group">
-                      <input type="password" class="form-control" id="step2-confirm-password" placeholder="Confirm password" required />
-                      <button class="btn btn-outline-secondary" type="button" id="step2-toggle-confirm" title="Show password">👁️</button>
+                      <input type="password" class="form-control" id="step1-confirm-password" placeholder="Confirm password" required />
+                      <button class="btn btn-outline-secondary" type="button" id="step1-toggle-confirm" title="Show password">👁️</button>
                     </div>
                   </div>
 
@@ -140,11 +106,81 @@
                     </div>
                   </div>
 
+                  <div id="step1-error" class="alert alert-danger small mb-3 d-none"></div>
+                </form>
+              </div>
+
+              <!-- Step 2: Profile Information (Category, Focus, Name) -->
+              <div class="wizard-step" id="step2" style="display: none;">
+                <h6 class="fw-bold mb-4">Tell Us About Yourself</h6>
+                <p class="text-secondary small mb-3">Share your professional background and personal details</p>
+                
+                <form id="form-step2">
+                  <div class="mb-3">
+                    <label for="category" class="form-label fw-semibold">What Best Describes You *</label>
+                    <select class="form-select" id="category" required>
+                      <option value="">Select a category</option>
+                      <option value="agriculture">Agriculture</option>
+                      <option value="technology">Technology</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="finance">Finance</option>
+                      <option value="retail">Retail</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="focus" class="form-label fw-semibold">Focus Area *</label>
+                    <select class="form-select" id="focus" required>
+                      <option value="">Select focus area</option>
+                      <option value="farmer">Farmer / Producer</option>
+                      <option value="consultant">Consultant</option>
+                      <option value="researcher">Researcher</option>
+                      <option value="business">Business Owner</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="step2-firstName" class="form-label fw-semibold">First Name *</label>
+                      <input type="text" class="form-control" id="step2-firstName" placeholder="John" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="step2-lastName" class="form-label fw-semibold">Last Name *</label>
+                      <input type="text" class="form-control" id="step2-lastName" placeholder="Doe" required />
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="step2-country" class="form-label fw-semibold">Country *</label>
+                    <select class="form-select" id="step2-country" required>
+                      <option value="austria" selected>Austria</option>
+                      <option value="germany">Germany</option>
+                      <option value="france">France</option>
+                      <option value="italy">Italy</option>
+                      <option value="spain">Spain</option>
+                      <option value="uk">United Kingdom</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="step2-language" class="form-label fw-semibold">Language *</label>
+                    <select class="form-select" id="step2-language" required>
+                      <option value="english" selected>English</option>
+                      <option value="german">German</option>
+                      <option value="french">French</option>
+                      <option value="italian">Italian</option>
+                      <option value="spanish">Spanish</option>
+                    </select>
+                  </div>
+
                   <div id="step2-error" class="alert alert-danger small mb-3 d-none"></div>
                 </form>
               </div>
 
-              <!-- Step 3: Farm Operations -->
+              <!-- Step 3: Farm Operations Details -->
               <div class="wizard-step" id="step3" style="display: none;">
                 <h6 class="fw-bold mb-4">Farm Operations Details</h6>
                 <p class="text-secondary small mb-3">Tell us more about your farming operations</p>
@@ -190,55 +226,11 @@
                 </form>
               </div>
 
-              <!-- Step 4: Personal Details -->
+              <!-- Step 4: Terms & Conditions -->
               <div class="wizard-step" id="step4" style="display: none;">
-                <h6 class="fw-bold mb-4">Personal Details</h6>
-                
-                <form id="form-step4">
-                  <div class="row">
-                    <div class="col-md-6 mb-3">
-                      <label for="step4-firstName" class="form-label fw-semibold">First Name *</label>
-                      <input type="text" class="form-control" id="step4-firstName" placeholder="John" required />
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <label for="step4-lastName" class="form-label fw-semibold">Last Name *</label>
-                      <input type="text" class="form-control" id="step4-lastName" placeholder="Doe" required />
-                    </div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="step4-country" class="form-label fw-semibold">Country *</label>
-                    <select class="form-select" id="step4-country" required>
-                      <option value="austria" selected>Austria</option>
-                      <option value="germany">Germany</option>
-                      <option value="france">France</option>
-                      <option value="italy">Italy</option>
-                      <option value="spain">Spain</option>
-                      <option value="uk">United Kingdom</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="step4-language" class="form-label fw-semibold">Language *</label>
-                    <select class="form-select" id="step4-language" required>
-                      <option value="english" selected>English</option>
-                      <option value="german">German</option>
-                      <option value="french">French</option>
-                      <option value="italian">Italian</option>
-                      <option value="spanish">Spanish</option>
-                    </select>
-                  </div>
-
-                  <div id="step4-error" class="alert alert-danger small mb-3 d-none"></div>
-                </form>
-              </div>
-
-              <!-- Step 5: Terms & Conditions -->
-              <div class="wizard-step" id="step5" style="display: none;">
                 <h6 class="fw-bold mb-4">Terms & Conditions</h6>
                 
-                <form id="form-step5">
+                <form id="form-step4">
                   <div class="alert alert-light border mb-4 p-3" style="max-height: 250px; overflow-y: auto;">
                     <h6 class="fw-bold mb-2">FC Platform Terms & Conditions</h6>
                     <p class="small mb-2"><strong>1. Acceptance of Terms</strong><br>By creating an account, you agree to these terms and conditions.</p>
@@ -249,21 +241,21 @@
                   </div>
 
                   <div class="form-check mb-4">
-                    <input class="form-check-input" type="checkbox" id="step5-terms" required />
-                    <label class="form-check-label" for="step5-terms">
+                    <input class="form-check-input" type="checkbox" id="step4-terms" required />
+                    <label class="form-check-label" for="step4-terms">
                       I have read and agree to the Terms & Conditions
                     </label>
                   </div>
 
                   <div class="form-check mb-4">
-                    <input class="form-check-input" type="checkbox" id="step5-privacy" required />
-                    <label class="form-check-label" for="step5-privacy">
+                    <input class="form-check-input" type="checkbox" id="step4-privacy" required />
+                    <label class="form-check-label" for="step4-privacy">
                       I agree to the Privacy Policy
                     </label>
                   </div>
 
-                  <div id="step5-error" class="alert alert-danger small mb-3 d-none"></div>
-                  <div id="step5-success" class="alert alert-success small mb-3 d-none"></div>
+                  <div id="step4-error" class="alert alert-danger small mb-3 d-none"></div>
+                  <div id="step4-success" class="alert alert-success small mb-3 d-none"></div>
                 </form>
               </div>
             </div>
@@ -314,20 +306,26 @@
       window.cropsTagInput = cropsTagInput; // Store for later access
       
       // Add password strength listener
-      const passwordInput = document.getElementById('step2-password');
+      const passwordInput = document.getElementById('step1-password');
       if (passwordInput) {
         passwordInput.addEventListener('input', updatePasswordStrength);
       }
 
       // Password visibility toggles
-      document.getElementById('step2-toggle-password').addEventListener('click', function() {
-        const input = document.getElementById('step2-password');
+      document.getElementById('step1-toggle-password').addEventListener('click', function() {
+        const input = document.getElementById('step1-password');
         input.type = input.type === 'password' ? 'text' : 'password';
         this.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
       });
 
-      document.getElementById('step2-toggle-confirm').addEventListener('click', function() {
-        const input = document.getElementById('step2-confirm-password');
+      document.getElementById('step1-toggle-confirm').addEventListener('click', function() {
+        const input = document.getElementById('step1-confirm-password');
+        input.type = input.type === 'password' ? 'text' : 'password';
+        this.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
+      });
+
+      document.getElementById('step1-toggle-confirm').addEventListener('click', function() {
+        const input = document.getElementById('step1-confirm-password');
         input.type = input.type === 'password' ? 'text' : 'password';
         this.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
       });
@@ -337,12 +335,18 @@
     });
 
     function prefillDemoData() {
+      document.getElementById('step1-email').value = 'john.smith@example.com';
+      document.getElementById('step1-username').value = 'johnsmith_dev';
+      document.getElementById('accountType').value = 'individual';
+      document.getElementById('step1-password').value = 'Password123';
+      document.getElementById('step1-confirm-password').value = 'Password123';
+      
       document.getElementById('category').value = 'agriculture';
       document.getElementById('focus').value = 'farmer';
-      document.getElementById('accountType').value = 'individual';
-      
-      document.getElementById('step2-password').value = 'Password123';
-      document.getElementById('step2-confirm-password').value = 'Password123';
+      document.getElementById('step2-firstName').value = 'John';
+      document.getElementById('step2-lastName').value = 'Smith';
+      document.getElementById('step2-country').value = 'austria';
+      document.getElementById('step2-language').value = 'english';
       
       // Set crops using the multi-tag component
       if (window.cropsTagInput) {
@@ -355,17 +359,12 @@
       document.getElementById('step3-irrigation').value = 'yes';
       document.getElementById('step3-pest-management').value = 'organic';
       
-      document.getElementById('step4-firstName').value = 'John';
-      document.getElementById('step4-lastName').value = 'Smith';
-      document.getElementById('step4-country').value = 'austria';
-      document.getElementById('step4-language').value = 'english';
-      
       // Update password strength display for prefilled password
       updatePasswordStrength();
     }
 
     function updatePasswordStrength() {
-      const password = document.getElementById('step2-password').value;
+      const password = document.getElementById('step1-password').value;
       
       updateCheckmark('check-length', password.length >= 10 && password.length <= 30);
       updateCheckmark('check-upper', /[A-Z]/.test(password));
@@ -400,8 +399,8 @@
     }
 
     function handleSubmit() {
-      if (!document.getElementById('step5-terms').checked || !document.getElementById('step5-privacy').checked) {
-        showError('step5', 'You must accept both terms and privacy policy');
+      if (!document.getElementById('step4-terms').checked || !document.getElementById('step4-privacy').checked) {
+        showError('step4', 'You must accept both terms and privacy policy');
         return;
       }
 
@@ -410,19 +409,20 @@
     }
 
     function validateStep(step) {
-      const errorIds = ['step1-error', 'step2-error', 'step3-error', 'step4-error', 'step5-error'];
+      const errorIds = ['step1-error', 'step2-error', 'step3-error', 'step4-error'];
       if (errorIds[step - 1]) {
         document.getElementById(errorIds[step - 1]).classList.add('d-none');
       }
 
       if (step === 1) {
-        const category = document.getElementById('category').value;
-        const focus = document.getElementById('focus').value;
+        // Step 1: Account Setup (Email, Username, Account Type, Password)
         const username = document.getElementById('step1-username').value.trim();
         const email = document.getElementById('step1-email').value.trim();
         const accountType = document.getElementById('accountType').value;
+        const password = document.getElementById('step1-password').value;
+        const confirm = document.getElementById('step1-confirm-password').value;
 
-        if (!category || !focus || !username || !email || !accountType) {
+        if (!username || !email || !accountType || !password || !confirm) {
           showError('step1', 'All fields are required');
           return false;
         }
@@ -436,56 +436,58 @@
           showError('step1', 'Please enter a valid email address');
           return false;
         }
-        return true;
-      }
-
-      if (step === 2) {
-        const password = document.getElementById('step2-password').value;
-        const confirm = document.getElementById('step2-confirm-password').value;
-
-        if (!password || !confirm) {
-          showError('step2', 'Both password fields are required');
-          return false;
-        }
 
         if (password.length < 10 || password.length > 30) {
-          showError('step2', 'Password must be 10-30 characters');
+          showError('step1', 'Password must be 10-30 characters');
           return false;
         }
 
         if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
-          showError('step2', 'Password must include uppercase, lowercase, and number');
+          showError('step1', 'Password must include uppercase, lowercase, and number');
           return false;
         }
 
         if (password !== confirm) {
-          showError('step2', 'Passwords do not match');
+          showError('step1', 'Passwords do not match');
+          return false;
+        }
+        return true;
+      }
+
+      if (step === 2) {
+        // Step 2: Profile Information (Category, Focus, First Name, Last Name, Country, Language)
+        const category = document.getElementById('category').value;
+        const focus = document.getElementById('focus').value;
+        const firstName = document.getElementById('step2-firstName').value.trim();
+        const lastName = document.getElementById('step2-lastName').value.trim();
+        const country = document.getElementById('step2-country').value;
+        const language = document.getElementById('step2-language').value;
+
+        if (!category || !focus || !firstName || !lastName || !country || !language) {
+          showError('step2', 'All fields are required');
           return false;
         }
         return true;
       }
 
       if (step === 3) {
-        const crops = document.getElementById('step3-crops').value;
+        // Step 3: Farm Operations (Crops, Farm Size, Irrigation, Pest Management)
         const farmSize = document.getElementById('step3-farm-size').value;
         const irrigation = document.getElementById('step3-irrigation').value;
         const pestManagement = document.getElementById('step3-pest-management').value;
-
-        if (!crops || !farmSize || !irrigation || !pestManagement) {
-          showError('step3', 'Please fill in all farm operation details');
+        
+        // Check if crops were added via multi-tag
+        const crops = window.cropsTagInput && window.cropsTagInput.getTags && window.cropsTagInput.getTags();
+        
+        if (!farmSize || !irrigation || !pestManagement || !crops || crops.length === 0) {
+          showError('step3', 'Please fill in all farm operation details and select at least one crop');
           return false;
         }
         return true;
       }
 
       if (step === 4) {
-        const firstName = document.getElementById('step4-firstName').value;
-        const lastName = document.getElementById('step4-lastName').value;
-
-        if (!firstName || !lastName) {
-          showError('step4', 'First and last names are required');
-          return false;
-        }
+        // Step 4: Terms & Conditions (checkboxes only - actual checking happens in handleSubmit)
         return true;
       }
 
@@ -494,23 +496,26 @@
 
     function saveStepData() {
       if (currentStep === 1) {
-        formData.category = document.getElementById('category').value;
-        formData.focus = document.getElementById('focus').value;
+        // Step 1: Account Setup
         formData.username = document.getElementById('step1-username').value.trim();
         formData.email = document.getElementById('step1-email').value.trim();
         formData.accountType = document.getElementById('accountType').value;
+        formData.password = document.getElementById('step1-password').value;
       } else if (currentStep === 2) {
-        formData.password = document.getElementById('step2-password').value;
+        // Step 2: Profile Information
+        formData.category = document.getElementById('category').value;
+        formData.focus = document.getElementById('focus').value;
+        formData.firstName = document.getElementById('step2-firstName').value.trim();
+        formData.lastName = document.getElementById('step2-lastName').value.trim();
+        formData.country = document.getElementById('step2-country').value;
+        formData.language = document.getElementById('step2-language').value;
       } else if (currentStep === 3) {
-        formData.crops = document.getElementById('step3-crops').value;
+        // Step 3: Farm Operations
+        formData.crops = window.cropsTagInput && window.cropsTagInput.getTags ? 
+          window.cropsTagInput.getTags().join(', ') : document.getElementById('step3-crops').value;
         formData.farmSize = document.getElementById('step3-farm-size').value;
         formData.irrigation = document.getElementById('step3-irrigation').value;
         formData.pestManagement = document.getElementById('step3-pest-management').value;
-      } else if (currentStep === 4) {
-        formData.firstName = document.getElementById('step4-firstName').value;
-        formData.lastName = document.getElementById('step4-lastName').value;
-        formData.country = document.getElementById('step4-country').value;
-        formData.language = document.getElementById('step4-language').value;
       }
     }
 
@@ -534,13 +539,13 @@
       const result = storeUser(userData, formData.accountType);
 
       if (result.success) {
-        document.getElementById('step5-success').textContent = `Registration successful! Redirecting to sign in...`;
-        document.getElementById('step5-success').classList.remove('d-none');
+        document.getElementById('step4-success').textContent = `Registration successful! Redirecting to sign in...`;
+        document.getElementById('step4-success').classList.remove('d-none');
         setTimeout(() => {
           window.location.href = 'signin.html?verified=true';
         }, 2000);
       } else {
-        showError('step5', result.message);
+        showError('step4', result.message);
       }
     }
 
@@ -549,8 +554,8 @@
       document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
       document.getElementById(`step${currentStep}`).style.display = 'block';
 
-      // Update chips
-      for (let i = 1; i <= 5; i++) {
+      // Update chips (4 steps)
+      for (let i = 1; i <= 4; i++) {
         const chip = document.getElementById(`chip${i}`);
         chip.classList.remove('active');
         if (i < currentStep) {
@@ -564,11 +569,11 @@
 
       // Update buttons
       document.getElementById('backBtn').style.display = currentStep > 1 ? 'block' : 'none';
-      document.getElementById('nextBtn').style.display = currentStep < 5 ? 'block' : 'none';
-      document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 5);
+      document.getElementById('nextBtn').style.display = currentStep < 4 ? 'block' : 'none';
+      document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 4);
 
       // Update hints
-      const hints = ['Select category and account type', 'Create a strong password', 'Share your farm details', 'Enter your personal details', 'Accept terms to complete'];
+      const hints = ['Set up your account with email and password', 'Share your professional background', 'Tell us about your farming operations', 'Accept terms and complete registration'];
       document.getElementById('wizardHint').textContent = hints[currentStep - 1];
     }
 
