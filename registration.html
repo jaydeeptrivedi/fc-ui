@@ -121,10 +121,10 @@
                     <select class="form-select" id="category" required>
                       <option value="">Select a category</option>
                       <option value="agriculture">Agriculture</option>
-                      <option value="technology">Technology</option>
-                      <option value="healthcare">Healthcare</option>
-                      <option value="finance">Finance</option>
-                      <option value="retail">Retail</option>
+                      <option value="software">Connected Software Company</option>
+                      <option value="golf">Golf and Turf</option>
+                      <option value="forestry">Forestry Life Sciences</option>
+                      <option value="research">Research Institute</option>
                       <option value="other">Other</option>
                     </select>
                   </div>
@@ -296,6 +296,16 @@
     let currentStep = 1;
     let formData = {};
 
+    // Category to Focus Area mapping
+    const categoryFocusMap = {
+      'agriculture': ['Farmer', 'Consultant', 'Supplier', 'Other'],
+      'software': ['Developer', 'Manager', 'Other'],
+      'golf': ['Manager', 'Consultant', 'Operator', 'Other'],
+      'forestry': ['Researcher', 'Manager', 'Consultant', 'Other'],
+      'research': ['Researcher', 'Faculty', 'Student', 'Other'],
+      'other': ['Other']
+    };
+
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('nextBtn').addEventListener('click', handleNext);
       document.getElementById('backBtn').addEventListener('click', handleBack);
@@ -310,6 +320,11 @@
       if (passwordInput) {
         passwordInput.addEventListener('input', updatePasswordStrength);
       }
+
+      // Category change handler - update focus options dynamically
+      document.getElementById('category').addEventListener('change', function() {
+        updateFocusOptions('focus', this.value);
+      });
 
       // Password visibility toggles
       document.getElementById('step1-toggle-password').addEventListener('click', function() {
@@ -334,6 +349,25 @@
       updateUI();
     });
 
+    function updateFocusOptions(focusSelectId, selectedCategory) {
+      const focusSelect = document.getElementById(focusSelectId);
+      const focusOptions = categoryFocusMap[selectedCategory] || ['Other'];
+      
+      // Clear existing options except the placeholder
+      focusSelect.innerHTML = '<option value="">Select focus area</option>';
+      
+      // Add new options based on category
+      focusOptions.forEach(option => {
+        const optionEl = document.createElement('option');
+        optionEl.value = option.toLowerCase().replace(/\s+/g, '-');
+        optionEl.textContent = option;
+        focusSelect.appendChild(optionEl);
+      });
+      
+      // Reset focus selection
+      focusSelect.value = '';
+    }
+
     function prefillDemoData() {
       document.getElementById('step1-email').value = 'john.smith@example.com';
       document.getElementById('step1-username').value = 'johnsmith_dev';
@@ -342,6 +376,7 @@
       document.getElementById('step1-confirm-password').value = 'Password123';
       
       document.getElementById('category').value = 'agriculture';
+      updateFocusOptions('focus', 'agriculture');
       document.getElementById('focus').value = 'farmer';
       document.getElementById('step2-firstName').value = 'John';
       document.getElementById('step2-lastName').value = 'Smith';
