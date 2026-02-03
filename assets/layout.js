@@ -38,7 +38,7 @@ function seedDemoData() {
         firstName: 'John',
         lastName: 'Smith',
         email: 'john.smith@example.com',
-        username: 'johnsmith_dev',
+        username: 'johnsmith_farmer',
         password: 'Password123',
         type: 'individual',
         category: 'agriculture',

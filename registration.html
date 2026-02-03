@@ -60,7 +60,7 @@
                     <select class="form-select" id="accountType" required>
                       <option value="">Select account type</option>
                       <option value="individual">Individual User</option>
-                      <option value="organization">Organization</option>
+                      <option disabled value="organization">Organization (not finalized yet)</option>
                     </select>
                   </div>
 
@@ -370,7 +370,7 @@
 
     function prefillDemoData() {
       document.getElementById('step1-email').value = 'john.smith@example.com';
-      document.getElementById('step1-username').value = 'johnsmith_dev';
+      document.getElementById('step1-username').value = 'johnsmith_farmer';
       document.getElementById('accountType').value = 'individual';
       document.getElementById('step1-password').value = 'Password123';
       document.getElementById('step1-confirm-password').value = 'Password123';
