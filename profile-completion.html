@@ -32,7 +32,7 @@
                 <div class="flex-grow-1 border-top"></div>
                 <div class="stepchip" id="chip2">2. Category</div>
                 <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip3">3. Farm</div>
+                <div class="stepchip" id="chip3">3. Details</div>
                 <div class="flex-grow-1 border-top"></div>
                 <div class="stepchip" id="chip4">4. Location</div>
               </div>
@@ -150,46 +150,144 @@
                 </form>
               </div>
 
-              <!-- Step 3: Farm Details -->
+              <!-- Step 3: Operations Details (Category-Based) -->
               <div class="wizard-step" id="step3" style="display: none;">
-                <h6 class="fw-bold mb-4">Farm Operations Details</h6>
-                <p class="text-secondary small mb-3">Tell us more about your farming operations</p>
+                <h6 class="fw-bold mb-4" id="step3-title">Operations Details</h6>
+                <p class="text-secondary small mb-3" id="step3-description">Tell us more about your operations</p>
                 
                 <form id="form-step3">
-                  <div class="mb-3">
-                    <label for="profile-crops" class="form-label fw-semibold">Crops/Fruits Grown *</label>
-                    <input type="text" class="form-control" id="profile-crops" placeholder="Search and select crops, or add your own..." required style="display: none;" />
-                    <small class="form-text d-block mt-2">Select from suggestions or type to add custom crops. Press Enter or comma to add.</small>
+                  <!-- AGRICULTURE: Crops, Farm Size, Irrigation, Pest Management -->
+                  <div id="section-agriculture" style="display: none;">
+                    <div class="mb-3">
+                      <label for="profile-crops" class="form-label fw-semibold">Crops/Fruits Grown *</label>
+                      <input type="text" class="form-control" id="profile-crops" placeholder="Search and select crops, or add your own..." required style="display: none;" />
+                      <small class="form-text d-block mt-2">Select from suggestions or type to add custom crops. Press Enter or comma to add.</small>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-farm-size" class="form-label fw-semibold">Farm Size Range *</label>
+                      <select class="form-select" id="profile-farm-size" required>
+                        <option value="">Select farm size</option>
+                        <option value="small">Small (< 5 hectares)</option>
+                        <option value="medium">Medium (5-20 hectares)</option>
+                        <option value="large">Large (20-50 hectares)</option>
+                        <option value="xlarge">Extra Large (> 50 hectares)</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-irrigation" class="form-label fw-semibold">Irrigation System *</label>
+                      <select class="form-select" id="profile-irrigation" required>
+                        <option value="">Select irrigation method</option>
+                        <option value="yes">Yes, I use irrigation</option>
+                        <option value="no">No, rain-fed farming</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-pest-management" class="form-label fw-semibold">Pest Management Practice *</label>
+                      <select class="form-select" id="profile-pest-management" required>
+                        <option value="">Select pest management approach</option>
+                        <option value="organic">Organic</option>
+                        <option value="conventional">Conventional</option>
+                        <option value="integrated">Integrated (Mixed)</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div class="mb-3">
-                    <label for="profile-farm-size" class="form-label fw-semibold">Farm Size Range *</label>
-                    <select class="form-select" id="profile-farm-size" required>
-                      <option value="">Select farm size</option>
-                      <option value="small">Small (< 5 hectares)</option>
-                      <option value="medium">Medium (5-20 hectares)</option>
-                      <option value="large">Large (20-50 hectares)</option>
-                      <option value="xlarge">Extra Large (> 50 hectares)</option>
-                    </select>
+                  <!-- GOLF & TURF: Turf Type, Area, Irrigation, Maintenance -->
+                  <div id="section-golf" style="display: none;">
+                    <div class="mb-3">
+                      <label for="profile-turf-type" class="form-label fw-semibold">Turf Type/Coverage *</label>
+                      <input type="text" class="form-control" id="profile-turf-type" placeholder="e.g., Golf Course, Sports Field, Landscape" required />
+                      <small class="form-text">Describe your primary turf coverage type</small>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-turf-area" class="form-label fw-semibold">Turf Area (hectares) *</label>
+                      <select class="form-select" id="profile-turf-area" required>
+                        <option value="">Select area size</option>
+                        <option value="small">Small (< 2 hectares)</option>
+                        <option value="medium">Medium (2-10 hectares)</option>
+                        <option value="large">Large (10-50 hectares)</option>
+                        <option value="xlarge">Extra Large (> 50 hectares)</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-turf-irrigation" class="form-label fw-semibold">Irrigation System *</label>
+                      <select class="form-select" id="profile-turf-irrigation" required>
+                        <option value="">Select irrigation method</option>
+                        <option value="automated">Automated/Sprinkler</option>
+                        <option value="manual">Manual</option>
+                        <option value="hybrid">Hybrid</option>
+                        <option value="none">None/Minimal</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-turf-maintenance" class="form-label fw-semibold">Maintenance Practice *</label>
+                      <select class="form-select" id="profile-turf-maintenance" required>
+                        <option value="">Select maintenance approach</option>
+                        <option value="organic">Organic</option>
+                        <option value="conventional">Conventional</option>
+                        <option value="sustainable">Sustainable/Low-input</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div class="mb-3">
-                    <label for="profile-irrigation" class="form-label fw-semibold">Irrigation System *</label>
-                    <select class="form-select" id="profile-irrigation" required>
-                      <option value="">Select irrigation method</option>
-                      <option value="yes">Yes, I use irrigation</option>
-                      <option value="no">No, rain-fed farming</option>
-                    </select>
+                  <!-- FORESTRY: Forest Type, Area, Management, Conservation -->
+                  <div id="section-forestry" style="display: none;">
+                    <div class="mb-3">
+                      <label for="profile-forest-type" class="form-label fw-semibold">Forest Type *</label>
+                      <select class="form-select" id="profile-forest-type" required>
+                        <option value="">Select forest type</option>
+                        <option value="deciduous">Deciduous</option>
+                        <option value="coniferous">Coniferous</option>
+                        <option value="mixed">Mixed</option>
+                        <option value="tropical">Tropical</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-forest-area" class="form-label fw-semibold">Forest Area (hectares) *</label>
+                      <select class="form-select" id="profile-forest-area" required>
+                        <option value="">Select area size</option>
+                        <option value="small">Small (< 10 hectares)</option>
+                        <option value="medium">Medium (10-100 hectares)</option>
+                        <option value="large">Large (100-1000 hectares)</option>
+                        <option value="xlarge">Extra Large (> 1000 hectares)</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-forest-management" class="form-label fw-semibold">Management Practice *</label>
+                      <select class="form-select" id="profile-forest-management" required>
+                        <option value="">Select management approach</option>
+                        <option value="sustainable">Sustainable Forestry</option>
+                        <option value="conservation">Conservation/Protected</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="research">Research</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-forest-certification" class="form-label fw-semibold">Conservation Status</label>
+                      <select class="form-select" id="profile-forest-certification">
+                        <option value="">Select status (optional)</option>
+                        <option value="certified">FSC Certified</option>
+                        <option value="protected">Protected Area</option>
+                        <option value="none">None</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div class="mb-3">
-                    <label for="profile-pest-management" class="form-label fw-semibold">Pest Management Practice *</label>
-                    <select class="form-select" id="profile-pest-management" required>
-                      <option value="">Select pest management approach</option>
-                      <option value="organic">Organic</option>
-                      <option value="conventional">Conventional</option>
-                      <option value="integrated">Integrated (Mixed)</option>
-                    </select>
+                  <!-- SOFTWARE & RESEARCH: Skip - Optional Message -->
+                  <div id="section-other" style="display: none;">
+                    <div class="alert alert-info">
+                      <p class="small mb-0">Operations details are not applicable for your category. Continue to the next step to finalize your profile.</p>
+                    </div>
                   </div>
 
                   <div id="step3-error" class="alert alert-danger small mb-3 d-none"></div>
@@ -276,6 +374,43 @@
       'other': ['Other']
     };
 
+    // Category-based Step 3 configuration
+    const step3Config = {
+      'agriculture': {
+        show: true,
+        title: 'Farm Operations Details',
+        description: 'Tell us more about your farming operations',
+        section: 'section-agriculture',
+        requiredFields: ['profile-crops', 'profile-farm-size', 'profile-irrigation', 'profile-pest-management']
+      },
+      'golf': {
+        show: true,
+        title: 'Turf Operations Details',
+        description: 'Tell us more about your turf operations',
+        section: 'section-golf',
+        requiredFields: ['profile-turf-type', 'profile-turf-area', 'profile-turf-irrigation', 'profile-turf-maintenance']
+      },
+      'forestry': {
+        show: true,
+        title: 'Forest Operations Details',
+        description: 'Tell us more about your forest operations',
+        section: 'section-forestry',
+        requiredFields: ['profile-forest-type', 'profile-forest-area', 'profile-forest-management']
+      },
+      'software': {
+        show: false,
+        section: 'section-other'
+      },
+      'research': {
+        show: false,
+        section: 'section-other'
+      },
+      'other': {
+        show: false,
+        section: 'section-other'
+      }
+    };
+
     document.addEventListener('DOMContentLoaded', function() {
       currentUser = getCurrentUser();
       
@@ -295,9 +430,10 @@
       document.getElementById('backBtn').addEventListener('click', handleBack);
       document.getElementById('submitBtn').addEventListener('click', handleSubmit);
 
-      // Category change handler - update focus options dynamically
+      // Category change handler - update focus options and Step 3 dynamically
       document.getElementById('profile-category').addEventListener('change', function() {
         updateFocusOptions('profile-focus', this.value);
+        updateStep3ForCategory(this.value);
       });
 
       // Password field listeners
@@ -341,26 +477,44 @@
       if (currentUser.category) {
         updateFocusOptions('profile-focus', currentUser.category);
         document.getElementById('profile-focus').value = currentUser.focus || '';
+        
+        // Update Step 3 for the selected category
+        updateStep3ForCategory(currentUser.category);
       }
       
       document.getElementById('profile-country').value = currentUser.country || 'austria';
       document.getElementById('profile-language').value = currentUser.language || 'english';
       
-      // Load crops using multi-tag component if available
-      if (currentUser.crops) {
-        if (window.cropsTagInput) {
-          const cropsArray = typeof currentUser.crops === 'string' 
-            ? currentUser.crops.split(',').map(c => c.trim()).filter(c => c)
-            : Array.isArray(currentUser.crops) ? currentUser.crops : [];
-          window.cropsTagInput.setTags(cropsArray);
-        } else {
-          document.getElementById('profile-crops').value = currentUser.crops || '';
-        }
-      }
+      // Load category-specific operation data
+      const category = currentUser.category;
       
-      document.getElementById('profile-farm-size').value = currentUser.farmSize || '';
-      document.getElementById('profile-irrigation').value = currentUser.irrigation || '';
-      document.getElementById('profile-pest-management').value = currentUser.pestManagement || '';
+      if (category === 'agriculture') {
+        // Load crops using multi-tag component if available
+        if (currentUser.crops) {
+          if (window.cropsTagInput) {
+            const cropsArray = typeof currentUser.crops === 'string' 
+              ? currentUser.crops.split(',').map(c => c.trim()).filter(c => c)
+              : Array.isArray(currentUser.crops) ? currentUser.crops : [];
+            window.cropsTagInput.setTags(cropsArray);
+          } else {
+            document.getElementById('profile-crops').value = currentUser.crops || '';
+          }
+        }
+        
+        document.getElementById('profile-farm-size').value = currentUser.farmSize || '';
+        document.getElementById('profile-irrigation').value = currentUser.irrigation || '';
+        document.getElementById('profile-pest-management').value = currentUser.pestManagement || '';
+      } else if (category === 'golf') {
+        document.getElementById('profile-turf-type').value = currentUser.turfType || '';
+        document.getElementById('profile-turf-area').value = currentUser.turfArea || '';
+        document.getElementById('profile-turf-irrigation').value = currentUser.turfIrrigation || '';
+        document.getElementById('profile-turf-maintenance').value = currentUser.turfMaintenance || '';
+      } else if (category === 'forestry') {
+        document.getElementById('profile-forest-type').value = currentUser.forestType || '';
+        document.getElementById('profile-forest-area').value = currentUser.forestArea || '';
+        document.getElementById('profile-forest-management').value = currentUser.forestManagement || '';
+        document.getElementById('profile-forest-certification').value = currentUser.forestCertification || '';
+      }
     }
 
     function updateFocusOptions(focusSelectId, selectedCategory) {
@@ -380,6 +534,30 @@
       
       // Reset focus selection
       focusSelect.value = '';
+    }
+
+    function updateStep3ForCategory(category) {
+      // Hide all category sections first
+      document.getElementById('section-agriculture').style.display = 'none';
+      document.getElementById('section-golf').style.display = 'none';
+      document.getElementById('section-forestry').style.display = 'none';
+      document.getElementById('section-other').style.display = 'none';
+
+      const config = step3Config[category];
+      
+      if (config && config.show) {
+        // Show the appropriate section
+        document.getElementById(config.section).style.display = 'block';
+        
+        // Update step title and description
+        document.getElementById('step3-title').textContent = config.title;
+        document.getElementById('step3-description').textContent = config.description;
+      } else {
+        // For categories without operations (Software, Research)
+        document.getElementById('section-other').style.display = 'block';
+        document.getElementById('step3-title').textContent = 'Operations Details';
+        document.getElementById('step3-description').textContent = 'Farm operations are not applicable for your organization type. You can proceed to the next step.';
+      }
     }
 
     function updatePasswordStrength() {
@@ -474,27 +652,56 @@
 
       if (step === 3) {
         const category = document.getElementById('profile-category').value;
-        const focus = document.getElementById('profile-focus').value;
-
-        if (!category || !focus) {
-          showError('step3', 'Please select both category and focus area');
-          return false;
+        const config = step3Config[category];
+        
+        // If category doesn't require Step 3 (Software, Research), skip validation
+        if (config && !config.show) {
+          return true;
+        }
+        
+        // Validate category-specific required fields
+        if (config && config.requiredFields) {
+          for (const fieldId of config.requiredFields) {
+            const field = document.getElementById(fieldId);
+            if (!field) continue;
+            
+            let value = field.value.trim();
+            
+            // Special handling for multi-tag input (crops)
+            if (fieldId === 'profile-crops' && window.cropsTagInput && window.cropsTagInput.getTags) {
+              const tags = window.cropsTagInput.getTags();
+              if (!tags || tags.length === 0) {
+                showError('step3', 'Please select at least one crop');
+                return false;
+              }
+            } else if (!value) {
+              const labels = {
+                'profile-crops': 'Crops',
+                'profile-farm-size': 'Farm Size',
+                'profile-irrigation': 'Irrigation System',
+                'profile-pest-management': 'Pest Management',
+                'profile-turf-type': 'Turf Type',
+                'profile-turf-area': 'Turf Area',
+                'profile-turf-irrigation': 'Irrigation System',
+                'profile-turf-maintenance': 'Maintenance Practice',
+                'profile-forest-type': 'Forest Type',
+                'profile-forest-area': 'Forest Area',
+                'profile-forest-management': 'Management Practice'
+              };
+              showError('step3', `Please select a ${labels[fieldId] || 'required field'}`);
+              return false;
+            }
+          }
         }
         return true;
       }
 
       if (step === 4) {
-        const crops = window.cropsTagInput && window.cropsTagInput.getTags ? 
-          window.cropsTagInput.getTags() : 
-          document.getElementById('profile-crops').value.split(',').map(c => c.trim()).filter(c => c);
-        const farmSize = document.getElementById('profile-farm-size').value;
-        const irrigation = document.getElementById('profile-irrigation').value;
-        const pestManagement = document.getElementById('profile-pest-management').value;
         const country = document.getElementById('profile-country').value;
         const language = document.getElementById('profile-language').value;
 
-        if (!crops || crops.length === 0 || !farmSize || !irrigation || !pestManagement || !country || !language) {
-          showError('step4', 'Please fill in all farm and location details');
+        if (!country || !language) {
+          showError('step4', 'Please select both country and language');
           return false;
         }
         return true;
@@ -512,10 +719,30 @@
         updatedData.category = document.getElementById('profile-category').value;
         updatedData.focus = document.getElementById('profile-focus').value;
       } else if (currentStep === 3) {
-        updatedData.crops = document.getElementById('profile-crops').value;
-        updatedData.farmSize = document.getElementById('profile-farm-size').value;
-        updatedData.irrigation = document.getElementById('profile-irrigation').value;
-        updatedData.pestManagement = document.getElementById('profile-pest-management').value;
+        const category = document.getElementById('profile-category').value;
+        const config = step3Config[category];
+        
+        // Only save operations data if the category requires it
+        if (config && config.show) {
+          if (category === 'agriculture') {
+            const crops = window.cropsTagInput && window.cropsTagInput.getTags ? 
+              window.cropsTagInput.getTags() : [];
+            updatedData.crops = Array.isArray(crops) ? crops : [];
+            updatedData.farmSize = document.getElementById('profile-farm-size').value;
+            updatedData.irrigation = document.getElementById('profile-irrigation').value;
+            updatedData.pestManagement = document.getElementById('profile-pest-management').value;
+          } else if (category === 'golf') {
+            updatedData.turfType = document.getElementById('profile-turf-type').value;
+            updatedData.turfArea = document.getElementById('profile-turf-area').value;
+            updatedData.turfIrrigation = document.getElementById('profile-turf-irrigation').value;
+            updatedData.turfMaintenance = document.getElementById('profile-turf-maintenance').value;
+          } else if (category === 'forestry') {
+            updatedData.forestType = document.getElementById('profile-forest-type').value;
+            updatedData.forestArea = document.getElementById('profile-forest-area').value;
+            updatedData.forestManagement = document.getElementById('profile-forest-management').value;
+            updatedData.forestCertification = document.getElementById('profile-forest-certification').value;
+          }
+        }
       } else if (currentStep === 4) {
         updatedData.country = document.getElementById('profile-country').value;
         updatedData.language = document.getElementById('profile-language').value;
@@ -553,6 +780,12 @@
       document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
       document.getElementById(`step${currentStep}`).style.display = 'block';
 
+      // Update Step 3 title and sections based on current category
+      if (currentStep === 3) {
+        const category = document.getElementById('profile-category').value;
+        updateStep3ForCategory(category);
+      }
+
       // Update chips (4 steps now)
       for (let i = 1; i <= 4; i++) {
         const chip = document.getElementById(`chip${i}`);
@@ -572,7 +805,7 @@
       document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 4);
 
       // Update hints
-      const hints = ['Set up your account email and password', 'Verify your professional profile', 'Share your farm details', 'Set your location and language'];
+      const hints = ['Set up your account email and password', 'Verify your professional profile', 'Share your operational details', 'Set your location and language'];
       document.getElementById('wizardHint').textContent = hints[currentStep - 1];
     }
 

@@ -32,7 +32,7 @@
                 <div class="flex-grow-1 border-top"></div>
                 <div class="stepchip" id="chip2">2. Profile</div>
                 <div class="flex-grow-1 border-top"></div>
-                <div class="stepchip" id="chip3">3. Farm</div>
+                <div class="stepchip" id="chip3">3. Details</div>
                 <div class="flex-grow-1 border-top"></div>
                 <div class="stepchip" id="chip4">4. Terms</div>
               </div>
@@ -180,46 +180,145 @@
                 </form>
               </div>
 
-              <!-- Step 3: Farm Operations Details -->
+              <!-- Step 3: Operations Details (Category-Based) -->
               <div class="wizard-step" id="step3" style="display: none;">
-                <h6 class="fw-bold mb-4">Farm Operations Details</h6>
-                <p class="text-secondary small mb-3">Tell us more about your farming operations</p>
+                <h6 class="fw-bold mb-4" id="step3-title">Operations Details</h6>
+                <p class="text-secondary small mb-3" id="step3-description">Tell us more about your operations</p>
                 
                 <form id="form-step3">
-                  <div class="mb-3">
-                    <label for="step3-crops" class="form-label fw-semibold">Crops/Fruits Grown *</label>
-                    <input type="text" class="form-control" id="step3-crops" placeholder="Search and select crops, or add your own..." required style="display: none;" />
-                    <small class="form-text d-block mt-2">Select from suggestions or type to add custom crops. Press Enter or comma to add.</small>
+                  <!-- AGRICULTURE: Crops, Farm Size, Irrigation, Pest Management -->
+                  <div id="section-agriculture" style="display: none;">
+                    <div class="mb-3">
+                      <label for="step3-crops" class="form-label fw-semibold">Crops/Fruits Grown *</label>
+                      <input type="text" class="form-control" id="step3-crops" placeholder="Search and select crops, or add your own..." required style="display: none;" />
+                      <small class="form-text d-block mt-2">Select from suggestions or type to add custom crops. Press Enter or comma to add.</small>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-farm-size" class="form-label fw-semibold">Farm Size Range *</label>
+                      <select class="form-select" id="step3-farm-size" required>
+                        <option value="">Select farm size</option>
+                        <option value="small">Small (< 5 hectares)</option>
+                        <option value="medium">Medium (5-20 hectares)</option>
+                        <option value="large">Large (20-50 hectares)</option>
+                        <option value="xlarge">Extra Large (> 50 hectares)</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-irrigation" class="form-label fw-semibold">Irrigation System *</label>
+                      <select class="form-select" id="step3-irrigation" required>
+                        <option value="">Select irrigation method</option>
+                        <option value="yes">Yes, I use irrigation</option>
+                        <option value="no">No, rain-fed farming</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-pest-management" class="form-label fw-semibold">Pest Management Practice *</label>
+                      <select class="form-select" id="step3-pest-management" required>
+                        <option value="">Select pest management approach</option>
+                        <option value="organic">Organic</option>
+                        <option value="conventional">Conventional</option>
+                        <option value="integrated">Integrated (Mixed)</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div class="mb-3">
-                    <label for="step3-farm-size" class="form-label fw-semibold">Farm Size Range *</label>
-                    <select class="form-select" id="step3-farm-size" required>
-                      <option value="">Select farm size</option>
-                      <option value="small">Small (< 5 hectares)</option>
-                      <option value="medium">Medium (5-20 hectares)</option>
-                      <option value="large">Large (20-50 hectares)</option>
-                      <option value="xlarge">Extra Large (> 50 hectares)</option>
-                    </select>
+                  <!-- GOLF & TURF: Turf Type, Area, Irrigation, Maintenance -->
+                  <div id="section-golf" style="display: none;">
+                    <div class="mb-3">
+                      <label for="step3-turf-type" class="form-label fw-semibold">Turf Type/Coverage *</label>
+                      <input type="text" class="form-control" id="step3-turf-type" placeholder="e.g., Golf Course, Sports Field, Landscape" required />
+                      <small class="form-text">Describe your primary turf coverage type</small>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-turf-area" class="form-label fw-semibold">Turf Area (hectares) *</label>
+                      <select class="form-select" id="step3-turf-area" required>
+                        <option value="">Select area size</option>
+                        <option value="small">Small (< 2 hectares)</option>
+                        <option value="medium">Medium (2-10 hectares)</option>
+                        <option value="large">Large (10-50 hectares)</option>
+                        <option value="xlarge">Extra Large (> 50 hectares)</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-turf-irrigation" class="form-label fw-semibold">Irrigation System *</label>
+                      <select class="form-select" id="step3-turf-irrigation" required>
+                        <option value="">Select irrigation method</option>
+                        <option value="automated">Automated/Sprinkler</option>
+                        <option value="manual">Manual</option>
+                        <option value="hybrid">Hybrid</option>
+                        <option value="none">None/Minimal</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-turf-maintenance" class="form-label fw-semibold">Maintenance Practice *</label>
+                      <select class="form-select" id="step3-turf-maintenance" required>
+                        <option value="">Select maintenance approach</option>
+                        <option value="organic">Organic</option>
+                        <option value="conventional">Conventional</option>
+                        <option value="sustainable">Sustainable/Low-input</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div class="mb-3">
-                    <label for="step3-irrigation" class="form-label fw-semibold">Irrigation System *</label>
-                    <select class="form-select" id="step3-irrigation" required>
-                      <option value="">Select irrigation method</option>
-                      <option value="yes">Yes, I use irrigation</option>
-                      <option value="no">No, rain-fed farming</option>
-                    </select>
+                  <!-- FORESTRY: Forest Type, Area, Management, Conservation -->
+                  <div id="section-forestry" style="display: none;">
+                    <div class="mb-3">
+                      <label for="step3-forest-type" class="form-label fw-semibold">Forest Type *</label>
+                      <select class="form-select" id="step3-forest-type" required>
+                        <option value="">Select forest type</option>
+                        <option value="deciduous">Deciduous</option>
+                        <option value="coniferous">Coniferous</option>
+                        <option value="mixed">Mixed</option>
+                        <option value="tropical">Tropical</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-forest-area" class="form-label fw-semibold">Forest Area (hectares) *</label>
+                      <select class="form-select" id="step3-forest-area" required>
+                        <option value="">Select area size</option>
+                        <option value="small">Small (< 10 hectares)</option>
+                        <option value="medium">Medium (10-100 hectares)</option>
+                        <option value="large">Large (100-1000 hectares)</option>
+                        <option value="xlarge">Extra Large (> 1000 hectares)</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-forest-management" class="form-label fw-semibold">Management Practice *</label>
+                      <select class="form-select" id="step3-forest-management" required>
+                        <option value="">Select management approach</option>
+                        <option value="sustainable">Sustainable Forestry</option>
+                        <option value="conservation">Conservation/Protected</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="research">Research</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-forest-certification" class="form-label fw-semibold">Conservation Status</label>
+                      <select class="form-select" id="step3-forest-certification">
+                        <option value="">Select status (optional)</option>
+                        <option value="certified">FSC Certified</option>
+                        <option value="protected">Protected Area</option>
+                        <option value="none">None</option>
+                      </select>
+                    </div>
                   </div>
 
-                  <div class="mb-3">
-                    <label for="step3-pest-management" class="form-label fw-semibold">Pest Management Practice *</label>
-                    <select class="form-select" id="step3-pest-management" required>
-                      <option value="">Select pest management approach</option>
-                      <option value="organic">Organic</option>
-                      <option value="conventional">Conventional</option>
-                      <option value="integrated">Integrated (Mixed)</option>
-                    </select>
+                  <!-- SOFTWARE/RESEARCH: No operations details needed -->
+                  <div id="section-other" style="display: none;">
+                    <div class="alert alert-info" role="alert">
+                      <strong>Operations Details</strong><br />
+                      Operations details are not applicable for your organization type. You can proceed to the next step to complete your registration.
+                    </div>
                   </div>
 
                   <div id="step3-error" class="alert alert-danger small mb-3 d-none"></div>
@@ -306,6 +405,43 @@
       'other': ['Other']
     };
 
+    // Category-based Step 3 configuration
+    const step3Config = {
+      'agriculture': {
+        show: true,
+        title: 'Farm Operations Details',
+        description: 'Tell us more about your farming operations',
+        section: 'section-agriculture',
+        requiredFields: ['step3-crops', 'step3-farm-size', 'step3-irrigation', 'step3-pest-management']
+      },
+      'golf': {
+        show: true,
+        title: 'Turf Operations Details',
+        description: 'Tell us more about your turf operations',
+        section: 'section-golf',
+        requiredFields: ['step3-turf-type', 'step3-turf-area', 'step3-turf-irrigation', 'step3-turf-maintenance']
+      },
+      'forestry': {
+        show: true,
+        title: 'Forest Operations Details',
+        description: 'Tell us more about your forest operations',
+        section: 'section-forestry',
+        requiredFields: ['step3-forest-type', 'step3-forest-area', 'step3-forest-management']
+      },
+      'software': {
+        show: false,
+        section: 'section-other'
+      },
+      'research': {
+        show: false,
+        section: 'section-other'
+      },
+      'other': {
+        show: false,
+        section: 'section-other'
+      }
+    };
+
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('nextBtn').addEventListener('click', handleNext);
       document.getElementById('backBtn').addEventListener('click', handleBack);
@@ -321,9 +457,10 @@
         passwordInput.addEventListener('input', updatePasswordStrength);
       }
 
-      // Category change handler - update focus options dynamically
+      // Category change handler - update focus options and Step 3 dynamically
       document.getElementById('category').addEventListener('change', function() {
         updateFocusOptions('focus', this.value);
+        updateStep3ForCategory(this.value);
       });
 
       // Password visibility toggles
@@ -396,6 +533,30 @@
       
       // Update password strength display for prefilled password
       updatePasswordStrength();
+    }
+
+    function updateStep3ForCategory(category) {
+      // Hide all category sections first
+      document.getElementById('section-agriculture').style.display = 'none';
+      document.getElementById('section-golf').style.display = 'none';
+      document.getElementById('section-forestry').style.display = 'none';
+      document.getElementById('section-other').style.display = 'none';
+
+      const config = step3Config[category];
+      
+      if (config && config.show) {
+        // Show the appropriate section
+        document.getElementById(config.section).style.display = 'block';
+        
+        // Update step title and description
+        document.getElementById('step3-title').textContent = config.title;
+        document.getElementById('step3-description').textContent = config.description;
+      } else {
+        // For categories without operations (Software, Research)
+        document.getElementById('section-other').style.display = 'block';
+        document.getElementById('step3-title').textContent = 'Operations Details';
+        document.getElementById('step3-description').textContent = 'Operations details are not applicable for your organization type. You can proceed to the next step.';
+      }
     }
 
     function updatePasswordStrength() {
@@ -506,17 +667,48 @@
       }
 
       if (step === 3) {
-        // Step 3: Farm Operations (Crops, Farm Size, Irrigation, Pest Management)
-        const farmSize = document.getElementById('step3-farm-size').value;
-        const irrigation = document.getElementById('step3-irrigation').value;
-        const pestManagement = document.getElementById('step3-pest-management').value;
+        // Step 3: Operations Details (Category-Based)
+        const category = document.getElementById('category').value;
+        const config = step3Config[category];
         
-        // Check if crops were added via multi-tag
-        const crops = window.cropsTagInput && window.cropsTagInput.getTags && window.cropsTagInput.getTags();
+        // If category doesn't require Step 3 (Software, Research), skip validation
+        if (config && !config.show) {
+          return true;
+        }
         
-        if (!farmSize || !irrigation || !pestManagement || !crops || crops.length === 0) {
-          showError('step3', 'Please fill in all farm operation details and select at least one crop');
-          return false;
+        // Validate category-specific required fields
+        if (config && config.requiredFields) {
+          for (const fieldId of config.requiredFields) {
+            const field = document.getElementById(fieldId);
+            if (!field) continue;
+            
+            let value = field.value.trim();
+            
+            // Special handling for multi-tag input (crops)
+            if (fieldId === 'step3-crops' && window.cropsTagInput && window.cropsTagInput.getTags) {
+              const tags = window.cropsTagInput.getTags();
+              if (!tags || tags.length === 0) {
+                showError('step3', 'Please select at least one crop');
+                return false;
+              }
+            } else if (!value) {
+              const labels = {
+                'step3-crops': 'Crops',
+                'step3-farm-size': 'Farm Size',
+                'step3-irrigation': 'Irrigation System',
+                'step3-pest-management': 'Pest Management',
+                'step3-turf-type': 'Turf Type',
+                'step3-turf-area': 'Turf Area',
+                'step3-turf-irrigation': 'Irrigation System',
+                'step3-turf-maintenance': 'Maintenance Practice',
+                'step3-forest-type': 'Forest Type',
+                'step3-forest-area': 'Forest Area',
+                'step3-forest-management': 'Management Practice'
+              };
+              showError('step3', `Please select a ${labels[fieldId] || 'required field'}`);
+              return false;
+            }
+          }
         }
         return true;
       }
@@ -545,12 +737,31 @@
         formData.country = document.getElementById('step2-country').value;
         formData.language = document.getElementById('step2-language').value;
       } else if (currentStep === 3) {
-        // Step 3: Farm Operations
-        formData.crops = window.cropsTagInput && window.cropsTagInput.getTags ? 
-          window.cropsTagInput.getTags().join(', ') : document.getElementById('step3-crops').value;
-        formData.farmSize = document.getElementById('step3-farm-size').value;
-        formData.irrigation = document.getElementById('step3-irrigation').value;
-        formData.pestManagement = document.getElementById('step3-pest-management').value;
+        // Step 3: Operations Details (Category-Based)
+        const category = document.getElementById('category').value;
+        const config = step3Config[category];
+        
+        // Only save operations data if the category requires it
+        if (config && config.show) {
+          if (category === 'agriculture') {
+            const crops = window.cropsTagInput && window.cropsTagInput.getTags ? 
+              window.cropsTagInput.getTags() : [];
+            formData.crops = Array.isArray(crops) ? crops.join(', ') : crops;
+            formData.farmSize = document.getElementById('step3-farm-size').value;
+            formData.irrigation = document.getElementById('step3-irrigation').value;
+            formData.pestManagement = document.getElementById('step3-pest-management').value;
+          } else if (category === 'golf') {
+            formData.turfType = document.getElementById('step3-turf-type').value;
+            formData.turfArea = document.getElementById('step3-turf-area').value;
+            formData.turfIrrigation = document.getElementById('step3-turf-irrigation').value;
+            formData.turfMaintenance = document.getElementById('step3-turf-maintenance').value;
+          } else if (category === 'forestry') {
+            formData.forestType = document.getElementById('step3-forest-type').value;
+            formData.forestArea = document.getElementById('step3-forest-area').value;
+            formData.forestManagement = document.getElementById('step3-forest-management').value;
+            formData.forestCertification = document.getElementById('step3-forest-certification').value;
+          }
+        }
       }
     }
 
@@ -589,6 +800,12 @@
       document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
       document.getElementById(`step${currentStep}`).style.display = 'block';
 
+      // Update Step 3 title and sections based on current category
+      if (currentStep === 3) {
+        const category = document.getElementById('category').value;
+        updateStep3ForCategory(category);
+      }
+
       // Update chips (4 steps)
       for (let i = 1; i <= 4; i++) {
         const chip = document.getElementById(`chip${i}`);
@@ -608,7 +825,7 @@
       document.getElementById('submitBtn').classList.toggle('d-none', currentStep !== 4);
 
       // Update hints
-      const hints = ['Set up your account with email and password', 'Share your professional background', 'Tell us about your farming operations', 'Accept terms and complete registration'];
+      const hints = ['Set up your account with email and password', 'Share your professional background', 'Share your operational details', 'Accept terms and complete registration'];
       document.getElementById('wizardHint').textContent = hints[currentStep - 1];
     }
 
