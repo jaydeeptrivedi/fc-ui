@@ -283,7 +283,28 @@
                     </div>
                   </div>
 
-                  <!-- SOFTWARE & RESEARCH: Skip - Optional Message -->
+                  <!-- SOFTWARE: Connected Software Company -->
+                  <div id="section-software" style="display: none;">
+                    <div class="mb-3">
+                      <label for="profile-software-work-area" class="form-label fw-semibold">Area of Work *</label>
+                      <select class="form-select" id="profile-software-work-area" required>
+                        <option value="">Select area of work</option>
+                        <option value="farm-management">Farm Management</option>
+                        <option value="value-chain">Value Chain</option>
+                        <option value="crop-management">Crop Management</option>
+                        <option value="weather-meteorological">Weather / Meteorological Services</option>
+                        <option value="machinery">Machinery</option>
+                        <option value="turf-management">Turf Management</option>
+                        <option value="irrigation">Irrigation</option>
+                        <option value="crop-plant-protection">Crop / Plant Protection</option>
+                        <option value="agronomic">Agronomic</option>
+                        <option value="biodiversity">Biodiversity</option>
+                        <option value="others">Others</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- RESEARCH & OTHER: Skip - Optional Message -->
                   <div id="section-other" style="display: none;">
                     <div class="alert alert-info">
                       <p class="small mb-0">Operations details are not applicable for your category. Continue to the next step to finalize your profile.</p>
@@ -398,8 +419,11 @@
         requiredFields: ['profile-forest-type', 'profile-forest-area', 'profile-forest-management']
       },
       'software': {
-        show: false,
-        section: 'section-other'
+        show: true,
+        title: 'Software Company Details',
+        description: 'Tell us about your software company focus',
+        section: 'section-software',
+        requiredFields: ['profile-software-work-area']
       },
       'research': {
         show: false,
@@ -541,6 +565,7 @@
       document.getElementById('section-agriculture').style.display = 'none';
       document.getElementById('section-golf').style.display = 'none';
       document.getElementById('section-forestry').style.display = 'none';
+      document.getElementById('section-software').style.display = 'none';
       document.getElementById('section-other').style.display = 'none';
 
       const config = step3Config[category];
