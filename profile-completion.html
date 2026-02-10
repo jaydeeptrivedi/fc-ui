@@ -118,11 +118,11 @@
               <!-- Step 2: Category & Focus -->
               <div class="wizard-step" id="step2" style="display: none;">
                 <h6 class="fw-bold mb-4">Verify Your Professional Profile</h6>
-                <p class="text-secondary small mb-3">Ensure your category and focus area are correct</p>
+                <p class="text-secondary small mb-3">Ensure your industry/sector and position/role are correct</p>
                 
                 <form id="form-step2">
                   <div class="mb-3">
-                    <label for="profile-category" class="form-label fw-semibold">What Best Describes You *</label>
+                    <label for="profile-category" class="form-label fw-semibold">Select your industry/sector *</label>
                     <select class="form-select" id="profile-category" required>
                       <option value="">Select a category</option>
                       <option value="agriculture">Agriculture</option>
@@ -135,9 +135,9 @@
                   </div>
 
                   <div class="mb-3">
-                    <label for="profile-focus" class="form-label fw-semibold">Focus Area *</label>
+                    <label for="profile-focus" class="form-label fw-semibold">Select your position/role *</label>
                     <select class="form-select" id="profile-focus" required>
-                      <option value="">Select focus area</option>
+                      <option value="">Select your position/role</option>
                       <option value="farmer">Farmer / Producer</option>
                       <option value="consultant">Consultant</option>
                       <option value="researcher">Researcher</option>
@@ -389,7 +389,7 @@
     const categoryFocusMap = {
       'agriculture': ['Farmer', 'Consultant', 'Supplier', 'Other'],
       'software': ['Developer', 'Manager', 'Other'],
-      'golf': ['Manager', 'Consultant', 'Operator', 'Other'],
+      'golf': ['Superintendent', 'Technician', 'Greenkeeper', 'Other'],
       'forestry': ['Researcher', 'Manager', 'Consultant', 'Other'],
       'research': ['Researcher', 'Faculty', 'Student', 'Other'],
       'other': ['Other']
@@ -546,7 +546,7 @@
       const focusOptions = categoryFocusMap[selectedCategory] || ['Other'];
       
       // Clear existing options except the placeholder
-      focusSelect.innerHTML = '<option value="">Select focus area</option>';
+      focusSelect.innerHTML = '<option value="">Select your position/role</option>';
       
       // Add new options based on category
       focusOptions.forEach(option => {

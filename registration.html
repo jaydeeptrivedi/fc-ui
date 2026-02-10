@@ -117,7 +117,7 @@
                 
                 <form id="form-step2">
                   <div class="mb-3">
-                    <label for="category" class="form-label fw-semibold">What Best Describes You *</label>
+                    <label for="category" class="form-label fw-semibold">Select your industry/sector *</label>
                     <select class="form-select" id="category" required>
                       <option value="">Select a category</option>
                       <option value="agriculture">Agriculture</option>
@@ -130,9 +130,9 @@
                   </div>
 
                   <div class="mb-3">
-                    <label for="focus" class="form-label fw-semibold">Focus Area *</label>
+                    <label for="focus" class="form-label fw-semibold">Select your position/role *</label>
                     <select class="form-select" id="focus" required>
-                      <option value="">Select focus area</option>
+                      <option value="">Select your position/role</option>
                       <option value="farmer">Farmer / Producer</option>
                       <option value="consultant">Consultant</option>
                       <option value="researcher">Researcher</option>
@@ -420,7 +420,7 @@
     const categoryFocusMap = {
       'agriculture': ['Farmer', 'Consultant', 'Supplier', 'Other'],
       'software': ['Developer', 'Manager', 'Other'],
-      'golf': ['Manager', 'Consultant', 'Operator', 'Other'],
+      'golf': ['Superintendent', 'Technician', 'Greenkeeper', 'Other'],
       'forestry': ['Researcher', 'Manager', 'Consultant', 'Other'],
       'research': ['Researcher', 'Faculty', 'Student', 'Other'],
       'other': ['Other']
@@ -515,7 +515,7 @@
       const focusOptions = categoryFocusMap[selectedCategory] || ['Other'];
       
       // Clear existing options except the placeholder
-      focusSelect.innerHTML = '<option value="">Select focus area</option>';
+      focusSelect.innerHTML = '<option value="">Select your position/role</option>';
       
       // Add new options based on category
       focusOptions.forEach(option => {
