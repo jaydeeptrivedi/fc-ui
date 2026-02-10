@@ -458,12 +458,6 @@
         this.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
       });
 
-      document.getElementById('step1-toggle-confirm').addEventListener('click', function() {
-        const input = document.getElementById('step1-confirm-password');
-        input.type = input.type === 'password' ? 'text' : 'password';
-        this.textContent = input.type === 'password' ? '👁️' : '👁️‍🗨️';
-      });
-
       prefillDemoData();
       updateUI();
     });

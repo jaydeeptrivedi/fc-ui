@@ -83,25 +83,6 @@
                       <span class="small">One Number</span>
                     </div>
                   </div>
-                  <div id="password-strength" class="mb-4 p-3 border border-light-subtle rounded bg-light" style="display: none;">
-                    <div class="text-secondary small fw-semibold mb-3">Password Requirements</div>
-                    <div class="password-guideline d-flex align-items-center gap-2 mb-2">
-                      <span id="profile-check-length" class="badge bg-light text-dark fw-bold">✗</span>
-                      <span class="small">10 to 30 characters</span>
-                    </div>
-                    <div class="password-guideline d-flex align-items-center gap-2 mb-2">
-                      <span id="profile-check-upper" class="badge bg-light text-dark fw-bold">✗</span>
-                      <span class="small">One Uppercase Letter</span>
-                    </div>
-                    <div class="password-guideline d-flex align-items-center gap-2 mb-2">
-                      <span id="profile-check-lower" class="badge bg-light text-dark fw-bold">✗</span>
-                      <span class="small">One Lowercase Letter</span>
-                    </div>
-                    <div class="password-guideline d-flex align-items-center gap-2">
-                      <span id="profile-check-number" class="badge bg-light text-dark fw-bold">✗</span>
-                      <span class="small">One Number</span>
-                    </div>
-                  </div>
 
                   <div class="mb-4">
                     <label for="profile-confirm-password" class="form-label fw-semibold">Confirm Password *</label>
@@ -492,11 +473,6 @@
       } else if (category === 'other') {
         document.getElementById('profile-other-industry').value = currentUser.otherIndustry || '';
         document.getElementById('profile-other-role').value = currentUser.otherRole || '';
-      } else if (category === 'forestry') {
-        document.getElementById('profile-forest-type').value = currentUser.forestType || '';
-        document.getElementById('profile-forest-area').value = currentUser.forestArea || '';
-        document.getElementById('profile-forest-management').value = currentUser.forestManagement || '';
-        document.getElementById('profile-forest-certification').value = currentUser.forestCertification || '';
       }
     }
 
@@ -721,6 +697,7 @@
             updatedData.otherRole = document.getElementById('profile-other-role').value;
           }
         }
+      } else if (currentStep === 4) {
       } else if (currentStep === 4) {
         updatedData.country = document.getElementById('profile-country').value;
         updatedData.language = document.getElementById('profile-language').value;
