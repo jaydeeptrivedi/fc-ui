@@ -242,7 +242,22 @@
                     </div>
                   </div>
 
-                  <!-- RESEARCH & OTHER: Skip - Optional Message -->
+                  <!-- OTHER: Custom Industry Details -->
+                  <div id="section-other-industry" style="display: none;">
+                    <div class="mb-3">
+                      <label for="profile-other-industry" class="form-label fw-semibold">Your Industry/Sector *</label>
+                      <input type="text" class="form-control" id="profile-other-industry" placeholder="Enter your industry or sector" required />
+                      <small class="form-text">Please specify your industry or sector</small>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="profile-other-role" class="form-label fw-semibold">Your Position/Role *</label>
+                      <input type="text" class="form-control" id="profile-other-role" placeholder="Enter your position or role" required />
+                      <small class="form-text">Please specify your position or role</small>
+                    </div>
+                  </div>
+
+                  <!-- RESEARCH, NGO, GOVT: Not Applicable -->
                   <div id="section-other" style="display: none;">
                     <div class="alert alert-info">
                       <p class="small mb-0">Operations details are not applicable for your category. Continue to the next step to finalize your profile.</p>
@@ -370,8 +385,11 @@
         section: 'section-other'
       },
       'other': {
-        show: false,
-        section: 'section-other'
+        show: true,
+        title: 'Industry/Sector Details',
+        description: 'Please specify your industry/sector and position/role',
+        section: 'section-other-industry',
+        requiredFields: ['profile-other-industry', 'profile-other-role']
       }
     };
 
@@ -471,6 +489,9 @@
       } else if (category === 'golf') {
         document.getElementById('profile-turf-area').value = currentUser.turfArea || '';
         document.getElementById('profile-turf-irrigation').value = currentUser.turfIrrigation || '';
+      } else if (category === 'other') {
+        document.getElementById('profile-other-industry').value = currentUser.otherIndustry || '';
+        document.getElementById('profile-other-role').value = currentUser.otherRole || '';
       } else if (category === 'forestry') {
         document.getElementById('profile-forest-type').value = currentUser.forestType || '';
         document.getElementById('profile-forest-area').value = currentUser.forestArea || '';
@@ -503,6 +524,7 @@
       document.getElementById('section-agriculture').style.display = 'none';
       document.getElementById('section-golf').style.display = 'none';
       document.getElementById('section-software').style.display = 'none';
+      document.getElementById('section-other-industry').style.display = 'none';
       document.getElementById('section-other').style.display = 'none';
 
       const config = step3Config[category];
@@ -518,7 +540,7 @@
         // For categories without operations (Software, Research)
         document.getElementById('section-other').style.display = 'block';
         document.getElementById('step3-title').textContent = 'Operations Details';
-        document.getElementById('step3-description').textContent = 'Farm operations are not applicable for your organization type. You can proceed to the next step.';
+        document.getElementById('step3-description').textContent = 'Operations details are not applicable for your industry/sector type. You can proceed to the next step.';
       }
     }
 
@@ -644,7 +666,9 @@
                 'profile-pest-management': 'Pest Management',
                 'profile-turf-area': 'Turf Area',
                 'profile-turf-irrigation': 'Irrigation System',
-                'profile-software-work-area': 'Area of Work'
+                'profile-software-work-area': 'Area of Work',
+                'profile-other-industry': 'Your Industry/Sector',
+                'profile-other-role': 'Your Position/Role'
               };
               showError('step3', `Please select a ${labels[fieldId] || 'required field'}`);
               return false;
@@ -692,6 +716,9 @@
           } else if (category === 'golf') {
             updatedData.turfArea = document.getElementById('profile-turf-area').value;
             updatedData.turfIrrigation = document.getElementById('profile-turf-irrigation').value;
+          } else if (category === 'other') {
+            updatedData.otherIndustry = document.getElementById('profile-other-industry').value;
+            updatedData.otherRole = document.getElementById('profile-other-role').value;
           }
         }
       } else if (currentStep === 4) {

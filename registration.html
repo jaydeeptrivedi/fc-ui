@@ -272,7 +272,22 @@
                     </div>
                   </div>
 
-                  <!-- RESEARCH & OTHER: No operations details needed -->
+                  <!-- OTHER: Custom Industry Details -->
+                  <div id="section-other-industry" style="display: none;">
+                    <div class="mb-3">
+                      <label for="step3-other-industry" class="form-label fw-semibold">Your Industry/Sector *</label>
+                      <input type="text" class="form-control" id="step3-other-industry" placeholder="Enter your industry or sector" required />
+                      <small class="form-text">Please specify your industry or sector</small>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="step3-other-role" class="form-label fw-semibold">Your Position/Role *</label>
+                      <input type="text" class="form-control" id="step3-other-role" placeholder="Enter your position or role" required />
+                      <small class="form-text">Please specify your position or role</small>
+                    </div>
+                  </div>
+
+                  <!-- RESEARCH, NGO, GOVT: Not Applicable -->
                   <div id="section-other" style="display: none;">
                     <div class="alert alert-info" role="alert">
                       <strong>Operations Details</strong><br />
@@ -401,8 +416,11 @@
         section: 'section-other'
       },
       'other': {
-        show: false,
-        section: 'section-other'
+        show: true,
+        title: 'Industry/Sector Details',
+        description: 'Please specify your industry/sector and position/role',
+        section: 'section-other-industry',
+        requiredFields: ['step3-other-industry', 'step3-other-role']
       }
     };
 
@@ -484,14 +502,14 @@
       document.getElementById('step2-country').value = 'austria';
       document.getElementById('step2-language').value = 'english';
       
-      // Set crops using the multi-tag component
+      // Set produces using the multi-tag component
       if (window.cropsTagInput) {
-        window.cropsTagInput.setTags(['Wheat', 'Rice']);
+        window.cropsTagInput.setTags(['Arable / Field Crops', 'Vegetables / Horticulture']);
       } else {
-        document.getElementById('step3-crops').value = 'Wheat, Rice';
+        document.getElementById('step3-crops').value = 'Arable / Field Crops, Vegetables / Horticulture';
       }
       
-      document.getElementById('step3-farm-size').value = 'medium';
+      document.getElementById('step3-farm-size').value = '2';
       document.getElementById('step3-irrigation').value = 'yes';
       document.getElementById('step3-pest-management').value = 'organic';
       
@@ -504,6 +522,7 @@
       document.getElementById('section-agriculture').style.display = 'none';
       document.getElementById('section-golf').style.display = 'none';
       document.getElementById('section-software').style.display = 'none';
+      document.getElementById('section-other-industry').style.display = 'none';
       document.getElementById('section-other').style.display = 'none';
 
       const config = step3Config[category];
@@ -663,7 +682,9 @@
                 'step3-pest-management': 'Pest Management',
                 'step3-turf-area': 'Turf Area',
                 'step3-turf-irrigation': 'Irrigation System',
-                'step3-software-work-area': 'Area of Work'
+                'step3-software-work-area': 'Area of Work',
+                'step3-other-industry': 'Your Industry/Sector',
+                'step3-other-role': 'Your Position/Role'
               };
               showError('step3', `Please select a ${labels[fieldId] || 'required field'}`);
               return false;
@@ -713,6 +734,9 @@
           } else if (category === 'golf') {
             formData.turfArea = document.getElementById('step3-turf-area').value;
             formData.turfIrrigation = document.getElementById('step3-turf-irrigation').value;
+          } else if (category === 'other') {
+            formData.otherIndustry = document.getElementById('step3-other-industry').value;
+            formData.otherRole = document.getElementById('step3-other-role').value;
           }
         }
       }
@@ -732,7 +756,11 @@
         crops: formData.crops,
         farmSize: formData.farmSize,
         irrigation: formData.irrigation,
-        pestManagement: formData.pestManagement
+        pestManagement: formData.pestManagement,
+        turfArea: formData.turfArea,
+        turfIrrigation: formData.turfIrrigation,
+        otherIndustry: formData.otherIndustry,
+        otherRole: formData.otherRole
       };
 
       const result = storeUser(userData, formData.accountType);
