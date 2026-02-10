@@ -229,12 +229,6 @@
                   <!-- GOLF & TURF: Turf Type, Area, Irrigation, Maintenance -->
                   <div id="section-golf" style="display: none;">
                     <div class="mb-3">
-                      <label for="step3-turf-type" class="form-label fw-semibold">Turf Type/Coverage *</label>
-                      <input type="text" class="form-control" id="step3-turf-type" placeholder="e.g., Golf Course, Sports Field, Landscape" required />
-                      <small class="form-text">Describe your primary turf coverage type</small>
-                    </div>
-
-                    <div class="mb-3">
                       <label for="step3-turf-area" class="form-label fw-semibold">Turf Area (hectares) *</label>
                       <select class="form-select" id="step3-turf-area" required>
                         <option value="">Select area size</option>
@@ -253,16 +247,6 @@
                         <option value="manual">Manual</option>
                         <option value="hybrid">Hybrid</option>
                         <option value="none">None/Minimal</option>
-                      </select>
-                    </div>
-
-                    <div class="mb-3">
-                      <label for="step3-turf-maintenance" class="form-label fw-semibold">Maintenance Practice *</label>
-                      <select class="form-select" id="step3-turf-maintenance" required>
-                        <option value="">Select maintenance approach</option>
-                        <option value="organic">Organic</option>
-                        <option value="conventional">Conventional</option>
-                        <option value="sustainable">Sustainable/Low-input</option>
                       </select>
                     </div>
                   </div>
@@ -395,7 +379,7 @@
         title: 'Turf Operations Details',
         description: 'Tell us more about your turf operations',
         section: 'section-golf',
-        requiredFields: ['step3-turf-type', 'step3-turf-area', 'step3-turf-irrigation', 'step3-turf-maintenance']
+        requiredFields: ['step3-turf-area', 'step3-turf-irrigation']
       },
       'software': {
         show: true,
@@ -677,13 +661,9 @@
                 'step3-farm-size': 'Farm Size',
                 'step3-irrigation': 'Irrigation System',
                 'step3-pest-management': 'Pest Management',
-                'step3-turf-type': 'Turf Type',
                 'step3-turf-area': 'Turf Area',
                 'step3-turf-irrigation': 'Irrigation System',
-                'step3-turf-maintenance': 'Maintenance Practice',
-                'step3-forest-type': 'Forest Type',
-                'step3-forest-area': 'Forest Area',
-                'step3-forest-management': 'Management Practice'
+                'step3-software-work-area': 'Area of Work'
               };
               showError('step3', `Please select a ${labels[fieldId] || 'required field'}`);
               return false;
@@ -731,10 +711,8 @@
             formData.irrigation = document.getElementById('step3-irrigation').value;
             formData.pestManagement = document.getElementById('step3-pest-management').value;
           } else if (category === 'golf') {
-            formData.turfType = document.getElementById('step3-turf-type').value;
             formData.turfArea = document.getElementById('step3-turf-area').value;
             formData.turfIrrigation = document.getElementById('step3-turf-irrigation').value;
-            formData.turfMaintenance = document.getElementById('step3-turf-maintenance').value;
           }
         }
       }
