@@ -130,6 +130,8 @@
                       <option value="golf">Golf and Turf</option>
                       <option value="forestry">Forestry Life Sciences</option>
                       <option value="research">Research Institute</option>
+                      <option value="ngo">NGO / Non Profits</option>
+                      <option value="govt">Government</option>
                       <option value="other">Other</option>
                     </select>
                   </div>
@@ -392,6 +394,8 @@
       'golf': ['Superintendent', 'Technician', 'Greenkeeper', 'Other'],
       'forestry': ['Researcher', 'Manager', 'Consultant', 'Other'],
       'research': ['Researcher', 'Faculty', 'Student', 'Other'],
+      'ngo': ['Program Manager', 'Field Officer', 'Coordinator', 'Other'],
+      'govt': ['Officer', 'Manager', 'Specialist', 'Other'],
       'other': ['Other']
     };
 
@@ -426,6 +430,14 @@
         requiredFields: ['profile-software-work-area']
       },
       'research': {
+        show: false,
+        section: 'section-other'
+      },
+      'ngo': {
+        show: false,
+        section: 'section-other'
+      },
+      'govt': {
         show: false,
         section: 'section-other'
       },
