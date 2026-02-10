@@ -123,7 +123,6 @@
                       <option value="agriculture">Agriculture</option>
                       <option value="software">Connected Software Company</option>
                       <option value="golf">Golf and Turf</option>
-                      <option value="forestry">Forestry Life Sciences</option>
                       <option value="research">Research Institute</option>
                       <option value="ngo">NGO / Non Profits</option>
                       <option value="govt">Government</option>
@@ -268,53 +267,6 @@
                     </div>
                   </div>
 
-                  <!-- FORESTRY: Forest Type, Area, Management, Conservation -->
-                  <div id="section-forestry" style="display: none;">
-                    <div class="mb-3">
-                      <label for="step3-forest-type" class="form-label fw-semibold">Forest Type *</label>
-                      <select class="form-select" id="step3-forest-type" required>
-                        <option value="">Select forest type</option>
-                        <option value="deciduous">Deciduous</option>
-                        <option value="coniferous">Coniferous</option>
-                        <option value="mixed">Mixed</option>
-                        <option value="tropical">Tropical</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-
-                    <div class="mb-3">
-                      <label for="step3-forest-area" class="form-label fw-semibold">Forest Area (hectares) *</label>
-                      <select class="form-select" id="step3-forest-area" required>
-                        <option value="">Select area size</option>
-                        <option value="small">Small (< 10 hectares)</option>
-                        <option value="medium">Medium (10-100 hectares)</option>
-                        <option value="large">Large (100-1000 hectares)</option>
-                        <option value="xlarge">Extra Large (> 1000 hectares)</option>
-                      </select>
-                    </div>
-
-                    <div class="mb-3">
-                      <label for="step3-forest-management" class="form-label fw-semibold">Management Practice *</label>
-                      <select class="form-select" id="step3-forest-management" required>
-                        <option value="">Select management approach</option>
-                        <option value="sustainable">Sustainable Forestry</option>
-                        <option value="conservation">Conservation/Protected</option>
-                        <option value="commercial">Commercial</option>
-                        <option value="research">Research</option>
-                      </select>
-                    </div>
-
-                    <div class="mb-3">
-                      <label for="step3-forest-certification" class="form-label fw-semibold">Conservation Status</label>
-                      <select class="form-select" id="step3-forest-certification">
-                        <option value="">Select status (optional)</option>
-                        <option value="certified">FSC Certified</option>
-                        <option value="protected">Protected Area</option>
-                        <option value="none">None</option>
-                      </select>
-                    </div>
-                  </div>
-
                   <!-- SOFTWARE: Connected Software Company -->
                   <div id="section-software" style="display: none;">
                     <div class="mb-3">
@@ -423,7 +375,6 @@
       'agriculture': ['Farmer', 'Consultant', 'Supplier', 'Other'],
       'software': ['Developer', 'Manager', 'Other'],
       'golf': ['Superintendent', 'Technician', 'Greenkeeper', 'Other'],
-      'forestry': ['Researcher', 'Manager', 'Consultant', 'Other'],
       'research': ['Researcher', 'Faculty', 'Student', 'Other'],
       'ngo': ['Program Manager', 'Field Officer', 'Coordinator', 'Other'],
       'govt': ['Officer', 'Manager', 'Specialist', 'Other'],
@@ -445,13 +396,6 @@
         description: 'Tell us more about your turf operations',
         section: 'section-golf',
         requiredFields: ['step3-turf-type', 'step3-turf-area', 'step3-turf-irrigation', 'step3-turf-maintenance']
-      },
-      'forestry': {
-        show: true,
-        title: 'Forest Operations Details',
-        description: 'Tell us more about your forest operations',
-        section: 'section-forestry',
-        requiredFields: ['step3-forest-type', 'step3-forest-area', 'step3-forest-management']
       },
       'software': {
         show: true,
@@ -575,7 +519,6 @@
       // Hide all category sections first
       document.getElementById('section-agriculture').style.display = 'none';
       document.getElementById('section-golf').style.display = 'none';
-      document.getElementById('section-forestry').style.display = 'none';
       document.getElementById('section-software').style.display = 'none';
       document.getElementById('section-other').style.display = 'none';
 
@@ -792,11 +735,6 @@
             formData.turfArea = document.getElementById('step3-turf-area').value;
             formData.turfIrrigation = document.getElementById('step3-turf-irrigation').value;
             formData.turfMaintenance = document.getElementById('step3-turf-maintenance').value;
-          } else if (category === 'forestry') {
-            formData.forestType = document.getElementById('step3-forest-type').value;
-            formData.forestArea = document.getElementById('step3-forest-area').value;
-            formData.forestManagement = document.getElementById('step3-forest-management').value;
-            formData.forestCertification = document.getElementById('step3-forest-certification').value;
           }
         }
       }
