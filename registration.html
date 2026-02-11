@@ -88,7 +88,7 @@
                         <div class="text-secondary small fw-semibold mb-2">Password Guidelines</div>
                         <div class="password-guideline d-flex align-items-center gap-2 mb-2">
                           <span id="check-length" class="badge bg-light text-dark">✗</span>
-                          <span class="small">10 to 30 characters</span>
+                          <span class="small">8 to 20 characters</span>
                         </div>
                         <div class="password-guideline d-flex align-items-center gap-2 mb-2">
                           <span id="check-upper" class="badge bg-light text-dark">✗</span>
@@ -539,7 +539,7 @@
     function updatePasswordStrength() {
       const password = document.getElementById('step1-password').value;
       
-      updateCheckmark('check-length', password.length >= 10 && password.length <= 30);
+      updateCheckmark('check-length', password.length >= 8 && password.length <= 20);
       updateCheckmark('check-upper', /[A-Z]/.test(password));
       updateCheckmark('check-lower', /[a-z]/.test(password));
       updateCheckmark('check-number', /[0-9]/.test(password));
@@ -610,8 +610,8 @@
           return false;
         }
 
-        if (password.length < 10 || password.length > 30) {
-          showError('step1', 'Password must be 10-30 characters');
+        if (password.length < 8 || password.length > 20) {
+          showError('step1', 'Password must be 8-20 characters');
           return false;
         }
 
