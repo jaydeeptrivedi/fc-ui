@@ -484,7 +484,8 @@
     function prefillDemoData() {
       document.getElementById('step1-email').value = 'john.smith@example.com';
       document.getElementById('step1-username').value = 'johnsmith_farmer';
-      document.getElementById('accountType').value = 'individual';
+      // accountType field is disabled
+      // document.getElementById('accountType').value = 'individual';
       document.getElementById('step1-password').value = 'Password123';
       document.getElementById('step1-confirm-password').value = 'Password123';
       
@@ -588,14 +589,15 @@
       }
 
       if (step === 1) {
-        // Step 1: Account Setup (Email, Username, Account Type, Password)
+        // Step 1: Account Setup (Email, Username, Password)
         const username = document.getElementById('step1-username').value.trim();
         const email = document.getElementById('step1-email').value.trim();
-        const accountType = document.getElementById('accountType').value;
+        // accountType field is disabled
+        // const accountType = document.getElementById('accountType').value;
         const password = document.getElementById('step1-password').value;
         const confirm = document.getElementById('step1-confirm-password').value;
 
-        if (!username || !email || !accountType || !password || !confirm) {
+        if (!username || !email || !password || !confirm) {
           showError('step1', 'All fields are required');
           return false;
         }
@@ -701,7 +703,7 @@
         // Step 1: Account Setup
         formData.username = document.getElementById('step1-username').value.trim();
         formData.email = document.getElementById('step1-email').value.trim();
-        formData.accountType = document.getElementById('accountType').value;
+        formData.accountType = 'individual'; // Default to individual (field is disabled)
         formData.password = document.getElementById('step1-password').value;
       } else if (currentStep === 2) {
         // Step 2: Profile Information
