@@ -14,43 +14,86 @@ const seed = [
 const DM_CROPS = {
   'apple': {
     name: 'Apple',
-    requiredSensors: ['temperature', 'humidity', 'leaf_wetness'],
-    description: 'Apple Scab, Fire Blight, Powdery Mildew'
+    requiredSensors: ['temperature', 'humidity'],  // Minimum for any model
+    description: 'Apple Scab, Fire Blight, Powdery Mildew',
+    models: [
+      { id: 'aphid_risk', name: 'Aphid Risk', sensors: ['temperature', 'humidity'] },
+      { id: 'rain_washoff', name: 'Rain Pesticide Wash Off', sensors: ['rainfall'] },
+      { id: 'fire_blight', name: 'Fire Blight (Erwinia amylovora)', sensors: ['temperature', 'humidity', 'leaf_wetness'] },
+      { id: 'scab_ascospore_maturity', name: 'Scab / Ascospore Maturity', sensors: ['temperature', 'humidity', 'leaf_wetness'] },
+      { id: 'scab_ascospore_infection', name: 'Scab / Ascospore Infection', sensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'] },
+      { id: 'scab_conidia_infection', name: 'Scab / Conidia Infection', sensors: ['temperature', 'humidity', 'leaf_wetness'] },
+      { id: 'codling_moth', name: 'Codling Moth', sensors: ['temperature'] },
+      { id: 'chilling_portions', name: 'Chilling Portions', sensors: ['temperature'] }
+    ]
   },
   'grape': {
     name: 'Grape / Vine',
-    requiredSensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'],
-    description: 'Downy Mildew, Powdery Mildew, Botrytis'
+    requiredSensors: ['temperature', 'humidity'],
+    description: 'Downy Mildew, Powdery Mildew, Botrytis',
+    models: [
+      { id: 'downy_mildew', name: 'Downy Mildew', sensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'] },
+      { id: 'powdery_mildew', name: 'Powdery Mildew', sensors: ['temperature', 'humidity'] },
+      { id: 'botrytis', name: 'Botrytis', sensors: ['temperature', 'humidity', 'leaf_wetness'] }
+    ]
   },
   'wheat': {
     name: 'Wheat',
     requiredSensors: ['temperature', 'humidity'],
-    description: 'Septoria, Rust, Fusarium'
+    description: 'Septoria, Rust, Fusarium',
+    models: [
+      { id: 'septoria', name: 'Septoria', sensors: ['temperature', 'humidity', 'rainfall'] },
+      { id: 'rust', name: 'Rust', sensors: ['temperature', 'humidity'] },
+      { id: 'fusarium', name: 'Fusarium', sensors: ['temperature', 'humidity'] }
+    ]
   },
   'potato': {
     name: 'Potato',
-    requiredSensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'],
-    description: 'Late Blight, Early Blight'
+    requiredSensors: ['temperature', 'humidity'],
+    description: 'Late Blight, Early Blight',
+    models: [
+      { id: 'late_blight', name: 'Late Blight', sensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'] },
+      { id: 'early_blight', name: 'Early Blight', sensors: ['temperature', 'humidity'] }
+    ]
   },
   'tomato': {
     name: 'Tomato',
-    requiredSensors: ['temperature', 'humidity', 'leaf_wetness'],
-    description: 'Late Blight, Botrytis, Bacterial Spot'
+    requiredSensors: ['temperature', 'humidity'],
+    description: 'Late Blight, Botrytis, Bacterial Spot',
+    models: [
+      { id: 'late_blight', name: 'Late Blight', sensors: ['temperature', 'humidity', 'leaf_wetness'] },
+      { id: 'botrytis', name: 'Botrytis', sensors: ['temperature', 'humidity', 'leaf_wetness'] },
+      { id: 'bacterial_spot', name: 'Bacterial Spot', sensors: ['temperature', 'humidity', 'rainfall'] }
+    ]
   },
   'corn': {
     name: 'Corn / Maize',
     requiredSensors: ['temperature', 'humidity'],
-    description: 'Gray Leaf Spot, Northern Corn Leaf Blight'
+    description: 'Gray Leaf Spot, Northern Corn Leaf Blight',
+    models: [
+      { id: 'gray_leaf_spot', name: 'Gray Leaf Spot', sensors: ['temperature', 'humidity'] },
+      { id: 'northern_leaf_blight', name: 'Northern Corn Leaf Blight', sensors: ['temperature', 'humidity'] }
+    ]
   },
   'citrus': {
     name: 'Citrus',
-    requiredSensors: ['temperature', 'humidity', 'leaf_wetness'],
-    description: 'Citrus Canker, Greening, Black Spot'
+    requiredSensors: ['temperature', 'humidity'],
+    description: 'Citrus Canker, Greening, Black Spot',
+    models: [
+      { id: 'citrus_canker', name: 'Citrus Canker', sensors: ['temperature', 'humidity', 'leaf_wetness'] },
+      { id: 'greening', name: 'Greening (HLB)', sensors: ['temperature'] },
+      { id: 'black_spot', name: 'Black Spot', sensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'] }
+    ]
   },
   'strawberry': {
     name: 'Strawberry',
-    requiredSensors: ['temperature', 'humidity', 'leaf_wetness'],
-    description: 'Botrytis, Powdery Mildew, Anthracnose'
+    requiredSensors: ['temperature', 'humidity'],
+    description: 'Botrytis, Powdery Mildew, Anthracnose',
+    models: [
+      { id: 'botrytis', name: 'Botrytis', sensors: ['temperature', 'humidity', 'leaf_wetness'] },
+      { id: 'powdery_mildew', name: 'Powdery Mildew', sensors: ['temperature', 'humidity'] },
+      { id: 'anthracnose', name: 'Anthracnose', sensors: ['temperature', 'humidity', 'rainfall'] }
+    ]
   }
 };
 
@@ -431,6 +474,27 @@ function selectedDMDevices() {
   return Array.from(document.querySelectorAll('.dm-device-check:checked')).map(ch => ch.value);
 }
 
+// Get which models a device can run for a given crop
+function getDeviceModelCompatibility(deviceId, cropKey) {
+  const device = DM_DEVICES.find(d => d.id === deviceId);
+  const crop = DM_CROPS[cropKey];
+  if (!device || !crop || !crop.models) return { supported: [], unsupported: [] };
+  
+  const supported = [];
+  const unsupported = [];
+  
+  crop.models.forEach(model => {
+    const missing = model.sensors.filter(s => !device.sensors.includes(s));
+    if (missing.length === 0) {
+      supported.push(model);
+    } else {
+      unsupported.push({ ...model, missing });
+    }
+  });
+  
+  return { supported, unsupported };
+}
+
 function renderDMDevices(cropKey) {
   const list = document.getElementById('dmDeviceList');
   const sensorInfo = document.getElementById('dmSensorInfo');
@@ -444,32 +508,55 @@ function renderDMDevices(cropKey) {
   
   const crop = DM_CROPS[cropKey];
   
-  // Show required sensors
-  const sensorNames = crop.requiredSensors.map(s => SENSOR_NAMES[s] || s).join(', ');
-  requiredSensorsEl.textContent = sensorNames;
+  // Show available models for this crop
+  const modelNames = crop.models ? crop.models.map(m => m.name).join(', ') : crop.description;
+  requiredSensorsEl.innerHTML = `<strong>Available Models:</strong> ${modelNames}`;
   sensorInfo?.classList.remove('d-none');
   
   // Render device list
   let html = '';
   DM_DEVICES.forEach(dev => {
     const { compatible } = deviceHasRequiredSensors(dev.id, cropKey);
-    const missingSensors = crop.requiredSensors.filter(s => !dev.sensors.includes(s));
-    const missingNames = missingSensors.map(s => SENSOR_NAMES[s] || s).join(', ');
+    const { supported, unsupported } = getDeviceModelCompatibility(dev.id, cropKey);
+    const totalModels = (crop.models || []).length;
+    const supportedCount = supported.length;
+    
+    // Determine badge based on model support
+    let badge = '';
+    let badgeClass = '';
+    if (supportedCount === totalModels) {
+      badge = `All ${totalModels} models`;
+      badgeClass = 'bg-success-subtle text-success';
+    } else if (supportedCount > 0) {
+      badge = `${supportedCount}/${totalModels} models`;
+      badgeClass = 'bg-warning-subtle text-warning';
+    } else {
+      badge = 'No models';
+      badgeClass = 'bg-danger-subtle text-danger';
+    }
+    
+    // Build model compatibility details
+    let modelDetails = '';
+    if (supported.length > 0) {
+      modelDetails += `<div class="small text-success mt-1"><i class="bi bi-check-circle-fill me-1"></i>${supported.map(m => m.name).join(', ')}</div>`;
+    }
+    if (unsupported.length > 0) {
+      const unsupportedList = unsupported.map(m => `${m.name}`).join(', ');
+      modelDetails += `<div class="small text-danger mt-1"><i class="bi bi-x-circle-fill me-1"></i>${unsupportedList}</div>`;
+    }
     
     html += `
-      <div class="form-check py-1 border-bottom ${compatible ? '' : 'opacity-50'}">
+      <div class="form-check py-2 border-bottom ${compatible ? '' : 'opacity-50'}">
         <input class="form-check-input dm-device-check" type="checkbox" value="${dev.id}" id="dm-dev-${dev.id}" ${compatible ? '' : 'disabled'}>
         <label class="form-check-label w-100" for="dm-dev-${dev.id}">
           <div class="d-flex justify-content-between align-items-center">
             <span class="fw-medium">${dev.name}</span>
-            ${compatible 
-              ? '<span class="badge bg-success-subtle text-success small">Compatible</span>' 
-              : '<span class="badge bg-danger-subtle text-danger small">Incompatible</span>'}
+            <span class="badge ${badgeClass} small">${badge}</span>
           </div>
           <div class="small text-secondary">
             Sensors: ${dev.sensors.map(s => SENSOR_NAMES[s] || s).join(', ')}
           </div>
-          ${!compatible ? `<div class="small text-danger">Missing: ${missingNames}</div>` : ''}
+          ${modelDetails}
         </label>
       </div>`;
   });
@@ -1183,39 +1270,62 @@ function manageRenderStep() {
         const existing = sub.devices || [];
         
         if (isDM) {
-          // Disease Models: show DM_DEVICES filtered by crop sensors
+          // Disease Models: show DM_DEVICES filtered by crop sensors with model compatibility
           const cropKey = sub.crop;
           const crop = DM_CROPS[cropKey];
           
-          if (crop) {
-            const sensorNames = crop.requiredSensors.map(s => SENSOR_NAMES[s] || s).join(', ');
-            listEl.innerHTML = `<div class="small text-secondary mb-2">Required sensors for ${crop.name}: ${sensorNames}</div>`;
+          if (crop && crop.models) {
+            const modelNames = crop.models.map(m => m.name).join(', ');
+            listEl.innerHTML = `<div class="small text-secondary mb-2"><strong>Available models for ${crop.name}:</strong> ${modelNames}</div>`;
           }
           
           DM_DEVICES.forEach(dev => {
             const isExisting = existing.includes(dev.id);
             const { compatible } = deviceHasRequiredSensors(dev.id, cropKey);
-            const missingSensors = crop ? crop.requiredSensors.filter(s => !dev.sensors.includes(s)) : [];
-            const missingNames = missingSensors.map(s => SENSOR_NAMES[s] || s).join(', ');
+            const { supported, unsupported } = getDeviceModelCompatibility(dev.id, cropKey);
+            const totalModels = (crop?.models || []).length;
+            const supportedCount = supported.length;
             const canSelect = compatible && !isExisting;
             
+            // Determine badge
+            let badge = '';
+            let badgeClass = '';
+            if (isExisting) {
+              badge = 'Already added';
+              badgeClass = 'bg-secondary-subtle text-secondary';
+            } else if (supportedCount === totalModels) {
+              badge = `All ${totalModels} models`;
+              badgeClass = 'bg-success-subtle text-success';
+            } else if (supportedCount > 0) {
+              badge = `${supportedCount}/${totalModels} models`;
+              badgeClass = 'bg-warning-subtle text-warning';
+            } else {
+              badge = 'No models';
+              badgeClass = 'bg-danger-subtle text-danger';
+            }
+            
+            // Build model compatibility details
+            let modelDetails = '';
+            if (!isExisting && supported.length > 0) {
+              modelDetails += `<div class="small text-success mt-1"><i class="bi bi-check-circle-fill me-1"></i>${supported.map(m => m.name).join(', ')}</div>`;
+            }
+            if (!isExisting && unsupported.length > 0) {
+              modelDetails += `<div class="small text-danger mt-1"><i class="bi bi-x-circle-fill me-1"></i>${unsupported.map(m => m.name).join(', ')}</div>`;
+            }
+            
             const div = document.createElement('div');
-            div.className = `form-check py-1 border-bottom ${canSelect ? '' : 'opacity-50'}`;
+            div.className = `form-check py-2 border-bottom ${canSelect ? '' : 'opacity-50'}`;
             div.innerHTML = `
               <input class="form-check-input" type="checkbox" value="${dev.id}" id="manageDev_${dev.id}" ${isExisting ? 'checked disabled' : ''} ${!compatible ? 'disabled' : ''}>
               <label class="form-check-label w-100" for="manageDev_${dev.id}">
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="fw-medium">${dev.name}</span>
-                  ${isExisting 
-                    ? '<span class="badge bg-secondary-subtle text-secondary small">Already added</span>'
-                    : compatible 
-                      ? '<span class="badge bg-success-subtle text-success small">Compatible</span>' 
-                      : '<span class="badge bg-danger-subtle text-danger small">Incompatible</span>'}
+                  <span class="badge ${badgeClass} small">${badge}</span>
                 </div>
                 <div class="small text-secondary">
                   Sensors: ${dev.sensors.map(s => SENSOR_NAMES[s] || s).join(', ')}
                 </div>
-                ${!compatible && !isExisting ? `<div class="small text-danger">Missing: ${missingNames}</div>` : ''}
+                ${modelDetails}
               </label>
             `;
             listEl.appendChild(div);
