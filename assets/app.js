@@ -1,10 +1,117 @@
 // assets/app.js
 const seed = [
   { product: "Client API", start: "2025-12-17", expiry: "2026-12-17", plan: "Tier 1", billing: "Self Pay", status: "Active", devices: ["device001", "device002"], billingProfile: { billName: "Example Customer", billEmail: "billing@example.com", billAddress: "Main Street 1, City, 12345", billCountry: "Austria", billVat: "", billMethod: "Self Pay" } },
-  { product: "Disease Model", start: "2024-05-08", expiry: "2026-05-08", plan: "Some Plan", billing: "Self Pay", status: "Active" },
+  { product: "Disease Models - Apple (2 licenses)", start: "2025-12-17", expiry: "2026-12-17", plan: "DM License", billing: "Self Pay", status: "Active", devices: ["device001", "device003"], crop: "apple", cropName: "Apple", billingProfile: { billName: "Example Customer", billEmail: "billing@example.com", billAddress: "Main Street 1, City, 12345", billCountry: "Austria", billVat: "", billMethod: "Self Pay" }, cost: 192 },
   { product: "FarmView with Satellite for 25 CropZones for 1 year", start: "2025-06-17", expiry: "2026-06-17", plan: "Some Plan", billing: "Self Pay", status: "Active" },
   { product: "Weather Forecast", start: "2025-10-27", expiry: "2026-10-27", plan: "Some Plan", billing: "Self Pay", status: "Active" },
 ];
+
+// =============================================
+// DISEASE MODELS CONFIGURATION
+// =============================================
+
+// Crops/Fruits with required sensors for disease model calculation
+const DM_CROPS = {
+  'apple': {
+    name: 'Apple',
+    requiredSensors: ['temperature', 'humidity', 'leaf_wetness'],
+    description: 'Apple Scab, Fire Blight, Powdery Mildew'
+  },
+  'grape': {
+    name: 'Grape / Vine',
+    requiredSensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'],
+    description: 'Downy Mildew, Powdery Mildew, Botrytis'
+  },
+  'wheat': {
+    name: 'Wheat',
+    requiredSensors: ['temperature', 'humidity'],
+    description: 'Septoria, Rust, Fusarium'
+  },
+  'potato': {
+    name: 'Potato',
+    requiredSensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'],
+    description: 'Late Blight, Early Blight'
+  },
+  'tomato': {
+    name: 'Tomato',
+    requiredSensors: ['temperature', 'humidity', 'leaf_wetness'],
+    description: 'Late Blight, Botrytis, Bacterial Spot'
+  },
+  'corn': {
+    name: 'Corn / Maize',
+    requiredSensors: ['temperature', 'humidity'],
+    description: 'Gray Leaf Spot, Northern Corn Leaf Blight'
+  },
+  'citrus': {
+    name: 'Citrus',
+    requiredSensors: ['temperature', 'humidity', 'leaf_wetness'],
+    description: 'Citrus Canker, Greening, Black Spot'
+  },
+  'strawberry': {
+    name: 'Strawberry',
+    requiredSensors: ['temperature', 'humidity', 'leaf_wetness'],
+    description: 'Botrytis, Powdery Mildew, Anthracnose'
+  }
+};
+
+// Sensor display names
+const SENSOR_NAMES = {
+  'temperature': 'Temperature Sensor',
+  'humidity': 'Relative Humidity Sensor',
+  'leaf_wetness': 'Leaf Wetness Sensor',
+  'rainfall': 'Rain Gauge',
+  'soil_moisture': 'Soil Moisture Sensor',
+  'solar_radiation': 'Solar Radiation Sensor',
+  'wind_speed': 'Wind Speed Sensor'
+};
+
+// Mock devices with their available sensors
+const DM_DEVICES = [
+  { id: 'device001', name: 'device001 (Station Alpha)', sensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall', 'soil_moisture'] },
+  { id: 'device002', name: 'device002 (Vineyard East)', sensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'] },
+  { id: 'device003', name: 'device003 (Orchard North)', sensors: ['temperature', 'humidity', 'leaf_wetness', 'solar_radiation'] },
+  { id: 'device004', name: 'device004 (Field South)', sensors: ['temperature', 'humidity'] },  // Missing leaf_wetness
+  { id: 'device005', name: 'device005 (Greenhouse A)', sensors: ['temperature', 'humidity', 'leaf_wetness', 'rainfall'] }
+];
+
+// Disease Model pricing brackets (per device/license per year)
+const DM_PRICING_BRACKETS = [
+  { min: 1, max: 10, price: 96 },
+  { min: 11, max: 20, price: 82 },
+  { min: 21, max: 50, price: 72 },
+  { min: 51, max: 100, price: 67 },
+  { min: 101, max: Infinity, price: 60 }
+];
+
+// Get price per license based on total license count
+function getDMPricePerLicense(licenseCount) {
+  const bracket = DM_PRICING_BRACKETS.find(b => licenseCount >= b.min && licenseCount <= b.max);
+  return bracket ? bracket.price : DM_PRICING_BRACKETS[DM_PRICING_BRACKETS.length - 1].price;
+}
+
+// Calculate total DM cost
+function calculateDMCost(deviceCount) {
+  if (deviceCount <= 0) return { pricePerLicense: 0, total: 0, bracket: null };
+  const pricePerLicense = getDMPricePerLicense(deviceCount);
+  return {
+    pricePerLicense,
+    total: pricePerLicense * deviceCount,
+    bracket: DM_PRICING_BRACKETS.find(b => deviceCount >= b.min && deviceCount <= b.max)
+  };
+}
+
+// Check if device has all required sensors for a crop
+function deviceHasRequiredSensors(deviceId, cropId) {
+  const device = DM_DEVICES.find(d => d.id === deviceId);
+  const crop = DM_CROPS[cropId];
+  if (!device || !crop) return { compatible: false, missing: [] };
+  
+  const missing = crop.requiredSensors.filter(s => !device.sensors.includes(s));
+  return {
+    compatible: missing.length === 0,
+    missing: missing.map(s => SENSOR_NAMES[s] || s)
+  };
+}
 
 // Mock user billing settings
 const userBillingProfile = {
@@ -87,6 +194,8 @@ function render() {
                     : row.status === "Cancelled" ? "text-bg-danger"
                     : "text-bg-secondary";
     const isClientAPI = row.product && row.product.includes('Client API');
+    const isDiseaseModel = row.product && row.product.includes('Disease Models');
+    const canManage = isClientAPI || isDiseaseModel;
     return `
       <tr>
         <td>
@@ -99,7 +208,7 @@ function render() {
         <td>${escapeHtml(row.start)}</td>
         <td>${escapeHtml(row.expiry)}</td>
         <td class="text-end">
-          <button class="btn btn-primary btn-sm" type="button" data-action="details" data-idx="${idx}" ${!isClientAPI ? 'disabled' : ''}>MANAGE</button>
+          <button class="btn btn-primary btn-sm" type="button" data-action="details" data-idx="${idx}" ${!canManage ? 'disabled' : ''}>MANAGE</button>
         </td>
       </tr>
     `;
@@ -212,6 +321,27 @@ function resetWizard() {
   apiEnd.value = isoDate(addYears(today, 1));
   apiTier.value = "Tier 2";
   
+  // Reset Disease Models fields
+  const dmCrop = document.getElementById('dmCrop');
+  const dmStart = document.getElementById('dmStart');
+  const dmEnd = document.getElementById('dmEnd');
+  const dmDeviceList = document.getElementById('dmDeviceList');
+  const dmSensorInfo = document.getElementById('dmSensorInfo');
+  
+  if (dmCrop) {
+    // Populate crop dropdown
+    dmCrop.innerHTML = '<option value="">Select a crop...</option>';
+    Object.entries(DM_CROPS).forEach(([id, crop]) => {
+      dmCrop.innerHTML += `<option value="${id}">${crop.name}</option>`;
+    });
+    dmCrop.value = '';
+  }
+  if (dmStart) dmStart.value = isoDate(today);
+  if (dmEnd) dmEnd.value = isoDate(addYears(today, 1));
+  if (dmDeviceList) dmDeviceList.innerHTML = '<div class="text-secondary small">Select a crop first to see compatible devices.</div>';
+  if (dmSensorInfo) dmSensorInfo.classList.add('d-none');
+  updateDMEstimate();
+  
   // Clear promo code input and messages
   const promoInput = document.getElementById('promoCode');
   const promoError = document.getElementById('promoError');
@@ -228,7 +358,23 @@ function resetWizard() {
 function setStep(n) {
   wizardStep = n;
 
-  stepEls.forEach((el, idx) => el.classList.toggle("d-none", idx+1 !== wizardStep));
+  // Hide all steps first
+  stepEls.forEach((el, idx) => el.classList.add("d-none"));
+  const step2dm = document.getElementById('step2-dm');
+  if (step2dm) step2dm.classList.add('d-none');
+  
+  // Show the appropriate step
+  if (wizardStep === 2) {
+    // Show appropriate step 2 based on selected type
+    if (selectedType === 'DiseaseModel') {
+      if (step2dm) step2dm.classList.remove('d-none');
+    } else {
+      stepEls[1].classList.remove('d-none'); // step2 for API
+    }
+  } else {
+    stepEls[wizardStep - 1].classList.remove('d-none');
+  }
+  
   chipEls.forEach(c => c.classList.remove("active"));
   chipEls[wizardStep-1].classList.add("active");
 
@@ -242,7 +388,10 @@ function setStep(n) {
 
 function hintForStep(n) {
   if (n === 1) return "Choose what you want to subscribe to.";
-  if (n === 2) return "Select devices, tier, and subscription dates.";
+  if (n === 2) {
+    if (selectedType === 'DiseaseModel') return "Select crop, compatible devices, and subscription dates.";
+    return "Select devices, tier, and subscription dates.";
+  }
   if (n === 3) return "Confirm billing profile before payment.";
   if (n === 4) return "Review summary and complete payment.";
   return "";
@@ -254,6 +403,15 @@ function updateNextState() {
     return;
   }
   if (wizardStep === 2) {
+    if (selectedType === 'DiseaseModel') {
+      const dmCrop = document.getElementById('dmCrop');
+      const dmDevs = selectedDMDevices();
+      const dmStart = document.getElementById('dmStart');
+      const dmEnd = document.getElementById('dmEnd');
+      const datesOk = dmStart?.value && dmEnd?.value && dmStart.value <= dmEnd.value;
+      nextBtn.disabled = !(dmCrop?.value && dmDevs.length > 0 && datesOk);
+      return;
+    }
     const devs = selectedDevices();
     const datesOk = apiStart.value && apiEnd.value && apiStart.value <= apiEnd.value;
     nextBtn.disabled = !(selectedType === "API" && devs.length > 0 && datesOk);
@@ -266,6 +424,84 @@ function updateNextState() {
     return;
   }
   nextBtn.disabled = false;
+}
+
+// Disease Models device selection
+function selectedDMDevices() {
+  return Array.from(document.querySelectorAll('.dm-device-check:checked')).map(ch => ch.value);
+}
+
+function renderDMDevices(cropKey) {
+  const list = document.getElementById('dmDeviceList');
+  const sensorInfo = document.getElementById('dmSensorInfo');
+  const requiredSensorsEl = document.getElementById('dmRequiredSensors');
+  
+  if (!cropKey || !DM_CROPS[cropKey]) {
+    list.innerHTML = '<div class="text-secondary small">Select a crop first to see compatible devices.</div>';
+    sensorInfo?.classList.add('d-none');
+    return;
+  }
+  
+  const crop = DM_CROPS[cropKey];
+  
+  // Show required sensors
+  const sensorNames = crop.requiredSensors.map(s => SENSOR_NAMES[s] || s).join(', ');
+  requiredSensorsEl.textContent = sensorNames;
+  sensorInfo?.classList.remove('d-none');
+  
+  // Render device list
+  let html = '';
+  DM_DEVICES.forEach(dev => {
+    const { compatible } = deviceHasRequiredSensors(dev.id, cropKey);
+    const missingSensors = crop.requiredSensors.filter(s => !dev.sensors.includes(s));
+    const missingNames = missingSensors.map(s => SENSOR_NAMES[s] || s).join(', ');
+    
+    html += `
+      <div class="form-check py-1 border-bottom ${compatible ? '' : 'opacity-50'}">
+        <input class="form-check-input dm-device-check" type="checkbox" value="${dev.id}" id="dm-dev-${dev.id}" ${compatible ? '' : 'disabled'}>
+        <label class="form-check-label w-100" for="dm-dev-${dev.id}">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-medium">${dev.name}</span>
+            ${compatible 
+              ? '<span class="badge bg-success-subtle text-success small">Compatible</span>' 
+              : '<span class="badge bg-danger-subtle text-danger small">Incompatible</span>'}
+          </div>
+          <div class="small text-secondary">
+            Sensors: ${dev.sensors.map(s => SENSOR_NAMES[s] || s).join(', ')}
+          </div>
+          ${!compatible ? `<div class="small text-danger">Missing: ${missingNames}</div>` : ''}
+        </label>
+      </div>`;
+  });
+  
+  list.innerHTML = html || '<div class="text-secondary small">No devices available.</div>';
+  
+  // Attach event listeners to new checkboxes
+  list.querySelectorAll('.dm-device-check').forEach(ch => {
+    ch.addEventListener('change', () => {
+      updateDMEstimate();
+      updateNextState();
+    });
+  });
+  
+  updateDMEstimate();
+}
+
+function updateDMEstimate() {
+  const dmEstCost = document.getElementById('dmEstCost');
+  const dmEstNote = document.getElementById('dmEstNote');
+  const devCount = selectedDMDevices().length;
+  
+  if (!devCount) {
+    dmEstCost.textContent = '€—';
+    dmEstNote.textContent = 'Select crop and devices to see an estimate.';
+    return;
+  }
+  
+  const { pricePerLicense, total } = calculateDMCost(devCount);
+  
+  dmEstCost.textContent = `€${total}`;
+  dmEstNote.textContent = `${devCount} device${devCount > 1 ? 's' : ''} × €${pricePerLicense}/device/year = €${total}`;
 }
 
 function selectedDevices() {
@@ -312,6 +548,36 @@ function updateEstimate() {
 }
 
 function buildSummary() {
+  const sumCropLabel = document.getElementById('sumCropLabel');
+  const sumCrop = document.getElementById('sumCrop');
+  const sumTierLabel = document.getElementById('sumTierLabel');
+  
+  if (selectedType === 'DiseaseModel') {
+    // Disease Models summary
+    const dmCrop = document.getElementById('dmCrop');
+    const dmDevs = selectedDMDevices();
+    const start = document.getElementById('dmStart').value;
+    const end = document.getElementById('dmEnd').value;
+    const { total } = calculateDMCost(dmDevs.length);
+    const cropName = dmCrop?.options[dmCrop.selectedIndex]?.text || '—';
+    
+    sumType.textContent = 'Disease Models';
+    
+    // Show crop row, hide tier row
+    if (sumCropLabel) sumCropLabel.style.display = '';
+    if (sumCrop) { sumCrop.style.display = ''; sumCrop.textContent = cropName; }
+    if (sumTierLabel) sumTierLabel.style.display = 'none';
+    sumTier.style.display = 'none';
+    
+    sumDevices.textContent = dmDevs.length ? dmDevs.join(', ') : '—';
+    sumDates.textContent = (start && end) ? `${start} → ${end}` : '—';
+    sumBilling.textContent = billMethod.value || '—';
+    sumCost.textContent = dmDevs.length ? `€${total}` : '€—';
+    
+    return { type: 'DiseaseModel', crop: dmCrop?.value, cropName, devs: dmDevs, start, end, cost: total, billing: billMethod.value };
+  }
+  
+  // API subscription summary (original logic)
   const devs = selectedDevices();
   const tier = apiTier.value;
   const start = apiStart.value;
@@ -320,6 +586,12 @@ function buildSummary() {
   // Use computeCost() to derive the current estimate
   const { tierPrice, devices: devCount, devicePrice, total } = computeCost();
   
+  // Hide crop row, show tier row
+  if (sumCropLabel) sumCropLabel.style.display = 'none';
+  if (sumCrop) sumCrop.style.display = 'none';
+  if (sumTierLabel) sumTierLabel.style.display = '';
+  sumTier.style.display = '';
+  
   sumType.textContent = selectedType || "—";
   sumDevices.textContent = devs.length ? devs.join(", ") : "—";
   sumTier.textContent = tier || "—";
@@ -327,33 +599,57 @@ function buildSummary() {
   sumBilling.textContent = billMethod.value || "—";
   sumCost.textContent = devs.length ? `€${total}` : "€—";
 
-  return { devs, tier, start, end, cost: total, billing: billMethod.value };
+  return { type: 'API', devs, tier, start, end, cost: total, billing: billMethod.value };
 }
 
 function completePayment() {
-  const { devs, tier, start, end, billing, cost } = buildSummary();
+  const summary = buildSummary();
+  const status = (summary.billing === "Self Pay") ? "Active" : "Pending";
   
-  const status = (billing === "Self Pay") ? "Active" : "Pending";
-
-  seed.push({
-    product: `Client API (${devs.length} device${devs.length === 1 ? "" : "s"})`,
-    start,
-    expiry: end,
-    plan: tier,
-    billing,
-    status,
-    devices: devs,
-    billingProfile: {
-      billName: billName.value,
-      billEmail: billEmail.value,
-      billAddress: billAddress.value,
-      billCountry: billCountry.value,
-      billVat: billVat.value,
-      billMethod: billMethod.value
-    },
-    cost: Math.max(0, cost - (currentDiscount ? calculateDiscount(cost, currentDiscount) : 0)),
-    discountApplied: currentPromoCode || null
-  });
+  if (summary.type === 'DiseaseModel') {
+    seed.push({
+      product: `Disease Models - ${summary.cropName} (${summary.devs.length} license${summary.devs.length === 1 ? '' : 's'})`,
+      start: summary.start,
+      expiry: summary.end,
+      plan: 'DM License',
+      billing: summary.billing,
+      status,
+      devices: summary.devs,
+      crop: summary.crop,
+      cropName: summary.cropName,
+      billingProfile: {
+        billName: billName.value,
+        billEmail: billEmail.value,
+        billAddress: billAddress.value,
+        billCountry: billCountry.value,
+        billVat: billVat.value,
+        billMethod: billMethod.value
+      },
+      cost: Math.max(0, summary.cost - (currentDiscount ? calculateDiscount(summary.cost, currentDiscount) : 0)),
+      discountApplied: currentPromoCode || null
+    });
+  } else {
+    // API subscription
+    seed.push({
+      product: `Client API (${summary.devs.length} device${summary.devs.length === 1 ? "" : "s"})`,
+      start: summary.start,
+      expiry: summary.end,
+      plan: summary.tier,
+      billing: summary.billing,
+      status,
+      devices: summary.devs,
+      billingProfile: {
+        billName: billName.value,
+        billEmail: billEmail.value,
+        billAddress: billAddress.value,
+        billCountry: billCountry.value,
+        billVat: billVat.value,
+        billMethod: billMethod.value
+      },
+      cost: Math.max(0, summary.cost - (currentDiscount ? calculateDiscount(summary.cost, currentDiscount) : 0)),
+      discountApplied: currentPromoCode || null
+    });
+  }
 
   render();
   wizard?.hide();
@@ -444,9 +740,15 @@ function updateFinalCost(wizardMode = 'add', subtotalOverride = null) {
       // For manage wizard, get the amount due from the summary
       subtotal = manageWizard.selection.amountDue || 0;
     } else {
-      // For add wizard, get cost from computeCost
-      const { total } = computeCost();
-      subtotal = total || 0;
+      // For add wizard, get cost based on subscription type
+      if (selectedType === 'DiseaseModel') {
+        const dmDevs = selectedDMDevices();
+        const { total } = calculateDMCost(dmDevs.length);
+        subtotal = total || 0;
+      } else {
+        const { total } = computeCost();
+        subtotal = total || 0;
+      }
     }
   }
 
@@ -543,10 +845,39 @@ document.getElementById('applyPromoBtn')?.addEventListener('click', () => applyP
 
 // Gating & estimate updates
 document.addEventListener("change", (e) => {
+  // API subscription
   if (e.target.classList.contains("device-check") || e.target.id === "apiTier") {
     updateEstimate(); updateNextState();
   }
   if (e.target.id === "apiStart" || e.target.id === "apiEnd") updateNextState();
+  
+  // Disease Models subscription
+  if (e.target.id === "dmCrop") {
+    const selectedCrop = e.target.value;
+    const dmCropError = document.getElementById('dmCropError');
+    const dmCropErrorText = document.getElementById('dmCropErrorText');
+    
+    // Check if subscription already exists for this crop
+    const existingSub = seed.find(s => s.crop === selectedCrop && (s.product?.includes('Disease Models') || s.plan === 'DM License'));
+    
+    if (existingSub && selectedCrop) {
+      const cropName = DM_CROPS[selectedCrop]?.name || selectedCrop;
+      if (dmCropError) {
+        dmCropErrorText.textContent = `A Disease Models subscription for ${cropName} already exists. To add more devices, use the MANAGE button on your existing subscription.`;
+        dmCropError.classList.remove('d-none');
+      }
+      // Reset the select and don't render devices
+      e.target.value = '';
+      renderDMDevices('');
+    } else {
+      if (dmCropError) dmCropError.classList.add('d-none');
+      renderDMDevices(selectedCrop);
+    }
+    updateNextState();
+  }
+  if (e.target.id === "dmStart" || e.target.id === "dmEnd") updateNextState();
+  
+  // Billing fields
   if (["billName","billEmail","billAddress","billCountry","billMethod","billVat"].includes(e.target.id)) updateNextState();
 });
 document.addEventListener("input", (e) => {
@@ -669,45 +1000,90 @@ function manageRenderStep() {
     const ov = document.getElementById('manageOverview');
     if (!ov) return;
     
-    ov.innerHTML = `
-      <h6 class="fw-bold mb-3">Subscription overview</h6>
-      <div class="row mb-4">
-        <div class="col-6">
-          <div class="mb-3">
-            <div class="text-secondary small">Product</div>
-            <div class="fw-semibold">${sub.product || 'Client API'}</div>
+    const isDM = sub.crop || (sub.product && sub.product.includes('Disease Models'));
+    
+    if (isDM) {
+      // Disease Models subscription overview
+      const cropName = sub.cropName || DM_CROPS[sub.crop]?.name || sub.crop || '—';
+      ov.innerHTML = `
+        <h6 class="fw-bold mb-3">Subscription overview</h6>
+        <div class="row mb-4">
+          <div class="col-6">
+            <div class="mb-3">
+              <div class="text-secondary small">Product</div>
+              <div class="fw-semibold">${sub.product || 'Disease Models'}</div>
+            </div>
+            <div class="mb-3">
+              <div class="text-secondary small">Crop</div>
+              <div class="fw-semibold">${cropName}</div>
+            </div>
+            <div>
+              <div class="text-secondary small">Devices (Licenses)</div>
+              <div class="fw-semibold">${(sub.devices && sub.devices.length) ? sub.devices.join(', ') : '—'}</div>
+            </div>
           </div>
-          <div class="mb-3">
-            <div class="text-secondary small">Plan / Tier</div>
-            <div class="fw-semibold">${sub.plan || '—'}</div>
-          </div>
-          <div>
-            <div class="text-secondary small">Devices</div>
-            <div class="fw-semibold">${(sub.devices && sub.devices.length) ? sub.devices.join(', ') : '—'}</div>
+          <div class="col-6">
+            <div class="mb-3">
+              <div class="text-secondary small">Start date</div>
+              <div class="fw-semibold">${sub.start || '—'}</div>
+            </div>
+            <div class="mb-3">
+              <div class="text-secondary small">Expiry date</div>
+              <div class="fw-semibold">${sub.expiry || '—'}</div>
+            </div>
+            <div>
+              <div class="text-secondary small">Status</div>
+              <div><span class="badge ${sub.status === 'Active' ? 'text-bg-success' : sub.status === 'Pending' ? 'text-bg-warning' : 'text-bg-secondary'}">${sub.status || '—'}</span></div>
+            </div>
           </div>
         </div>
-        <div class="col-6">
-          <div class="mb-3">
-            <div class="text-secondary small">Start date</div>
-            <div class="fw-semibold">${sub.start || '—'}</div>
+        <div class="d-flex gap-2 pt-2 border-top">
+          <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" id="manageActionAdd">Add devices</button>
+          <button type="button" class="btn btn-outline-danger btn-sm" id="manageActionDelete">Delete</button>
+        </div>
+      `;
+    } else {
+      // Client API subscription overview
+      ov.innerHTML = `
+        <h6 class="fw-bold mb-3">Subscription overview</h6>
+        <div class="row mb-4">
+          <div class="col-6">
+            <div class="mb-3">
+              <div class="text-secondary small">Product</div>
+              <div class="fw-semibold">${sub.product || 'Client API'}</div>
+            </div>
+            <div class="mb-3">
+              <div class="text-secondary small">Plan / Tier</div>
+              <div class="fw-semibold">${sub.plan || '—'}</div>
+            </div>
+            <div>
+              <div class="text-secondary small">Devices</div>
+              <div class="fw-semibold">${(sub.devices && sub.devices.length) ? sub.devices.join(', ') : '—'}</div>
+            </div>
           </div>
-          <div class="mb-3">
-            <div class="text-secondary small">Expiry date</div>
-            <div class="fw-semibold">${sub.expiry || '—'}</div>
-          </div>
-          <div>
-            <div class="text-secondary small">Status</div>
-            <div><span class="badge ${sub.status === 'Active' ? 'text-bg-success' : sub.status === 'Pending' ? 'text-bg-warning' : 'text-bg-secondary'}">${sub.status || '—'}</span></div>
+          <div class="col-6">
+            <div class="mb-3">
+              <div class="text-secondary small">Start date</div>
+              <div class="fw-semibold">${sub.start || '—'}</div>
+            </div>
+            <div class="mb-3">
+              <div class="text-secondary small">Expiry date</div>
+              <div class="fw-semibold">${sub.expiry || '—'}</div>
+            </div>
+            <div>
+              <div class="text-secondary small">Status</div>
+              <div><span class="badge ${sub.status === 'Active' ? 'text-bg-success' : sub.status === 'Pending' ? 'text-bg-warning' : 'text-bg-secondary'}">${sub.status || '—'}</span></div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="d-flex gap-2 pt-2 border-top">
-        <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" id="manageActionAdd">Add devices</button>
-        <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" id="manageActionUpgrade">Upgrade tier</button>
-        <button type="button" class="btn btn-outline-info btn-sm flex-grow-1" id="manageActionQuota">Check Quota</button>
-        <button type="button" class="btn btn-outline-danger btn-sm" id="manageActionDelete">Delete</button>
-      </div>
-    `;
+        <div class="d-flex gap-2 pt-2 border-top">
+          <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" id="manageActionAdd">Add devices</button>
+          <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" id="manageActionUpgrade">Upgrade tier</button>
+          <button type="button" class="btn btn-outline-info btn-sm flex-grow-1" id="manageActionQuota">Check Quota</button>
+          <button type="button" class="btn btn-outline-danger btn-sm" id="manageActionDelete">Delete</button>
+        </div>
+      `;
+    }
     
     const addBtn = document.getElementById('manageActionAdd');
     const upBtn = document.getElementById('manageActionUpgrade');
@@ -783,11 +1159,13 @@ function manageRenderStep() {
       managePayBtn.classList.add('d-none');
 
       if (manageWizard.mode === 'add-devices') {
+        const isDM = sub.crop || (sub.product && sub.product.includes('Disease Models'));
+        
         content.innerHTML = `
           <h6 class="fw-bold mb-2">Select devices to add</h6>
           <div class="row g-3">
             <div class="col-12">
-              <div class="border rounded-3 p-2">
+              <div class="border rounded-3 p-2" style="max-height: 250px; overflow-y: auto;">
                 <div id="manageDevicesList"></div>
               </div>
               <div class="form-text">Select devices to add to this subscription (pro-rated for remaining term).</div>
@@ -803,17 +1181,59 @@ function manageRenderStep() {
         if (!listEl) return;
         
         const existing = sub.devices || [];
-        const checks = document.querySelectorAll('#step2 input[type="checkbox"]');
-        checks.forEach(ch => {
-          const isExisting = existing.includes(ch.value);
-          const div = document.createElement('div');
-          div.className = 'form-check';
-          div.innerHTML = `
-            <input class="form-check-input" type="checkbox" value="${ch.value}" id="manageDev_${ch.value}" ${isExisting ? 'checked disabled' : ''}>
-            <label class="form-check-label" for="manageDev_${ch.value}" style="${isExisting ? 'opacity:0.6;' : ''}">${ch.nextElementSibling?.textContent?.trim() || ch.value}</label>
-          `;
-          listEl.appendChild(div);
-        });
+        
+        if (isDM) {
+          // Disease Models: show DM_DEVICES filtered by crop sensors
+          const cropKey = sub.crop;
+          const crop = DM_CROPS[cropKey];
+          
+          if (crop) {
+            const sensorNames = crop.requiredSensors.map(s => SENSOR_NAMES[s] || s).join(', ');
+            listEl.innerHTML = `<div class="small text-secondary mb-2">Required sensors for ${crop.name}: ${sensorNames}</div>`;
+          }
+          
+          DM_DEVICES.forEach(dev => {
+            const isExisting = existing.includes(dev.id);
+            const { compatible } = deviceHasRequiredSensors(dev.id, cropKey);
+            const missingSensors = crop ? crop.requiredSensors.filter(s => !dev.sensors.includes(s)) : [];
+            const missingNames = missingSensors.map(s => SENSOR_NAMES[s] || s).join(', ');
+            const canSelect = compatible && !isExisting;
+            
+            const div = document.createElement('div');
+            div.className = `form-check py-1 border-bottom ${canSelect ? '' : 'opacity-50'}`;
+            div.innerHTML = `
+              <input class="form-check-input" type="checkbox" value="${dev.id}" id="manageDev_${dev.id}" ${isExisting ? 'checked disabled' : ''} ${!compatible ? 'disabled' : ''}>
+              <label class="form-check-label w-100" for="manageDev_${dev.id}">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-medium">${dev.name}</span>
+                  ${isExisting 
+                    ? '<span class="badge bg-secondary-subtle text-secondary small">Already added</span>'
+                    : compatible 
+                      ? '<span class="badge bg-success-subtle text-success small">Compatible</span>' 
+                      : '<span class="badge bg-danger-subtle text-danger small">Incompatible</span>'}
+                </div>
+                <div class="small text-secondary">
+                  Sensors: ${dev.sensors.map(s => SENSOR_NAMES[s] || s).join(', ')}
+                </div>
+                ${!compatible && !isExisting ? `<div class="small text-danger">Missing: ${missingNames}</div>` : ''}
+              </label>
+            `;
+            listEl.appendChild(div);
+          });
+        } else {
+          // Client API: show API devices from step2
+          const checks = document.querySelectorAll('#step2 input[type="checkbox"]');
+          checks.forEach(ch => {
+            const isExisting = existing.includes(ch.value);
+            const div = document.createElement('div');
+            div.className = 'form-check';
+            div.innerHTML = `
+              <input class="form-check-input" type="checkbox" value="${ch.value}" id="manageDev_${ch.value}" ${isExisting ? 'checked disabled' : ''}>
+              <label class="form-check-label" for="manageDev_${ch.value}" style="${isExisting ? 'opacity:0.6;' : ''}">${ch.nextElementSibling?.textContent?.trim() || ch.value}</label>
+            `;
+            listEl.appendChild(div);
+          });
+        }
         
         listEl.querySelectorAll('input[type="checkbox"]:not([disabled])').forEach(ch => {
           ch.addEventListener('change', updateManageDevicesEstimate);
@@ -940,16 +1360,42 @@ function manageRenderStep() {
       const added = checks.filter(ch => ch.checked).map(ch => ch.value);
       manageWizard.selection.addDevices = added;
       const fr = prorataFractionForSub(sub);
-      amount = added.length * DEVICE_PRICE * fr;
       
-      html += `
-        <div class="row g-2 small">
-          <div class="col-4 text-secondary">Action</div><div class="col-8 fw-semibold">Add ${added.length} device(s)</div>
-          <div class="col-4 text-secondary">Cost/device</div><div class="col-8">€${DEVICE_PRICE}</div>
-          <div class="col-4 text-secondary">Proration</div><div class="col-8">${fr.toFixed(2)} remaining</div>
-          <div class="col-4 text-secondary">Total</div><div class="col-8 fw-bold">€${amount.toFixed(2)}</div>
-        </div>
-      `;
+      const isDM = sub.crop || (sub.product && sub.product.includes('Disease Models'));
+      
+      if (isDM) {
+        // Disease Models: bracket pricing
+        const existingCount = (sub.devices || []).length;
+        const newTotalCount = existingCount + added.length;
+        const currentCostPerYear = calculateDMCost(existingCount).total;
+        const newCostPerYear = calculateDMCost(newTotalCount).total;
+        const additionalCostPerYear = newCostPerYear - currentCostPerYear;
+        amount = additionalCostPerYear * fr;
+        const newPricePerLicense = getDMPricePerLicense(newTotalCount);
+        
+        html += `
+          <div class="row g-2 small">
+            <div class="col-4 text-secondary">Action</div><div class="col-8 fw-semibold">Add ${added.length} license(s)</div>
+            <div class="col-4 text-secondary">Current licenses</div><div class="col-8">${existingCount}</div>
+            <div class="col-4 text-secondary">New total</div><div class="col-8">${newTotalCount}</div>
+            <div class="col-4 text-secondary">Bracket price</div><div class="col-8">€${newPricePerLicense}/license/year</div>
+            <div class="col-4 text-secondary">Proration</div><div class="col-8">${fr.toFixed(2)} (${remainingDaysForSub(sub)} days remaining)</div>
+            <div class="col-4 text-secondary">Total</div><div class="col-8 fw-bold">€${amount.toFixed(2)}</div>
+          </div>
+        `;
+      } else {
+        // Client API: flat per-device pricing
+        amount = added.length * DEVICE_PRICE * fr;
+        
+        html += `
+          <div class="row g-2 small">
+            <div class="col-4 text-secondary">Action</div><div class="col-8 fw-semibold">Add ${added.length} device(s)</div>
+            <div class="col-4 text-secondary">Cost/device</div><div class="col-8">€${DEVICE_PRICE}</div>
+            <div class="col-4 text-secondary">Proration</div><div class="col-8">${fr.toFixed(2)} remaining</div>
+            <div class="col-4 text-secondary">Total</div><div class="col-8 fw-bold">€${amount.toFixed(2)}</div>
+          </div>
+        `;
+      }
     } else if (manageWizard.mode === 'upgrade-tier') {
       const newTier = document.getElementById('manageNewTier')?.value;
       manageWizard.selection.newTier = newTier;
@@ -994,9 +1440,41 @@ function updateManageDevicesEstimate() {
   
   const fr = prorataFractionForSub(sub);
   const remainingDays = remainingDaysForSub(sub);
-  const cost = selected * DEVICE_PRICE * fr;
   const est = document.getElementById('manageDevicesEstimate');
-  if (est) est.textContent = `Prorated for remaining subscription: €${DEVICE_PRICE}/device/yr × ${selected} devices × ${fr.toFixed(3)} (for remaining ${remainingDays} days) = €${cost.toFixed(2)}`;
+  
+  const isDM = sub.crop || (sub.product && sub.product.includes('Disease Models'));
+  
+  if (isDM) {
+    // Disease Models: bracket pricing based on total device count
+    const existingCount = (sub.devices || []).length;
+    const newTotalCount = existingCount + selected;
+    
+    // Calculate cost difference: new total cost - current cost, pro-rated
+    const currentCostPerYear = calculateDMCost(existingCount).total;
+    const newCostPerYear = calculateDMCost(newTotalCount).total;
+    const additionalCostPerYear = newCostPerYear - currentCostPerYear;
+    const cost = additionalCostPerYear * fr;
+    
+    const newPricePerLicense = getDMPricePerLicense(newTotalCount);
+    
+    if (est) {
+      if (selected === 0) {
+        est.textContent = 'Select devices to see pro-rata cost estimate.';
+      } else {
+        est.innerHTML = `
+          <div class="mb-1"><strong>Pro-rata calculation:</strong></div>
+          <div>Current licenses: ${existingCount} | Adding: ${selected} | New total: ${newTotalCount}</div>
+          <div>New bracket price: €${newPricePerLicense}/license/year</div>
+          <div>Additional cost/year: €${additionalCostPerYear.toFixed(2)}</div>
+          <div>Pro-rata (${remainingDays} days remaining): €${additionalCostPerYear.toFixed(2)} × ${fr.toFixed(3)} = <strong>€${cost.toFixed(2)}</strong></div>
+        `;
+      }
+    }
+  } else {
+    // Client API: flat per-device pricing
+    const cost = selected * DEVICE_PRICE * fr;
+    if (est) est.textContent = `Prorated for remaining subscription: €${DEVICE_PRICE}/device/yr × ${selected} devices × ${fr.toFixed(3)} (for remaining ${remainingDays} days) = €${cost.toFixed(2)}`;
+  }
 }
 
 function updateManageUpgradeEstimate() {
@@ -1046,6 +1524,16 @@ managePayBtn?.addEventListener('click', () => {
   if (manageWizard.mode === 'add-devices') {
     const toAdd = manageWizard.selection.addDevices || [];
     sub.devices = Array.from(new Set([...(sub.devices || []), ...toAdd]));
+    
+    // Update product name to reflect new device count
+    const isDM = sub.crop || (sub.product && sub.product.includes('Disease Models'));
+    if (isDM) {
+      const cropName = sub.cropName || DM_CROPS[sub.crop]?.name || sub.crop || 'Unknown';
+      sub.product = `Disease Models - ${cropName} (${sub.devices.length} license${sub.devices.length === 1 ? '' : 's'})`;
+    } else {
+      sub.product = `Client API (${sub.devices.length} device${sub.devices.length === 1 ? '' : 's'})`;
+    }
+    
     // update cost stored on subscription if you store it
     sub.cost = (sub.cost || 0) + amount;
     sub.discountApplied = currentPromoCode || null;

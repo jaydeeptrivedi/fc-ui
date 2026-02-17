@@ -94,19 +94,19 @@
                 </div>
               </div>
               <div class="col-12 col-md-4">
-                <div class="card h-100" data-subtype="Webhooks">
+                <div class="card h-100 selectable" data-subtype="DiseaseModel">
                   <div class="card-body">
-                    <div class="fw-bold">Weather Forcast</div>
-                    <div class="text-secondary small">3 day, 7 day forcast data</div>
-                    <div class="mt-2"><span class="badge text-bg-secondary">Coming Soon</span></div>
+                    <div class="fw-bold">Disease Models</div>
+                    <div class="text-secondary small">For wide range of crops and fruits</div>
+                    <div class="mt-2"><span class="badge text-bg-success">Available</span></div>
                   </div>
                 </div>
               </div>
               <div class="col-12 col-md-4">
-                <div class="card h-100" data-subtype="SMS">
+                <div class="card h-100" data-subtype="Webhooks">
                   <div class="card-body">
-                    <div class="fw-bold">Disease Models</div>
-                    <div class="text-secondary small">For wide range of crops and fruits</div>
+                    <div class="fw-bold">Weather Forecast</div>
+                    <div class="text-secondary small">3 day, 7 day forecast data</div>
                     <div class="mt-2"><span class="badge text-bg-secondary">Coming Soon</span></div>
                   </div>
                 </div>
@@ -114,7 +114,7 @@
             </div>
 
             <div class="alert alert-info small mt-3 mb-0">
-              For this demo, the wizard fully implements <strong>API Access</strong> flow. Other types are placeholders.
+              This wizard implements <strong>API Access</strong> and <strong>Disease Models</strong> subscription flows.
             </div>
           </div>
 
@@ -173,6 +173,68 @@
             </div>
           </div>
 
+          <!-- Step 2: Disease Models details -->
+          <div class="wizard-step d-none" id="step2-dm">
+            <h6 class="fw-bold mb-2">Configure Disease Model subscription</h6>
+            <div class="text-secondary small mb-3">Select a crop/fruit to view compatible devices. One subscription per crop.</div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label for="dmCrop" class="form-label fw-semibold">Crop / Fruit *</label>
+                <select id="dmCrop" class="form-select">
+                  <option value="">Select a crop...</option>
+                </select>
+                <div id="dmCropError" class="alert alert-warning small mt-2 d-none">
+                  <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                  <span id="dmCropErrorText"></span>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div id="dmSensorInfo" class="border rounded-3 p-2 bg-light d-none">
+                  <div class="text-secondary small fw-semibold mb-1">Required Sensors:</div>
+                  <div id="dmRequiredSensors" class="small"></div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-semibold">Select Devices (Licenses)</label>
+                <div id="dmDeviceList" class="border rounded-3 p-2" style="max-height: 220px; overflow-y: auto;">
+                  <div class="text-secondary small">Select a crop first to see compatible devices.</div>
+                </div>
+                <div class="form-text">Devices without required sensors are shown but cannot be selected.</div>
+              </div>
+
+              <div class="col-12 col-md-3">
+                <label for="dmStart" class="form-label fw-semibold">Start date</label>
+                <input id="dmStart" type="date" class="form-control"/>
+              </div>
+
+              <div class="col-12 col-md-3">
+                <label for="dmEnd" class="form-label fw-semibold">End date</label>
+                <input id="dmEnd" type="date" class="form-control"/>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="border rounded-3 p-2 bg-light h-100">
+                  <div class="text-secondary small fw-semibold mb-1">Pricing Brackets (per device/year):</div>
+                  <div class="small">
+                    1-10: €96 | 11-20: €82 | 21-50: €72 | 51-100: €67 | 100+: €60
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="border rounded-3 p-3 bg-body-tertiary">
+                  <div class="d-flex justify-content-between">
+                    <div class="text-secondary small">Estimated cost</div>
+                    <div class="fw-bold" id="dmEstCost">€—</div>
+                  </div>
+                  <div class="text-secondary small mt-1" id="dmEstNote">Select crop and devices to see an estimate.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Step 3: Billing -->
           <div class="wizard-step d-none" id="step3">
             <h6 class="fw-bold mb-2">Billing details</h6>
@@ -224,8 +286,9 @@
               <div class="fw-semibold mb-2">Order summary</div>
               <div class="row g-2 small">
                 <div class="col-4 text-secondary">Type</div><div class="col-8" id="sumType">—</div>
+                <div class="col-4 text-secondary" id="sumCropLabel" style="display:none;">Crop</div><div class="col-8" id="sumCrop" style="display:none;">—</div>
                 <div class="col-4 text-secondary">Devices</div><div class="col-8" id="sumDevices">—</div>
-                <div class="col-4 text-secondary">Tier</div><div class="col-8" id="sumTier">—</div>
+                <div class="col-4 text-secondary" id="sumTierLabel">Tier</div><div class="col-8" id="sumTier">—</div>
                 <div class="col-4 text-secondary">Dates</div><div class="col-8" id="sumDates">—</div>
                 <div class="col-4 text-secondary">Billing</div><div class="col-8" id="sumBilling">—</div>
                 <div class="col-4 text-secondary">Subtotal</div><div class="col-8 fw-semibold" id="sumCost">€—</div>
