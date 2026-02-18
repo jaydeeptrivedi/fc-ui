@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice - FC Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="assets/admin.css" rel="stylesheet" />
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      .admin-topbar, .admin-sidebar, .sidebar-backdrop { display: none !important; }
+      .admin-main { margin: 0 !important; padding: 0 !important; }
+      .invoice-container { box-shadow: none !important; }
+      body { background: white !important; }
+    }
+    .invoice-container {
+      background: white;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .invoice-header {
+      border-bottom: 3px solid #198754;
+    }
+    .invoice-table th {
+      background-color: #f8f9fa;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="admin-topbar navbar navbar-dark d-flex justify-content-between align-items-center no-print">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-link text-light d-lg-none me-2" id="sidebarToggle">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand fw-bold mb-0" href="index.html">
+        <span class="text-warning">FC</span> Admin Portal
+      </a>
+    </div>
+    <div class="d-flex align-items-center">
+      <a href="subscriptions.html" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Back to Subscriptions
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <nav class="admin-sidebar no-print" id="adminSidebar">
+    <div class="sidebar-heading">Main</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Management</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="products.html"><i class="bi bi-box-seam"></i>Products</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="subscriptions.html"><i class="bi bi-card-checklist"></i>Subscriptions</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="promos.html"><i class="bi bi-tag"></i>Promo Codes</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Settings</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-gear"></i>Configuration</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-people"></i>Users</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Backdrop (mobile) -->
+  <div class="sidebar-backdrop no-print" id="sidebarBackdrop"></div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+      <div>
+        <a href="subscriptions.html" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
+      </div>
+      <div>
+        <button class="btn btn-outline-primary me-2" onclick="window.print()">
+          <i class="bi bi-printer me-1"></i>Print
+        </button>
+        <button class="btn btn-primary" onclick="downloadPDF()">
+          <i class="bi bi-download me-1"></i>Download PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Invoice Content -->
+    <div class="invoice-container card border-0 shadow-sm p-4 p-md-5" id="invoiceContent">
+      <!-- Header -->
+      <div class="invoice-header pb-4 mb-4">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h2 class="fw-bold mb-1"><span class="text-warning">FC</span> Platform</h2>
+            <p class="text-secondary mb-0">FieldClimate Services</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <h3 class="fw-bold text-uppercase mb-2">Invoice</h3>
+            <p class="mb-0"><strong>Invoice #:</strong> <span id="invoiceNumber">-</span></p>
+            <p class="mb-0"><strong>Date:</strong> <span id="invoiceDate">-</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing Info -->
+      <div class="row mb-4">
+        <div class="col-md-6 mb-3 mb-md-0">
+          <h6 class="text-secondary text-uppercase small mb-2">From</h6>
+          <p class="mb-0 fw-semibold">Pessl Instruments GmbH</p>
+          <p class="mb-0 text-secondary small">Werksweg 107</p>
+          <p class="mb-0 text-secondary small">8160 Weiz, Austria</p>
+          <p class="mb-0 text-secondary small">VAT: ATU12345678</p>
+        </div>
+        <div class="col-md-6">
+          <h6 class="text-secondary text-uppercase small mb-2">Bill To</h6>
+          <p class="mb-0 fw-semibold" id="billToName">-</p>
+          <p class="mb-0 text-secondary small" id="billToAddress">-</p>
+          <p class="mb-0 text-secondary small" id="billToCountry">-</p>
+          <p class="mb-0 text-secondary small" id="billToVat">-</p>
+        </div>
+      </div>
+
+      <!-- Subscription Details -->
+      <div class="mb-4">
+        <h6 class="text-secondary text-uppercase small mb-2">Subscription Details</h6>
+        <div class="table-responsive">
+          <table class="table invoice-table mb-0">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th class="text-center">Period</th>
+                <th class="text-center">Qty</th>
+                <th class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="invoiceItems">
+              <tr>
+                <td colspan="4" class="text-center text-secondary">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="bg-light rounded p-3">
+            <h6 class="text-secondary small mb-2">Payment Method</h6>
+            <p class="mb-0 fw-semibold" id="paymentMethod">-</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <table class="table table-sm mb-0">
+            <tr>
+              <td class="text-secondary">Subtotal</td>
+              <td class="text-end" id="subtotal">€0.00</td>
+            </tr>
+            <tr id="discountRow" style="display: none;">
+              <td class="text-secondary">Discount (<span id="promoCode">-</span>)</td>
+              <td class="text-end text-success" id="discount">-€0.00</td>
+            </tr>
+            <tr>
+              <td class="text-secondary">VAT (0%)</td>
+              <td class="text-end">€0.00</td>
+            </tr>
+            <tr class="border-top">
+              <td class="fw-bold fs-5">Total</td>
+              <td class="text-end fw-bold fs-5 text-success" id="total">€0.00</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="mt-4 pt-4 border-top" id="notesSection" style="display: none;">
+        <h6 class="text-secondary small mb-2">Notes</h6>
+        <p class="text-secondary small mb-0" id="invoiceNotes">-</p>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-4 pt-4 border-top text-center">
+        <p class="text-secondary small mb-0">Thank you for your business!</p>
+        <p class="text-secondary small mb-0">For questions, contact: billing@fieldclimate.com</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="assets/admin-data.js"></script>
+  <script src="assets/admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const subId = urlParams.get('id');
+      
+      if (!subId) {
+        showError('No subscription ID provided');
+        return;
+      }
+      
+      const sub = AdminData.getSubscriptions().find(s => s.id === subId);
+      if (!sub) {
+        showError('Subscription not found');
+        return;
+      }
+      
+      renderInvoice(sub);
+    });
+
+    function showError(message) {
+      document.querySelector('.invoice-container').innerHTML = `
+        <div class="text-center py-5">
+          <i class="bi bi-exclamation-triangle text-warning fs-1 mb-3"></i>
+          <h5>${message}</h5>
+          <a href="subscriptions.html" class="btn btn-primary mt-3">
+            <i class="bi bi-arrow-left me-1"></i>Back to Subscriptions
+          </a>
+        </div>
+      `;
+    }
+
+    function renderInvoice(sub) {
+      const bp = sub.billingProfile || {};
+      const devices = sub.devices || [];
+      
+      // Invoice header
+      document.getElementById('invoiceNumber').textContent = sub.invoiceNumber || `INV-${sub.id}`;
+      document.getElementById('invoiceDate').textContent = sub.startDate || sub.start || new Date().toISOString().split('T')[0];
+      
+      // Bill to
+      document.getElementById('billToName').textContent = bp.billName || sub.customerName || 'N/A';
+      document.getElementById('billToAddress').textContent = bp.billAddress || '';
+      document.getElementById('billToCountry').textContent = bp.billCountry || '';
+      document.getElementById('billToVat').textContent = bp.billVat ? `VAT: ${bp.billVat}` : '';
+      
+      // Payment method
+      document.getElementById('paymentMethod').innerHTML = `
+        <span class="badge text-bg-${sub.paymentMethod === 'Invoice' ? 'secondary' : 'primary'}">${sub.paymentMethod || 'Online'}</span>
+        ${sub.billing ? `<span class="badge text-bg-info ms-1">${sub.billing}</span>` : ''}
+      `;
+      
+      // Build invoice items
+      let itemsHtml = '';
+      const period = `${sub.startDate || sub.start || '-'} to ${sub.endDate || sub.expiry || '-'}`;
+      
+      // Main product line
+      let description = sub.productName || sub.product || sub.productType || 'Subscription';
+      if (sub.tier || sub.plan) description += ` - ${sub.tier || sub.plan}`;
+      if (sub.crop) description += ` (${sub.crop})`;
+      if (sub.cropZones) description += ` - ${sub.cropZones} CropZones`;
+      
+      itemsHtml += `
+        <tr>
+          <td>
+            <div class="fw-semibold">${escapeHtml(description)}</div>
+            <div class="small text-secondary">${sub.productType || ''}</div>
+          </td>
+          <td class="text-center small">${period}</td>
+          <td class="text-center">1</td>
+          <td class="text-end">€${(sub.cost || 0).toFixed(2)}</td>
+        </tr>
+      `;
+      
+      // Device lines if any
+      if (devices.length > 0 && (sub.productType === 'Client API' || sub.productType === 'Disease Models')) {
+        itemsHtml += `
+          <tr>
+            <td>
+              <div class="small text-secondary ps-3">Registered Devices: ${devices.join(', ')}</div>
+            </td>
+            <td></td>
+            <td class="text-center">${devices.length}</td>
+            <td class="text-end text-secondary">included</td>
+          </tr>
+        `;
+      }
+      
+      // License lines if any
+      if (sub.licenses && sub.licenses > 1) {
+        itemsHtml += `
+          <tr>
+            <td>
+              <div class="small text-secondary ps-3">Additional Licenses</div>
+            </td>
+            <td></td>
+            <td class="text-center">${sub.licenses - 1}</td>
+            <td class="text-end text-secondary">included</td>
+          </tr>
+        `;
+      }
+      
+      document.getElementById('invoiceItems').innerHTML = itemsHtml;
+      
+      // Totals
+      const cost = sub.cost || 0;
+      document.getElementById('subtotal').textContent = `€${cost.toFixed(2)}`;
+      document.getElementById('total').textContent = `€${cost.toFixed(2)}`;
+      
+      // Promo code
+      if (sub.promoCode) {
+        document.getElementById('discountRow').style.display = 'table-row';
+        document.getElementById('promoCode').textContent = sub.promoCode;
+        document.getElementById('discount').textContent = 'Applied';
+      }
+      
+      // Notes
+      if (sub.notes) {
+        document.getElementById('notesSection').style.display = 'block';
+        document.getElementById('invoiceNotes').textContent = sub.notes;
+      }
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById('invoiceContent');
+      const invoiceNum = document.getElementById('invoiceNumber').textContent;
+      
+      const opt = {
+        margin: 10,
+        filename: `${invoiceNum}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
+</body>
+</html>

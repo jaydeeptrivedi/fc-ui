@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Subscription - FC Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="assets/admin.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="admin-topbar navbar navbar-dark d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-link text-light d-lg-none me-2" id="sidebarToggle">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand fw-bold mb-0" href="index.html">
+        <span class="text-warning">FC</span> Admin Portal
+      </a>
+    </div>
+    <div class="d-flex align-items-center">
+      <a href="subscriptions.html" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Back to Subscriptions
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <nav class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-heading">Main</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Management</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="products.html"><i class="bi bi-box-seam"></i>Products</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="subscriptions.html"><i class="bi bi-card-checklist"></i>Subscriptions</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="promos.html"><i class="bi bi-tag"></i>Promo Codes</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Settings</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-gear"></i>Configuration</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-people"></i>Users</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Backdrop (mobile) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="fw-bold mb-0" id="pageTitle">Create Subscription</h4>
+        <p class="text-secondary mb-0" id="pageSubtitle">Add a new customer subscription</p>
+      </div>
+      <a href="subscriptions.html" class="btn btn-outline-secondary">
+        <i class="bi bi-x-lg me-1"></i>Cancel
+      </a>
+    </div>
+
+    <form id="subscriptionForm" onsubmit="saveSubscription(event)">
+      <input type="hidden" id="subId">
+      
+      <div class="row g-4">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+          <!-- Billing Profile Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-credit-card me-2 text-primary"></i>Billing Profile</h6>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Billing Name <span class="text-danger">*</span></label>
+                  <input type="text" id="subBillName" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Billing Email <span class="text-danger">*</span></label>
+                  <input type="email" id="subBillEmail" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Address</label>
+                  <input type="text" id="subBillAddress" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Country</label>
+                  <input type="text" id="subBillCountry" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">VAT Number</label>
+                  <input type="text" id="subBillVat" class="form-control" placeholder="e.g., ATU12345678">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Billing Method</label>
+                  <select id="subBillMethod" class="form-select">
+                    <option value="Self Pay" selected>Self Pay</option>
+                    <option value="Reseller">Reseller</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Details Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-box-seam me-2 text-success"></i>Product Details</h6>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Product Type <span class="text-danger">*</span></label>
+                  <select id="subProduct" class="form-select" required onchange="handleProductChange()">
+                    <option value="">Select product...</option>
+                    <option value="Client API">Client API</option>
+                    <option value="Disease Models">Disease Models</option>
+                    <option value="FarmView">FarmView</option>
+                    <option value="Weather Forecast">Weather Forecast</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Status</label>
+                  <select id="subStatus" class="form-select">
+                    <option value="Pending">Pending (New)</option>
+                    <option value="Active" selected>Active</option>
+                    <option value="Expired">Expired</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <!-- API-specific options -->
+                <div class="col-md-6 api-fields" style="display: none;">
+                  <label class="form-label">Tier <span class="text-danger">*</span></label>
+                  <select id="subApiTier" class="form-select">
+                    <option value="Tier 1">Tier 1 (48 calls/day/device) - €49/year</option>
+                    <option value="Tier 2" selected>Tier 2 (500 calls/day/device) - €249/year</option>
+                    <option value="Tier 3">Tier 3 (1500 calls/day/device) - €499/year</option>
+                  </select>
+                </div>
+                <div class="col-md-6 api-fields" style="display: none;">
+                  <label class="form-label">Devices (comma-separated)</label>
+                  <input type="text" id="subApiDevices" class="form-control" placeholder="e.g., device001, device002">
+                  <div class="form-text">€30/device/year</div>
+                </div>
+
+                <!-- Disease Models-specific options -->
+                <div class="col-md-6 dm-fields" style="display: none;">
+                  <label class="form-label">Crop <span class="text-danger">*</span></label>
+                  <select id="subCrop" class="form-select">
+                    <option value="">Select crop...</option>
+                    <option value="apple">Apple</option>
+                    <option value="grape">Grape / Vine</option>
+                    <option value="wheat">Wheat</option>
+                    <option value="potato">Potato</option>
+                    <option value="tomato">Tomato</option>
+                    <option value="corn">Corn / Maize</option>
+                    <option value="citrus">Citrus</option>
+                    <option value="strawberry">Strawberry</option>
+                  </select>
+                </div>
+                <div class="col-md-6 dm-fields" style="display: none;">
+                  <label class="form-label">Devices / Licenses (comma-separated)</label>
+                  <input type="text" id="subDmDevices" class="form-control" placeholder="e.g., device001, device003">
+                  <div class="form-text">Bracket pricing: 1-10: €96, 11-20: €82, 21-50: €72, 51-100: €67, 101+: €60</div>
+                </div>
+
+                <!-- Weather Forecast-specific options -->
+                <div class="col-12 wf-fields" style="display: none;">
+                  <div class="alert alert-info small mb-0">
+                    <i class="bi bi-info-circle me-1"></i>Weather Forecast subscriptions are not fully implemented in the main platform yet.
+                  </div>
+                </div>
+
+                <!-- FarmView-specific options -->
+                <div class="col-md-6 fv-fields" style="display: none;">
+                  <label class="form-label">Number of CropZones</label>
+                  <input type="number" id="subCropZones" class="form-control" min="1" value="25">
+                  <div class="form-text">€50/CropZone/year</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Period & Pricing Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-calendar me-2 text-warning"></i>Period & Pricing</h6>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                  <input type="date" id="subStartDate" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">End Date <span class="text-danger">*</span></label>
+                  <input type="date" id="subEndDate" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Total Cost (€) <span class="text-danger">*</span></label>
+                  <input type="number" id="subCost" class="form-control" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Promo Code Applied</label>
+                  <input type="text" id="subPromoCode" class="form-control" placeholder="e.g., SUMMER20">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-sticky me-2 text-secondary"></i>Notes</h6>
+            </div>
+            <div class="card-body">
+              <textarea id="subNotes" class="form-control" rows="3" placeholder="Internal notes about this subscription..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Sidebar -->
+        <div class="col-lg-4">
+          <!-- Payment Information Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-cash-stack me-2 text-info"></i>Payment</h6>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label">Payment Method <span class="text-danger">*</span></label>
+                <select id="subPaymentMethod" class="form-select" required>
+                  <option value="Online">Online Payment</option>
+                  <option value="Invoice" selected>Invoice / Offline</option>
+                </select>
+                <div class="form-text">Online = immediate payment, Invoice = offline billing</div>
+              </div>
+              <div>
+                <label class="form-label">Invoice Number</label>
+                <input type="text" id="subInvoiceNumber" class="form-control" placeholder="e.g., INV-2026-001">
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <button type="submit" class="btn btn-primary w-100 mb-2">
+                <i class="bi bi-check-lg me-1"></i>Save Subscription
+              </button>
+              <a href="subscriptions.html" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-x-lg me-1"></i>Cancel
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Links (for edit mode) -->
+          <div class="card border-0 shadow-sm" id="quickLinksCard" style="display: none;">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Links</h6>
+            </div>
+            <div class="card-body">
+              <a href="#" id="viewInvoiceLink" class="btn btn-outline-info w-100 mb-2">
+                <i class="bi bi-receipt me-1"></i>View Invoice
+              </a>
+              <button type="button" class="btn btn-outline-danger w-100" onclick="deleteSubscription()">
+                <i class="bi bi-trash me-1"></i>Delete Subscription
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this subscription?</p>
+          <p class="text-danger small mb-0"><i class="bi bi-exclamation-triangle me-1"></i>This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+            <i class="bi bi-trash me-1"></i>Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/admin-data.js"></script>
+  <script src="assets/admin.js"></script>
+  <script>
+    let deleteModalInstance;
+    let currentSubId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteModal'));
+      
+      // Get subscription ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      currentSubId = urlParams.get('id');
+      
+      // Set default dates
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('subStartDate').value = today;
+      const nextYear = new Date();
+      nextYear.setFullYear(nextYear.getFullYear() + 1);
+      document.getElementById('subEndDate').value = nextYear.toISOString().split('T')[0];
+      
+      if (currentSubId) {
+        loadSubscription(currentSubId);
+      }
+      
+      // Delete confirmation
+      document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        if (currentSubId) {
+          AdminData.deleteSubscription(currentSubId);
+          showToast('Subscription deleted successfully', 'success');
+          setTimeout(() => window.location.href = 'subscriptions.html', 500);
+        }
+      });
+    });
+
+    function loadSubscription(id) {
+      const sub = AdminData.getSubscriptions().find(s => s.id === id);
+      if (!sub) {
+        showToast('Subscription not found', 'danger');
+        setTimeout(() => window.location.href = 'subscriptions.html', 1000);
+        return;
+      }
+      
+      // Update page title
+      document.getElementById('pageTitle').textContent = 'Edit Subscription';
+      document.getElementById('pageSubtitle').innerHTML = `Editing <code>${sub.id}</code>`;
+      document.title = `Edit ${sub.id} - FC Admin`;
+      
+      // Show quick links
+      document.getElementById('quickLinksCard').style.display = 'block';
+      document.getElementById('viewInvoiceLink').href = `invoice.html?id=${sub.id}`;
+      
+      // Fill form fields
+      document.getElementById('subId').value = sub.id;
+      
+      // Billing profile fields
+      const bp = sub.billingProfile || {};
+      document.getElementById('subBillName').value = bp.billName || sub.customerName || '';
+      document.getElementById('subBillEmail').value = bp.billEmail || sub.customerEmail || '';
+      document.getElementById('subBillAddress').value = bp.billAddress || '';
+      document.getElementById('subBillCountry').value = bp.billCountry || '';
+      document.getElementById('subBillVat').value = bp.billVat || '';
+      document.getElementById('subBillMethod').value = sub.billing || 'Self Pay';
+      
+      document.getElementById('subProduct').value = sub.productType || sub.product || '';
+      document.getElementById('subStatus').value = sub.status || 'Active';
+      document.getElementById('subStartDate').value = sub.startDate || sub.start || '';
+      document.getElementById('subEndDate').value = sub.endDate || sub.expiry || '';
+      document.getElementById('subCost').value = sub.cost || 0;
+      document.getElementById('subPromoCode').value = sub.promoCode || '';
+      document.getElementById('subNotes').value = sub.notes || '';
+      
+      // Payment fields
+      document.getElementById('subPaymentMethod').value = sub.paymentMethod || 'Online';
+      document.getElementById('subInvoiceNumber').value = sub.invoiceNumber || '';
+      
+      handleProductChange();
+      
+      // Fill product-specific fields
+      if (sub.productType === 'Client API' || (sub.product && sub.product.includes('API'))) {
+        document.getElementById('subApiTier').value = sub.tier || sub.plan || 'Tier 1';
+        const devices = sub.devices || [];
+        document.getElementById('subApiDevices').value = devices.join(', ');
+      } else if (sub.productType === 'Disease Models' || (sub.product && sub.product.includes('Disease'))) {
+        document.getElementById('subCrop').value = sub.crop || '';
+        const dmDevices = sub.devices || [];
+        document.getElementById('subDmDevices').value = dmDevices.join(', ');
+      } else if (sub.productType === 'FarmView') {
+        document.getElementById('subCropZones').value = sub.cropZones || 1;
+      }
+    }
+
+    function handleProductChange() {
+      const type = document.getElementById('subProduct').value;
+      
+      // Hide all product-specific fields
+      document.querySelectorAll('.api-fields, .dm-fields, .wf-fields, .fv-fields').forEach(el => {
+        el.style.display = 'none';
+      });
+      
+      // Show relevant fields
+      if (type === 'Client API') {
+        document.querySelectorAll('.api-fields').forEach(el => el.style.display = 'block');
+      } else if (type === 'Disease Models') {
+        document.querySelectorAll('.dm-fields').forEach(el => el.style.display = 'block');
+      } else if (type === 'Weather Forecast') {
+        document.querySelectorAll('.wf-fields').forEach(el => el.style.display = 'block');
+      } else if (type === 'FarmView') {
+        document.querySelectorAll('.fv-fields').forEach(el => el.style.display = 'block');
+      }
+    }
+
+    function saveSubscription(event) {
+      event.preventDefault();
+      
+      const id = document.getElementById('subId').value;
+      const productType = document.getElementById('subProduct').value;
+      
+      // Build billingProfile object
+      const billingProfile = {
+        billName: document.getElementById('subBillName').value,
+        billEmail: document.getElementById('subBillEmail').value,
+        billAddress: document.getElementById('subBillAddress').value,
+        billCountry: document.getElementById('subBillCountry').value,
+        billVat: document.getElementById('subBillVat').value
+      };
+      
+      // Build devices array from comma-separated input
+      let devices = [];
+      if (productType === 'Client API') {
+        const devInput = document.getElementById('subApiDevices').value;
+        devices = devInput ? devInput.split(',').map(d => d.trim()).filter(d => d) : [];
+      } else if (productType === 'Disease Models') {
+        const devInput = document.getElementById('subDmDevices').value;
+        devices = devInput ? devInput.split(',').map(d => d.trim()).filter(d => d) : [];
+      }
+      
+      const subscription = {
+        id: id || 'SUB-' + Date.now(),
+        product: productType,
+        productType: productType,
+        productName: document.getElementById('subProduct').options[document.getElementById('subProduct').selectedIndex].text,
+        billingProfile: billingProfile,
+        billing: document.getElementById('subBillMethod').value,
+        // Keep legacy fields for table display
+        customerName: billingProfile.billName,
+        customerEmail: billingProfile.billEmail,
+        status: document.getElementById('subStatus').value,
+        start: document.getElementById('subStartDate').value,
+        startDate: document.getElementById('subStartDate').value,
+        expiry: document.getElementById('subEndDate').value,
+        endDate: document.getElementById('subEndDate').value,
+        cost: parseFloat(document.getElementById('subCost').value),
+        promoCode: document.getElementById('subPromoCode').value,
+        notes: document.getElementById('subNotes').value,
+        // Payment fields
+        paymentMethod: document.getElementById('subPaymentMethod').value,
+        invoiceNumber: document.getElementById('subInvoiceNumber').value,
+        devices: devices,
+        // Product-specific fields
+        plan: productType === 'Client API' ? document.getElementById('subApiTier').value : undefined,
+        tier: productType === 'Client API' ? document.getElementById('subApiTier').value : undefined,
+        crop: productType === 'Disease Models' ? document.getElementById('subCrop').value : undefined,
+        licenses: productType === 'Disease Models' ? devices.length : undefined,
+        cropZones: productType === 'FarmView' ? parseInt(document.getElementById('subCropZones').value) : undefined
+      };
+      
+      if (id) {
+        AdminData.updateSubscription(subscription);
+        showToast('Subscription updated successfully', 'success');
+      } else {
+        AdminData.addSubscription(subscription);
+        showToast('Subscription created successfully', 'success');
+      }
+      
+      // Redirect back to list
+      setTimeout(() => window.location.href = 'subscriptions.html', 500);
+    }
+
+    function deleteSubscription() {
+      deleteModalInstance.show();
+    }
+  </script>
+</body>
+</html>

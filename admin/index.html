@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FC Platform - Admin Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="assets/admin.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="admin-topbar navbar navbar-dark d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-link text-light d-lg-none me-2" id="sidebarToggle">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand fw-bold mb-0" href="index.html">
+        <span class="text-warning">FC</span> Admin Portal
+      </a>
+    </div>
+    <div class="d-flex align-items-center">
+      <div class="dropdown">
+        <button class="btn btn-link text-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle me-1"></i>Admin User
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+      <a href="../index.html" class="btn btn-outline-light btn-sm ms-2">
+        <i class="bi bi-arrow-left me-1"></i>Back to Platform
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <nav class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-heading">Main</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" href="index.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Management</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="products.html"><i class="bi bi-box-seam"></i>Products</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="subscriptions.html"><i class="bi bi-card-checklist"></i>Subscriptions</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="promos.html"><i class="bi bi-tag"></i>Promo Codes</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Settings</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-gear"></i>Configuration</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-people"></i>Users</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Backdrop (mobile) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="fw-bold mb-0">Dashboard</h4>
+      <span class="text-secondary small" id="lastUpdated"></span>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+              <div class="bg-info bg-opacity-10 p-2 rounded me-3">
+                <i class="bi bi-cloud-arrow-up text-info"></i>
+              </div>
+              <div>
+                <div class="fs-4 fw-bold text-info" id="statApiRevenue">€0</div>
+                <div class="text-secondary small">API Revenue</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+              <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+                <i class="bi bi-currency-euro text-primary"></i>
+              </div>
+              <div>
+                <div class="fs-4 fw-bold" id="statRevenue">€100000</div>
+                <div class="text-secondary small">Total Revenue</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+              <div class="bg-success bg-opacity-10 p-2 rounded me-3">
+                <i class="bi bi-check-circle text-success"></i>
+              </div>
+              <div>
+                <div class="fs-4 fw-bold" id="statActive">0</div>
+                <div class="text-secondary small">Active Subs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+              <div class="bg-warning bg-opacity-10 p-2 rounded me-3">
+                <i class="bi bi-hourglass-split text-warning"></i>
+              </div>
+              <div>
+                <div class="fs-4 fw-bold" id="statPending">0</div>
+                <div class="text-secondary small">Pending</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Left Column -->
+      <div class="col-lg-8">
+        <!-- Country Team Scorecard -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-0"><i class="bi bi-trophy me-2 text-warning"></i>Country Team Scorecard</h6>
+            <span class="badge bg-primary" id="totalCountries">0 countries</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 50px;" class="text-center">#</th>
+                    <th>Country</th>
+                    <th class="text-center">Subs</th>
+                    <th class="text-end">Revenue</th>
+                    <th style="width: 120px;">Performance</th>
+                  </tr>
+                </thead>
+                <tbody id="countryScorecard">
+                  <tr><td colspan="5" class="text-center text-secondary py-3">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue by Country Chart -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-transparent border-0 py-3">
+            <h6 class="fw-bold mb-0"><i class="bi bi-globe-europe-africa me-2"></i>Revenue by Country</h6>
+          </div>
+          <div class="card-body" id="countryRevenueChart">
+            <div class="text-center text-secondary py-3">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="col-lg-4">
+        <!-- Revenue by Product -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-transparent border-0 py-3">
+            <h6 class="fw-bold mb-0">Revenue by Product</h6>
+          </div>
+          <div class="card-body pt-0" id="revenueByProduct">
+            <div class="text-center text-secondary py-3">Loading...</div>
+          </div>
+        </div>
+
+        <!-- Needs Attention -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-0">Needs Attention</h6>
+            <span class="badge bg-danger" id="attentionCount">0</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="list-group list-group-flush" id="attentionList">
+              <div class="list-group-item text-center text-secondary py-3">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/admin-data.js"></script>
+  <script src="assets/admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const subscriptions = AdminData.getSubscriptions();
+      const today = new Date().toISOString().split('T')[0];
+      const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      // Key Metrics
+      const active = subscriptions.filter(s => s.status === 'Active');
+      const pending = subscriptions.filter(s => s.status === 'Pending');
+      const totalRevenue = subscriptions.reduce((sum, s) => sum + (s.cost || 0), 0);
+      const apiRevenue = subscriptions.filter(s => (s.productType || s.product || '').includes('API'))
+        .reduce((sum, s) => sum + (s.cost || 0), 0);
+      
+      document.getElementById('statActive').textContent = active.length;
+      document.getElementById('statPending').textContent = pending.length;
+      document.getElementById('statRevenue').textContent = `€${totalRevenue.toLocaleString()}`;
+      document.getElementById('statApiRevenue').textContent = `€${apiRevenue.toLocaleString()}`;
+      document.getElementById('lastUpdated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+      
+      // Country flags mapping
+      const countryFlags = {
+        'Germany': '🇩🇪', 'France': '🇫🇷', 'Italy': '🇮🇹', 'Spain': '🇪🇸', 'Netherlands': '🇳🇱',
+        'Belgium': '🇧🇪', 'Austria': '🇦🇹', 'Switzerland': '🇨🇭', 'Poland': '🇵🇱', 'Portugal': '🇵🇹',
+        'Greece': '🇬🇷', 'Czech Republic': '🇨🇿', 'Hungary': '🇭🇺', 'Romania': '🇷🇴', 'Bulgaria': '🇧🇬',
+        'Croatia': '🇭🇷', 'Slovenia': '🇸🇮', 'Slovakia': '🇸🇰', 'Denmark': '🇩🇰', 'Sweden': '🇸🇪',
+        'Finland': '🇫🇮', 'Norway': '🇳🇴', 'Ireland': '🇮🇪', 'UK': '🇬🇧', 'USA': '🇺🇸',
+        'Canada': '🇨🇦', 'Australia': '🇦🇺', 'Brazil': '🇧🇷', 'Argentina': '🇦🇷', 'Chile': '🇨🇱',
+        'Mexico': '🇲🇽', 'India': '🇮🇳', 'China': '🇨🇳', 'Japan': '🇯🇵', 'South Korea': '🇰🇷'
+      };
+      
+      // Revenue by Country
+      const revenueByCountry = {};
+      const subsByCountry = {};
+      subscriptions.forEach(s => {
+        const bp = s.billingProfile || {};
+        const country = bp.billCountry || 'Unknown';
+        revenueByCountry[country] = (revenueByCountry[country] || 0) + (s.cost || 0);
+        subsByCountry[country] = (subsByCountry[country] || 0) + 1;
+      });
+      
+      const sortedCountries = Object.entries(revenueByCountry)
+        .filter(([c]) => c !== 'Unknown')
+        .sort((a, b) => b[1] - a[1]);
+      
+      document.getElementById('totalCountries').textContent = `${sortedCountries.length} countries`;
+      
+      // Country Team Scorecard
+      const scorecardBody = document.getElementById('countryScorecard');
+      if (sortedCountries.length === 0) {
+        scorecardBody.innerHTML = '<tr><td colspan="5" class="text-center text-secondary py-3">No country data yet</td></tr>';
+      } else {
+        const maxCountryRevenue = sortedCountries[0][1];
+        scorecardBody.innerHTML = sortedCountries.slice(0, 8).map(([country, revenue], idx) => {
+          const subs = subsByCountry[country] || 0;
+          const pct = maxCountryRevenue > 0 ? (revenue / maxCountryRevenue * 100) : 0;
+          const flag = countryFlags[country] || '🏳️';
+          const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
+          const badgeClass = idx === 0 ? 'bg-warning text-dark' : idx === 1 ? 'bg-secondary' : idx === 2 ? 'bg-danger bg-opacity-75' : 'bg-light text-dark';
+          return `
+            <tr>
+              <td class="text-center"><span class="badge ${badgeClass} rounded-pill">${medal}</span></td>
+              <td><span class="me-2">${flag}</span><span class="fw-medium">${escapeHtml(country)}</span></td>
+              <td class="text-center"><span class="badge bg-primary bg-opacity-10 text-primary">${subs}</span></td>
+              <td class="text-end fw-semibold">€${revenue.toLocaleString()}</td>
+              <td>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar bg-success" style="width: ${pct}%"></div>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+      
+      // Revenue by Country Chart (horizontal bars)
+      const chartContainer = document.getElementById('countryRevenueChart');
+      if (sortedCountries.length === 0) {
+        chartContainer.innerHTML = '<div class="text-center text-secondary py-3">No country data yet</div>';
+      } else {
+        const maxRev = sortedCountries[0][1];
+        chartContainer.innerHTML = `
+          <div class="row g-2">
+            ${sortedCountries.slice(0, 10).map(([country, revenue]) => {
+              const pct = maxRev > 0 ? (revenue / maxRev * 100) : 0;
+              const flag = countryFlags[country] || '🏳️';
+              return `
+                <div class="col-6">
+                  <div class="d-flex align-items-center mb-1">
+                    <span class="me-2">${flag}</span>
+                    <span class="small flex-grow-1">${escapeHtml(country)}</span>
+                    <span class="small fw-semibold">€${revenue.toLocaleString()}</span>
+                  </div>
+                  <div class="progress mb-2" style="height: 12px;">
+                    <div class="progress-bar bg-gradient" style="width: ${pct}%; background: linear-gradient(90deg, #0d6efd, #0dcaf0);"></div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+      
+      // Needs Attention
+      const attentionItems = [];
+      const expiring = active.filter(s => {
+        const end = s.endDate || s.expiry;
+        return end && end >= today && end <= in30Days;
+      });
+      pending.forEach(s => {
+        const bp = s.billingProfile || {};
+        attentionItems.push({
+          type: 'pending',
+          icon: 'hourglass-split',
+          color: 'warning',
+          text: `${bp.billName || s.customerName || 'Unknown'}`,
+          subtext: 'Pending approval',
+          id: s.id
+        });
+      });
+      expiring.slice(0, 3).forEach(s => {
+        const bp = s.billingProfile || {};
+        const daysLeft = Math.ceil((new Date(s.endDate || s.expiry) - new Date()) / (1000 * 60 * 60 * 24));
+        attentionItems.push({
+          type: 'expiring',
+          icon: 'clock',
+          color: 'danger',
+          text: `${bp.billName || s.customerName || 'Unknown'}`,
+          subtext: `Expires in ${daysLeft}d`,
+          id: s.id
+        });
+      });
+      
+      const attentionList = document.getElementById('attentionList');
+      document.getElementById('attentionCount').textContent = attentionItems.length;
+      
+      if (attentionItems.length === 0) {
+        attentionList.innerHTML = '<div class="list-group-item text-center text-success py-3"><i class="bi bi-check-circle me-2"></i>All clear!</div>';
+      } else {
+        attentionList.innerHTML = attentionItems.slice(0, 4).map(item => `
+          <a href="edit-subscription.html?id=${item.id}" class="list-group-item list-group-item-action d-flex align-items-center py-2">
+            <div class="bg-${item.color} bg-opacity-10 p-2 rounded me-2">
+              <i class="bi bi-${item.icon} text-${item.color} small"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="small fw-medium">${escapeHtml(item.text)}</div>
+              <div class="text-secondary small">${item.subtext}</div>
+            </div>
+          </a>
+        `).join('');
+      }
+      
+      // Revenue by Product
+      const revenueByType = {};
+      subscriptions.forEach(s => {
+        const type = s.productType || s.product || 'Other';
+        revenueByType[type] = (revenueByType[type] || 0) + (s.cost || 0);
+      });
+      
+      const revenueContainer = document.getElementById('revenueByProduct');
+      const sortedTypes = Object.entries(revenueByType).sort((a, b) => b[1] - a[1]);
+      
+      if (sortedTypes.length === 0) {
+        revenueContainer.innerHTML = '<div class="text-center text-secondary py-3">No revenue data</div>';
+      } else {
+        const maxRevenue = Math.max(...sortedTypes.map(t => t[1]));
+        revenueContainer.innerHTML = sortedTypes.map(([type, revenue]) => {
+          const pct = maxRevenue > 0 ? (revenue / maxRevenue * 100) : 0;
+          const color = type.includes('API') ? 'info' : type.includes('Disease') ? 'success' : type.includes('Weather') ? 'warning' : 'secondary';
+          return `
+            <div class="mb-3">
+              <div class="d-flex justify-content-between small mb-1">
+                <span>${escapeHtml(type)}</span>
+                <span class="fw-semibold">€${revenue.toLocaleString()}</span>
+              </div>
+              <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-${color}" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    });
+  </script>
+</body>
+</html>

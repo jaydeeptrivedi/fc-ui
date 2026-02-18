@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Promo Codes Management - FC Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="assets/admin.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="admin-topbar navbar navbar-dark d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-link text-light d-lg-none me-2" id="sidebarToggle">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand fw-bold mb-0" href="index.html">
+        <span class="text-warning">FC</span> Admin Portal
+      </a>
+    </div>
+    <div class="d-flex align-items-center">
+      <div class="dropdown">
+        <button class="btn btn-link text-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle me-1"></i>Admin User
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+      <a href="../index.html" class="btn btn-outline-light btn-sm ms-2">
+        <i class="bi bi-arrow-left me-1"></i>Back to Platform
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <nav class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-heading">Main</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Management</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="products.html"><i class="bi bi-box-seam"></i>Products</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="subscriptions.html"><i class="bi bi-card-checklist"></i>Subscriptions</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="promos.html"><i class="bi bi-tag"></i>Promo Codes</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Settings</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-gear"></i>Configuration</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-people"></i>Users</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Backdrop (mobile) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="fw-bold mb-0">Promo Codes Management</h4>
+        <p class="text-secondary mb-0">Create and manage discount promo codes</p>
+      </div>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#promoModal" onclick="openPromoModal()">
+        <i class="bi bi-plus-lg me-1"></i>Create Promo Code
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body py-3">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" id="searchPromos" class="form-control" placeholder="Search promo codes...">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <select id="filterStatus" class="form-select">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="expired">Expired</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select id="filterProduct" class="form-select">
+              <option value="">All Products</option>
+              <option value="all">All Products</option>
+              <option value="API">API Only</option>
+              <option value="Disease Models">Disease Models Only</option>
+              <option value="Weather Forecast">Weather Forecast Only</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <input type="number" id="filterMinDiscount" class="form-control" placeholder="Min %" min="0" max="100">
+          </div>
+          <div class="col-md-2">
+            <input type="number" id="filterMaxDiscount" class="form-control" placeholder="Max %" min="0" max="100">
+          </div>
+          <div class="col-md-1">
+            <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="bg-success bg-opacity-10 rounded-3 p-3 text-center">
+          <div class="fs-4 fw-bold text-success" id="activeCount">0</div>
+          <div class="small text-secondary">Active Promos</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="bg-info bg-opacity-10 rounded-3 p-3 text-center">
+          <div class="fs-4 fw-bold text-info" id="scheduledCount">0</div>
+          <div class="small text-secondary">Scheduled</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="bg-secondary bg-opacity-10 rounded-3 p-3 text-center">
+          <div class="fs-4 fw-bold text-secondary" id="expiredCount">0</div>
+          <div class="small text-secondary">Expired</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="bg-warning bg-opacity-10 rounded-3 p-3 text-center">
+          <div class="fs-4 fw-bold text-warning" id="totalUsage">0</div>
+          <div class="small text-secondary">Total Uses</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promos Table -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-3">Code</th>
+                <th>Description</th>
+                <th>Discount</th>
+                <th>Products</th>
+                <th>Validity Period</th>
+                <th>Usage</th>
+                <th>Status</th>
+                <th class="text-end pe-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="promosTableBody">
+              <tr><td colspan="8" class="text-center py-4 text-secondary">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Promo Modal -->
+  <div class="modal fade" id="promoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="promoModalTitle">Create Promo Code</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="promoForm" onsubmit="savePromo(event)">
+          <div class="modal-body">
+            <input type="hidden" id="promoId">
+            
+            <div class="row g-3">
+              <!-- Basic Info -->
+              <div class="col-md-6">
+                <label class="form-label">Promo Code <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input type="text" id="promoCode" class="form-control text-uppercase" required 
+                         pattern="[A-Za-z0-9]+" maxlength="20" 
+                         placeholder="e.g., SUMMER20">
+                  <button type="button" class="btn btn-outline-secondary" onclick="generateCode()">
+                    <i class="bi bi-shuffle"></i>
+                  </button>
+                </div>
+                <div class="form-text">Alphanumeric only, max 20 characters</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Discount Percentage <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input type="number" id="promoDiscount" class="form-control" required 
+                         min="1" max="100" placeholder="10">
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Description</label>
+                <input type="text" id="promoDescription" class="form-control" 
+                       placeholder="e.g., Summer sale 2024 - 20% off all products">
+              </div>
+
+              <!-- Validity Period -->
+              <div class="col-12 mt-4">
+                <h6 class="text-secondary mb-3"><i class="bi bi-calendar-range me-2"></i>Validity Period</h6>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                <input type="date" id="promoStartDate" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">End Date <span class="text-danger">*</span></label>
+                <input type="date" id="promoEndDate" class="form-control" required>
+              </div>
+
+              <!-- Restrictions -->
+              <div class="col-12 mt-4">
+                <h6 class="text-secondary mb-3"><i class="bi bi-sliders me-2"></i>Restrictions</h6>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Applicable Products</label>
+                <select id="promoProducts" class="form-select">
+                  <option value="all">All Products</option>
+                  <option value="API">API Only</option>
+                  <option value="Disease Models">Disease Models Only</option>
+                  <option value="Weather Forecast">Weather Forecast Only</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Usage Limit</label>
+                <input type="number" id="promoUsageLimit" class="form-control" min="0" 
+                       placeholder="Leave empty for unlimited">
+                <div class="form-text">0 or empty = unlimited</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Minimum Order Value (€)</label>
+                <input type="number" id="promoMinOrder" class="form-control" min="0" step="0.01" 
+                       placeholder="0">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Max Discount Amount (€)</label>
+                <input type="number" id="promoMaxDiscount" class="form-control" min="0" step="0.01" 
+                       placeholder="Leave empty for no cap">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Per-Customer Limit</label>
+                <input type="number" id="promoCustomerLimit" class="form-control" min="0" 
+                       placeholder="Leave empty for unlimited">
+                <div class="form-text">How many times a single customer can use this code</div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mt-4">
+                  <input type="checkbox" id="promoFirstTimeOnly" class="form-check-input">
+                  <label class="form-check-label" for="promoFirstTimeOnly">
+                    First-time customers only
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Internal Notes</label>
+                <textarea id="promoNotes" class="form-control" rows="2" 
+                          placeholder="Internal admin notes..."></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>Save Promo Code
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete promo code "<strong id="deletePromoCode"></strong>"?</p>
+          <p class="text-danger small mb-0"><i class="bi bi-exclamation-triangle me-1"></i>This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+            <i class="bi bi-trash me-1"></i>Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/admin-data.js"></script>
+  <script src="assets/admin.js"></script>
+  <script>
+    let promoModalInstance;
+    let deleteModalInstance;
+    let promoToDelete = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      promoModalInstance = new bootstrap.Modal(document.getElementById('promoModal'));
+      deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteModal'));
+      
+      renderPromos();
+      
+      // Filter listeners
+      document.getElementById('searchPromos').addEventListener('input', renderPromos);
+      document.getElementById('filterStatus').addEventListener('change', renderPromos);
+      document.getElementById('filterProduct').addEventListener('change', renderPromos);
+      document.getElementById('filterMinDiscount').addEventListener('input', renderPromos);
+      document.getElementById('filterMaxDiscount').addEventListener('input', renderPromos);
+      
+      // Delete confirmation
+      document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        if (promoToDelete) {
+          AdminData.deletePromo(promoToDelete);
+          renderPromos();
+          deleteModalInstance.hide();
+          showToast('Promo code deleted successfully', 'success');
+        }
+      });
+
+      // Set default dates
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('promoStartDate').value = today;
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      document.getElementById('promoEndDate').value = nextMonth.toISOString().split('T')[0];
+    });
+
+    function getPromoStatus(promo) {
+      const today = new Date().toISOString().split('T')[0];
+      if (promo.startDate > today) return 'scheduled';
+      if (promo.endDate < today) return 'expired';
+      return 'active';
+    }
+
+    function renderPromos() {
+      const search = document.getElementById('searchPromos').value.toLowerCase();
+      const statusFilter = document.getElementById('filterStatus').value;
+      const productFilter = document.getElementById('filterProduct').value;
+      const minDiscount = parseInt(document.getElementById('filterMinDiscount').value) || 0;
+      const maxDiscount = parseInt(document.getElementById('filterMaxDiscount').value) || 100;
+      
+      let promos = AdminData.getPromos();
+      
+      // Apply filters
+      if (search) {
+        promos = promos.filter(p => 
+          p.code.toLowerCase().includes(search) ||
+          (p.description || '').toLowerCase().includes(search)
+        );
+      }
+      if (statusFilter) {
+        promos = promos.filter(p => getPromoStatus(p) === statusFilter);
+      }
+      if (productFilter) {
+        promos = promos.filter(p => p.applicableProducts === productFilter || p.applicableProducts === 'all');
+      }
+      promos = promos.filter(p => p.discount >= minDiscount && p.discount <= maxDiscount);
+      
+      // Update stats
+      const allPromos = AdminData.getPromos();
+      document.getElementById('activeCount').textContent = allPromos.filter(p => getPromoStatus(p) === 'active').length;
+      document.getElementById('scheduledCount').textContent = allPromos.filter(p => getPromoStatus(p) === 'scheduled').length;
+      document.getElementById('expiredCount').textContent = allPromos.filter(p => getPromoStatus(p) === 'expired').length;
+      document.getElementById('totalUsage').textContent = allPromos.reduce((sum, p) => sum + (p.usageCount || 0), 0);
+      
+      const tbody = document.getElementById('promosTableBody');
+      
+      if (promos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-secondary">No promo codes found</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = promos.map(p => {
+        const status = getPromoStatus(p);
+        return `
+          <tr>
+            <td class="ps-3">
+              <code class="fs-6">${escapeHtml(p.code)}</code>
+              ${p.firstTimeOnly ? '<span class="badge text-bg-info ms-1" title="First-time only">1st</span>' : ''}
+            </td>
+            <td>
+              <div>${escapeHtml(p.description || 'No description')}</div>
+              ${p.minOrder > 0 ? `<div class="small text-secondary">Min order: €${p.minOrder}</div>` : ''}
+            </td>
+            <td>
+              <span class="badge text-bg-warning fs-6">${p.discount}%</span>
+              ${p.maxDiscountAmount ? `<div class="small text-secondary">Max: €${p.maxDiscountAmount}</div>` : ''}
+            </td>
+            <td><span class="badge text-bg-${getProductBadge(p.applicableProducts)}">${p.applicableProducts === 'all' ? 'All Products' : p.applicableProducts}</span></td>
+            <td class="small">
+              <div><i class="bi bi-calendar3 me-1 text-success"></i>${p.startDate}</div>
+              <div><i class="bi bi-calendar3 me-1 text-danger"></i>${p.endDate}</div>
+            </td>
+            <td>
+              <div class="fw-semibold">${p.usageCount || 0}${p.usageLimit ? `/${p.usageLimit}` : ''}</div>
+              ${p.usageLimit ? `
+                <div class="progress mt-1" style="height: 4px;">
+                  <div class="progress-bar" style="width: ${((p.usageCount || 0) / p.usageLimit * 100)}%"></div>
+                </div>
+              ` : '<div class="small text-secondary">Unlimited</div>'}
+            </td>
+            <td><span class="badge ${getStatusBadge(status)}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></td>
+            <td class="text-end pe-3">
+              <button class="btn btn-sm btn-outline-secondary me-1" onclick="copyCode('${escapeHtml(p.code)}')" title="Copy code">
+                <i class="bi bi-clipboard"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-primary me-1" onclick="editPromo('${p.id}')" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${p.id}')" title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function getProductBadge(products) {
+      if (products === 'all') return 'secondary';
+      if (products === 'API') return 'info';
+      if (products === 'Disease Models') return 'success';
+      if (products === 'Weather Forecast') return 'warning';
+      return 'secondary';
+    }
+
+    function getStatusBadge(status) {
+      switch(status) {
+        case 'active': return 'text-bg-success';
+        case 'scheduled': return 'text-bg-info';
+        case 'expired': return 'text-bg-secondary';
+        default: return 'text-bg-secondary';
+      }
+    }
+
+    function generateCode() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById('promoCode').value = code;
+    }
+
+    function copyCode(code) {
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('Promo code copied to clipboard', 'success');
+      });
+    }
+
+    function openPromoModal(id = null) {
+      document.getElementById('promoForm').reset();
+      document.getElementById('promoId').value = '';
+      document.getElementById('promoModalTitle').textContent = 'Create Promo Code';
+      
+      // Reset dates
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('promoStartDate').value = today;
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      document.getElementById('promoEndDate').value = nextMonth.toISOString().split('T')[0];
+      
+      if (id) {
+        const promo = AdminData.getPromos().find(p => p.id === id);
+        if (promo) {
+          document.getElementById('promoModalTitle').textContent = 'Edit Promo Code';
+          document.getElementById('promoId').value = promo.id;
+          document.getElementById('promoCode').value = promo.code;
+          document.getElementById('promoDiscount').value = promo.discount;
+          document.getElementById('promoDescription').value = promo.description || '';
+          document.getElementById('promoStartDate').value = promo.startDate;
+          document.getElementById('promoEndDate').value = promo.endDate;
+          document.getElementById('promoProducts').value = promo.applicableProducts || 'all';
+          document.getElementById('promoUsageLimit').value = promo.usageLimit || '';
+          document.getElementById('promoMinOrder').value = promo.minOrder || '';
+          document.getElementById('promoMaxDiscount').value = promo.maxDiscountAmount || '';
+          document.getElementById('promoCustomerLimit').value = promo.customerLimit || '';
+          document.getElementById('promoFirstTimeOnly').checked = promo.firstTimeOnly || false;
+          document.getElementById('promoNotes').value = promo.notes || '';
+        }
+      }
+    }
+
+    function editPromo(id) {
+      openPromoModal(id);
+      promoModalInstance.show();
+    }
+
+    function savePromo(event) {
+      event.preventDefault();
+      
+      const id = document.getElementById('promoId').value;
+      const existingPromo = id ? AdminData.getPromos().find(p => p.id === id) : null;
+      
+      const promo = {
+        id: id || 'PROMO-' + Date.now(),
+        code: document.getElementById('promoCode').value.toUpperCase(),
+        discount: parseInt(document.getElementById('promoDiscount').value),
+        description: document.getElementById('promoDescription').value,
+        startDate: document.getElementById('promoStartDate').value,
+        endDate: document.getElementById('promoEndDate').value,
+        applicableProducts: document.getElementById('promoProducts').value,
+        usageLimit: parseInt(document.getElementById('promoUsageLimit').value) || null,
+        minOrder: parseFloat(document.getElementById('promoMinOrder').value) || 0,
+        maxDiscountAmount: parseFloat(document.getElementById('promoMaxDiscount').value) || null,
+        customerLimit: parseInt(document.getElementById('promoCustomerLimit').value) || null,
+        firstTimeOnly: document.getElementById('promoFirstTimeOnly').checked,
+        notes: document.getElementById('promoNotes').value,
+        usageCount: existingPromo ? existingPromo.usageCount : 0
+      };
+      
+      // Validate code uniqueness
+      const existingCode = AdminData.getPromos().find(p => 
+        p.code.toUpperCase() === promo.code && p.id !== promo.id
+      );
+      if (existingCode) {
+        showToast('Promo code already exists', 'danger');
+        return;
+      }
+      
+      if (id) {
+        AdminData.updatePromo(promo);
+        showToast('Promo code updated successfully', 'success');
+      } else {
+        AdminData.addPromo(promo);
+        showToast('Promo code created successfully', 'success');
+      }
+      
+      promoModalInstance.hide();
+      renderPromos();
+    }
+
+    function confirmDelete(id) {
+      const promo = AdminData.getPromos().find(p => p.id === id);
+      if (promo) {
+        promoToDelete = id;
+        document.getElementById('deletePromoCode').textContent = promo.code;
+        deleteModalInstance.show();
+      }
+    }
+
+    function resetFilters() {
+      document.getElementById('searchPromos').value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterProduct').value = '';
+      document.getElementById('filterMinDiscount').value = '';
+      document.getElementById('filterMaxDiscount').value = '';
+      renderPromos();
+    }
+  </script>
+</body>
+</html>
