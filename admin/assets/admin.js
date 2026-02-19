@@ -2,6 +2,102 @@
  * Admin Portal - Shared JavaScript Utilities
  */
 
+// Auth check and UI initialization
+document.addEventListener('DOMContentLoaded', () => {
+  // Skip auth check on signin page
+  if (window.location.pathname.includes('signin.html')) return;
+  
+  // Require authentication
+  if (typeof AdminData !== 'undefined' && !AdminData.requireAuth()) return;
+  
+  // Initialize user UI
+  initUserUI();
+  
+  // Apply role-based UI restrictions
+  applyRoleRestrictions();
+});
+
+function initUserUI() {
+  const user = AdminData.getCurrentUser();
+  if (!user) return;
+  
+  // Update user dropdown in navbar
+  const userDropdown = document.querySelector('.dropdown-toggle');
+  if (userDropdown) {
+    const roleBadge = AdminData.getRoleBadgeClass(user.role);
+    const roleDisplay = AdminData.getRoleDisplayName(user.role);
+    userDropdown.innerHTML = `
+      <i class="bi bi-person-circle me-1"></i>${escapeHtml(user.name)}
+      <span class="badge ${roleBadge} ms-1" style="font-size: 0.65rem;">${user.role.includes('Global') ? 'HQ' : 'Regional'}</span>
+    `;
+  }
+  
+  // Update dropdown menu with user info and logout
+  const dropdownMenu = document.querySelector('.dropdown-menu');
+  if (dropdownMenu) {
+    const countriesText = user.countries && user.countries.length > 0 
+      ? user.countries.join(', ') 
+      : 'All Countries';
+    dropdownMenu.innerHTML = `
+      <li class="px-3 py-2">
+        <div class="small text-secondary">Signed in as</div>
+        <div class="fw-semibold">${escapeHtml(user.name)}</div>
+        <div class="small"><span class="badge ${AdminData.getRoleBadgeClass(user.role)}">${AdminData.getRoleDisplayName(user.role)}</span></div>
+        <div class="small text-secondary mt-1"><i class="bi bi-globe me-1"></i>${escapeHtml(countriesText)}</div>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="#" onclick="AdminData.logout(); return false;"><i class="bi bi-box-arrow-left me-2"></i>Sign Out</a></li>
+    `;
+  }
+}
+
+function applyRoleRestrictions() {
+  const canEdit = AdminData.canEdit();
+  
+  // Hide create buttons for read-only users
+  if (!canEdit) {
+    document.querySelectorAll('[data-requires-edit], .btn-create, a[href*="edit-subscription.html"]:not([href*="?id="])').forEach(el => {
+      if (!el.href || !el.href.includes('?id=')) {
+        el.style.display = 'none';
+      }
+    });
+    
+    // Hide edit/delete action buttons
+    document.querySelectorAll('.btn-edit, .btn-delete, [onclick*="delete"], [onclick*="Delete"]').forEach(el => {
+      el.style.display = 'none';
+    });
+    
+    // Show read-only banner
+    const main = document.querySelector('.admin-main');
+    if (main && !document.querySelector('.readonly-banner')) {
+      const banner = document.createElement('div');
+      banner.className = 'readonly-banner alert alert-info alert-dismissible fade show mb-3 py-2';
+      banner.innerHTML = `
+        <i class="bi bi-eye me-2"></i><strong>Read-Only Mode</strong> - You have view-only access.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      main.insertBefore(banner, main.firstChild);
+    }
+  }
+  
+  // For regional users, add country filter indicator
+  if (!AdminData.isGlobalRole()) {
+    const countries = AdminData.getUserCountries();
+    if (countries.length > 0) {
+      const main = document.querySelector('.admin-main');
+      if (main && !document.querySelector('.region-banner')) {
+        const banner = document.createElement('div');
+        banner.className = 'region-banner alert alert-secondary alert-dismissible fade show mb-3 py-2';
+        banner.innerHTML = `
+          <i class="bi bi-geo-alt me-2"></i><strong>Regional View:</strong> ${escapeHtml(countries.join(', '))}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        main.insertBefore(banner, main.firstChild);
+      }
+    }
+  }
+}
+
 // Sidebar Toggle (for mobile)
 document.addEventListener('DOMContentLoaded', () => {
   const sidebarToggle = document.getElementById('sidebarToggle');

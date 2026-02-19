@@ -343,6 +343,7 @@ const AdminData = {
         applicableProducts: 'all',
         usageLimit: null,
         usageCount: 45,
+        countries: [], // Global promo - available to all regions
         notes: 'Welcome promo - matches main platform'
       },
       {
@@ -355,43 +356,60 @@ const AdminData = {
         applicableProducts: 'all',
         usageLimit: 100,
         usageCount: 23,
+        countries: [], // Global promo
         notes: 'Launch promotion'
       },
       {
         id: 'PROMO-003',
-        code: 'EARLYBIRD15',
+        code: 'GERMANY15',
         discount: 15,
-        description: '15% early adopter discount',
+        description: '15% Germany market special',
         startDate: startDate,
         endDate: endDate,
         applicableProducts: 'all',
         usageLimit: 50,
         usageCount: 12,
-        notes: 'Early adopter promo'
+        countries: ['Germany'], // Germany-specific promo
+        notes: 'Germany market promo'
       },
       {
         id: 'PROMO-004',
-        code: 'SUMMER25',
+        code: 'FRANCE25',
         discount: 25,
-        description: '25% summer promotion',
+        description: '25% France summer promotion',
         startDate: startDate,
         endDate: endDate,
         applicableProducts: 'all',
         usageLimit: 200,
         usageCount: 67,
-        notes: 'Summer campaign'
+        countries: ['France'], // France-specific promo
+        notes: 'France summer campaign'
       },
       {
         id: 'PROMO-005',
-        code: 'SAVE30',
+        code: 'SPAIN30',
         discount: 30,
-        description: '30% special offer',
+        description: '30% Spain launch offer',
         startDate: startDate,
         endDate: endDate,
         applicableProducts: 'all',
         usageLimit: 30,
         usageCount: 8,
-        notes: 'Special limited offer'
+        countries: ['Spain'], // Spain-specific promo
+        notes: 'Spain market launch'
+      },
+      {
+        id: 'PROMO-006',
+        code: 'EUCENTRAL20',
+        discount: 20,
+        description: '20% Central Europe promo',
+        startDate: startDate,
+        endDate: endDate,
+        applicableProducts: 'all',
+        usageLimit: 100,
+        usageCount: 34,
+        countries: ['Germany', 'Austria', 'Switzerland'], // Multi-country promo
+        notes: 'Central Europe promotion'
       }
     ];
   },
@@ -417,5 +435,146 @@ const AdminData = {
     if (data.products) this.saveProducts(data.products);
     if (data.subscriptions) this.saveSubscriptions(data.subscriptions);
     if (data.promos) this.savePromos(data.promos);
+  },
+
+  // ==================== AUTH & PERMISSIONS ====================
+  
+  /**
+   * Role definitions:
+   * - GlobalAdmin: Full CRUD on all data, all countries
+   * - GlobalAnalyst: Read-only on all data, all countries
+   * - RegionalManager: Full CRUD but only for assigned countries
+   * - RegionalAnalyst: Read-only for assigned countries only
+   */
+  
+  getSession() {
+    const session = sessionStorage.getItem('fc_admin_session');
+    return session ? JSON.parse(session) : null;
+  },
+  
+  isLoggedIn() {
+    return this.getSession() !== null;
+  },
+  
+  logout() {
+    sessionStorage.removeItem('fc_admin_session');
+    window.location.href = 'signin.html';
+  },
+  
+  requireAuth() {
+    if (!this.isLoggedIn()) {
+      window.location.href = 'signin.html';
+      return false;
+    }
+    return true;
+  },
+  
+  getCurrentUser() {
+    return this.getSession();
+  },
+  
+  getUserRole() {
+    const session = this.getSession();
+    return session ? session.role : null;
+  },
+  
+  getUserCountries() {
+    const session = this.getSession();
+    return session ? (session.countries || []) : [];
+  },
+  
+  // Permission checks
+  isGlobalRole() {
+    const role = this.getUserRole();
+    return role === 'GlobalAdmin' || role === 'GlobalAnalyst';
+  },
+  
+  isAdminRole() {
+    const role = this.getUserRole();
+    return role === 'GlobalAdmin' || role === 'RegionalManager';
+  },
+  
+  isReadOnlyRole() {
+    const role = this.getUserRole();
+    return role === 'GlobalAnalyst' || role === 'RegionalAnalyst';
+  },
+  
+  canEdit() {
+    return this.isAdminRole();
+  },
+  
+  canDelete() {
+    return this.isAdminRole();
+  },
+  
+  canCreate() {
+    return this.isAdminRole();
+  },
+  
+  canAccessCountry(country) {
+    if (this.isGlobalRole()) return true;
+    const userCountries = this.getUserCountries();
+    return userCountries.length === 0 || userCountries.includes(country);
+  },
+  
+  // Filter data by user's country access
+  filterByCountryAccess(items) {
+    if (this.isGlobalRole()) return items;
+    const userCountries = this.getUserCountries();
+    if (userCountries.length === 0) return items;
+    
+    return items.filter(item => {
+      const country = item.billingProfile?.billCountry || item.country || '';
+      return !country || userCountries.includes(country);
+    });
+  },
+  
+  // Get subscriptions filtered by user access
+  getAccessibleSubscriptions() {
+    return this.filterByCountryAccess(this.getSubscriptions());
+  },
+  
+  // Get promos filtered by user's region access
+  // Promos with empty/null countries array are global (visible to all)
+  // Promos with countries array are regional (visible only to users with matching countries)
+  getAccessiblePromos() {
+    const promos = this.getPromos();
+    if (this.isGlobalRole()) return promos;
+    
+    const userCountries = this.getUserCountries();
+    if (userCountries.length === 0) return promos;
+    
+    return promos.filter(promo => {
+      // No countries = global promo, visible to all
+      if (!promo.countries || promo.countries.length === 0) return false;
+      // Check if any promo country matches user's countries
+      return promo.countries.some(c => userCountries.includes(c));
+    });
+  },
+  
+  // Check if user can edit products/promos (HQ only)
+  canEditGlobalResources() {
+    return this.getUserRole() === 'GlobalAdmin';
+  },
+  
+  // Role display helpers
+  getRoleDisplayName(role) {
+    const names = {
+      'GlobalAdmin': 'Global Administrator',
+      'GlobalAnalyst': 'Global Analyst',
+      'RegionalManager': 'Regional Manager',
+      'RegionalAnalyst': 'Regional Analyst'
+    };
+    return names[role] || role;
+  },
+  
+  getRoleBadgeClass(role) {
+    const classes = {
+      'GlobalAdmin': 'bg-danger',
+      'GlobalAnalyst': 'bg-secondary',
+      'RegionalManager': 'bg-success',
+      'RegionalAnalyst': 'bg-info'
+    };
+    return classes[role] || 'bg-secondary';
   }
 };

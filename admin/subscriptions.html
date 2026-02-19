@@ -77,7 +77,7 @@
         <h4 class="fw-bold mb-0">Subscriptions Management</h4>
         <p class="text-secondary mb-0">Manage customer subscriptions offline</p>
       </div>
-      <a href="edit-subscription.html" class="btn btn-primary">
+      <a href="edit-subscription.html" class="btn btn-primary" data-requires-edit>
         <i class="bi bi-plus-lg me-1"></i>Create Subscription
       </a>
     </div>
@@ -241,7 +241,8 @@
       const statusFilter = document.getElementById('filterStatus').value;
       const paymentFilter = document.getElementById('filterPayment').value;
       
-      let subscriptions = AdminData.getSubscriptions();
+      // Use accessible subscriptions (filtered by user's country access)
+      let subscriptions = AdminData.getAccessibleSubscriptions();
       
       // Apply filters
       if (search) {
@@ -263,8 +264,8 @@
         subscriptions = subscriptions.filter(s => s.paymentMethod === paymentFilter);
       }
       
-      // Update stats
-      const allSubs = AdminData.getSubscriptions();
+      // Update stats - use accessible subscriptions for stats too
+      const allSubs = AdminData.getAccessibleSubscriptions();
       document.getElementById('pendingCount').textContent = allSubs.filter(s => s.status === 'Pending').length;
       document.getElementById('activeCount').textContent = allSubs.filter(s => s.status === 'Active').length;
       document.getElementById('expiredCount').textContent = allSubs.filter(s => s.status === 'Expired').length;
@@ -272,6 +273,7 @@
       document.getElementById('totalRevenue').textContent = `€${allSubs.reduce((sum, s) => sum + (s.cost || 0), 0).toFixed(2)}`;
       
       const tbody = document.getElementById('subscriptionsTableBody');
+      const canEdit = AdminData.canEdit();
       
       if (subscriptions.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-secondary">No subscriptions found</td></tr>';
@@ -280,6 +282,16 @@
       
       tbody.innerHTML = subscriptions.map(s => {
         const bp = s.billingProfile || {};
+        const editBtn = canEdit ? `
+            <a href="edit-subscription.html?id=${s.id}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${s.id}')" title="Delete">
+              <i class="bi bi-trash"></i>
+            </button>` : `
+            <a href="edit-subscription.html?id=${s.id}" class="btn btn-sm btn-outline-secondary me-1" title="View Details">
+              <i class="bi bi-eye"></i>
+            </a>`;
         return `
         <tr>
           <td>
@@ -301,12 +313,7 @@
             <a href="invoice.html?id=${s.id}" class="btn btn-sm btn-outline-secondary me-1" title="Invoice">
               <i class="bi bi-receipt"></i>
             </a>
-            <a href="edit-subscription.html?id=${s.id}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
-              <i class="bi bi-pencil"></i>
-            </a>
-            <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete('${s.id}')" title="Delete">
-              <i class="bi bi-trash"></i>
-            </button>
+            ${editBtn}
           </td>
         </tr>
       `}).join('');

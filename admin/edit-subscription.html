@@ -316,13 +316,24 @@
   <script>
     let deleteModalInstance;
     let currentSubId = null;
+    let isReadOnly = false;
 
     document.addEventListener('DOMContentLoaded', () => {
       deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteModal'));
       
+      // Check if user has edit permissions
+      isReadOnly = !AdminData.canEdit();
+      
       // Get subscription ID from URL
       const urlParams = new URLSearchParams(window.location.search);
       currentSubId = urlParams.get('id');
+      
+      // If read-only and trying to create new, redirect back
+      if (isReadOnly && !currentSubId) {
+        showToast('You do not have permission to create subscriptions', 'danger');
+        setTimeout(() => window.location.href = 'subscriptions.html', 1000);
+        return;
+      }
       
       // Set default dates
       const today = new Date().toISOString().split('T')[0];
@@ -335,15 +346,38 @@
         loadSubscription(currentSubId);
       }
       
+      // Apply read-only mode
+      if (isReadOnly) {
+        applyReadOnlyMode();
+      }
+      
       // Delete confirmation
       document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-        if (currentSubId) {
+        if (currentSubId && !isReadOnly) {
           AdminData.deleteSubscription(currentSubId);
           showToast('Subscription deleted successfully', 'success');
           setTimeout(() => window.location.href = 'subscriptions.html', 500);
         }
       });
     });
+
+    function applyReadOnlyMode() {
+      // Update page title
+      document.getElementById('pageTitle').textContent = 'View Subscription';
+      document.getElementById('pageSubtitle').textContent = 'Subscription details (read-only)';
+      
+      // Disable all form inputs
+      document.querySelectorAll('#subscriptionForm input, #subscriptionForm select, #subscriptionForm textarea').forEach(el => {
+        el.disabled = true;
+      });
+      
+      // Hide save button and quick actions that modify
+      const saveBtn = document.querySelector('#subscriptionForm button[type="submit"]');
+      if (saveBtn) saveBtn.style.display = 'none';
+      
+      const quickActions = document.querySelector('.quick-actions');
+      if (quickActions) quickActions.style.display = 'none';
+    }
 
     function loadSubscription(id) {
       const sub = AdminData.getSubscriptions().find(s => s.id === id);
@@ -424,6 +458,12 @@
 
     function saveSubscription(event) {
       event.preventDefault();
+      
+      // Check permissions
+      if (isReadOnly) {
+        showToast('You do not have permission to save changes', 'danger');
+        return;
+      }
       
       const id = document.getElementById('subId').value;
       const productType = document.getElementById('subProduct').value;

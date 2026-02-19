@@ -73,8 +73,22 @@
   <!-- Main Content -->
   <main class="admin-main">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="fw-bold mb-0">Dashboard</h4>
+      <div>
+        <h4 class="fw-bold mb-0" id="dashboardTitle">Dashboard</h4>
+        <p class="text-secondary small mb-0" id="dashboardSubtitle"></p>
+      </div>
       <span class="text-secondary small" id="lastUpdated"></span>
+    </div>
+
+    <!-- Regional Context Banner (shown for regional users) -->
+    <div class="alert alert-primary d-none mb-4 py-2" id="regionBanner">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-geo-alt-fill me-2"></i>
+        <div>
+          <strong>Regional View</strong>
+          <span class="ms-2" id="regionCountriesList"></span>
+        </div>
+      </div>
     </div>
 
     <!-- Key Metrics -->
@@ -144,13 +158,13 @@
     <div class="row g-4">
       <!-- Left Column -->
       <div class="col-lg-8">
-        <!-- Country Team Scorecard -->
-        <div class="card border-0 shadow-sm mb-4">
+        <!-- Country Team Scorecard (Global) / Regional Summary (Regional) -->
+        <div class="card border-0 shadow-sm mb-4" id="scorecardCard">
           <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold mb-0"><i class="bi bi-trophy me-2 text-warning"></i>Country Team Scorecard</h6>
+            <h6 class="fw-bold mb-0" id="scorecardTitle"><i class="bi bi-trophy me-2 text-warning"></i>Country Team Scorecard</h6>
             <span class="badge bg-primary" id="totalCountries">0 countries</span>
           </div>
-          <div class="card-body p-0">
+          <div class="card-body p-0" id="scorecardBody">
             <div class="table-responsive">
               <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
@@ -171,9 +185,9 @@
         </div>
 
         <!-- Revenue by Country Chart -->
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm" id="countryChartCard">
           <div class="card-header bg-transparent border-0 py-3">
-            <h6 class="fw-bold mb-0"><i class="bi bi-globe-europe-africa me-2"></i>Revenue by Country</h6>
+            <h6 class="fw-bold mb-0" id="countryChartTitle"><i class="bi bi-globe-europe-africa me-2"></i>Revenue by Country</h6>
           </div>
           <div class="card-body" id="countryRevenueChart">
             <div class="text-center text-secondary py-3">Loading...</div>
@@ -214,9 +228,34 @@
   <script src="assets/admin.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const subscriptions = AdminData.getSubscriptions();
+      // Use accessible subscriptions (filtered by user's country access)
+      const subscriptions = AdminData.getAccessibleSubscriptions();
       const today = new Date().toISOString().split('T')[0];
       const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      // Check if regional user
+      const isGlobal = AdminData.isGlobalRole();
+      const userCountries = AdminData.getUserCountries();
+      const isRegional = !isGlobal && userCountries.length > 0;
+      
+      // Update dashboard title and context
+      if (isRegional) {
+        document.getElementById('dashboardTitle').textContent = 'Regional Dashboard';
+        document.getElementById('dashboardSubtitle').textContent = `Managing ${userCountries.length} ${userCountries.length === 1 ? 'country' : 'countries'}`;
+        
+        // Show regional banner with country flags
+        const countryFlagsMap = {
+          'Germany': '🇩🇪', 'France': '🇫🇷', 'Italy': '🇮🇹', 'Spain': '🇪🇸', 'Netherlands': '🇳🇱',
+          'Belgium': '🇧🇪', 'Austria': '🇦🇹', 'Switzerland': '🇨🇭', 'Poland': '🇵🇱', 'Portugal': '🇵🇹'
+        };
+        const flaggedCountries = userCountries.map(c => `${countryFlagsMap[c] || '🏳️'} ${c}`).join('  ');
+        document.getElementById('regionBanner').classList.remove('d-none');
+        document.getElementById('regionCountriesList').textContent = flaggedCountries;
+        
+        // Update scorecard title for regional users
+        document.getElementById('scorecardTitle').innerHTML = '<i class="bi bi-bar-chart-fill me-2 text-primary"></i>Your Regional Performance';
+        document.getElementById('countryChartTitle').innerHTML = '<i class="bi bi-pie-chart me-2"></i>Revenue Breakdown';
+      }
       
       // Key Metrics
       const active = subscriptions.filter(s => s.status === 'Active');
@@ -256,11 +295,56 @@
         .filter(([c]) => c !== 'Unknown')
         .sort((a, b) => b[1] - a[1]);
       
-      document.getElementById('totalCountries').textContent = `${sortedCountries.length} countries`;
+      document.getElementById('totalCountries').textContent = isRegional 
+        ? `${sortedCountries.length} ${sortedCountries.length === 1 ? 'country' : 'countries'}`
+        : `${sortedCountries.length} countries`;
       
-      // Country Team Scorecard
+      // Country Team Scorecard / Regional Summary
       const scorecardBody = document.getElementById('countryScorecard');
-      if (sortedCountries.length === 0) {
+      
+      if (isRegional && sortedCountries.length <= 3) {
+        // Show regional summary cards instead of table for small regions
+        const scorecardContainer = document.getElementById('scorecardBody');
+        scorecardContainer.classList.remove('p-0');
+        scorecardContainer.classList.add('p-3');
+        
+        if (sortedCountries.length === 0) {
+          scorecardContainer.innerHTML = '<div class="text-center text-secondary py-3">No subscription data yet for your region</div>';
+        } else {
+          let summaryHtml = '<div class="row g-3">';
+          sortedCountries.forEach(([country, revenue]) => {
+            const subs = subsByCountry[country] || 0;
+            const activeSubs = subscriptions.filter(s => (s.billingProfile?.billCountry || '') === country && s.status === 'Active').length;
+            const flag = countryFlags[country] || '🏳️';
+            summaryHtml += `
+              <div class="col-md-${sortedCountries.length === 1 ? '12' : sortedCountries.length === 2 ? '6' : '4'}">
+                <div class="border rounded-3 p-3 h-100">
+                  <div class="d-flex align-items-center mb-3">
+                    <span class="fs-3 me-2">${flag}</span>
+                    <h6 class="mb-0 fw-bold">${escapeHtml(country)}</h6>
+                  </div>
+                  <div class="row g-2 text-center">
+                    <div class="col-4">
+                      <div class="fs-5 fw-bold text-primary">${subs}</div>
+                      <div class="small text-secondary">Total</div>
+                    </div>
+                    <div class="col-4">
+                      <div class="fs-5 fw-bold text-success">${activeSubs}</div>
+                      <div class="small text-secondary">Active</div>
+                    </div>
+                    <div class="col-4">
+                      <div class="fs-5 fw-bold">€${revenue.toLocaleString()}</div>
+                      <div class="small text-secondary">Revenue</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          summaryHtml += '</div>';
+          scorecardContainer.innerHTML = summaryHtml;
+        }
+      } else if (sortedCountries.length === 0) {
         scorecardBody.innerHTML = '<tr><td colspan="5" class="text-center text-secondary py-3">No country data yet</td></tr>';
       } else {
         const maxCountryRevenue = sortedCountries[0][1];
@@ -286,9 +370,47 @@
         }).join('');
       }
       
-      // Revenue by Country Chart (horizontal bars)
+      // Revenue by Country Chart (horizontal bars) - or hide for small regional views
       const chartContainer = document.getElementById('countryRevenueChart');
-      if (sortedCountries.length === 0) {
+      const chartCard = document.getElementById('countryChartCard');
+      
+      if (isRegional && sortedCountries.length <= 3) {
+        // For small regions, show recent subscriptions instead
+        document.getElementById('countryChartTitle').innerHTML = '<i class="bi bi-clock-history me-2"></i>Recent Subscriptions';
+        
+        const recentSubs = [...subscriptions].sort((a, b) => {
+          const dateA = a.startDate || a.start || '';
+          const dateB = b.startDate || b.start || '';
+          return dateB.localeCompare(dateA);
+        }).slice(0, 5);
+        
+        if (recentSubs.length === 0) {
+          chartContainer.innerHTML = '<div class="text-center text-secondary py-3">No subscriptions yet</div>';
+        } else {
+          chartContainer.innerHTML = `
+            <div class="list-group list-group-flush">
+              ${recentSubs.map(s => {
+                const bp = s.billingProfile || {};
+                const statusColor = s.status === 'Active' ? 'success' : s.status === 'Pending' ? 'warning' : 'secondary';
+                return `
+                  <a href="edit-subscription.html?id=${s.id}" class="list-group-item list-group-item-action px-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <div class="fw-medium">${escapeHtml(bp.billName || s.customerName || 'N/A')}</div>
+                        <div class="small text-secondary">${s.productType || s.product || 'N/A'}</div>
+                      </div>
+                      <div class="text-end">
+                        <span class="badge text-bg-${statusColor}">${s.status}</span>
+                        <div class="small text-secondary">€${(s.cost || 0).toLocaleString()}</div>
+                      </div>
+                    </div>
+                  </a>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+      } else if (sortedCountries.length === 0) {
         chartContainer.innerHTML = '<div class="text-center text-secondary py-3">No country data yet</div>';
       } else {
         const maxRev = sortedCountries[0][1];
