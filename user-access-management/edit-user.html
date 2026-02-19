@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage User Access - FC User Access Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="assets/uam.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="uam-topbar navbar navbar-dark d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-link text-light d-lg-none me-2" id="sidebarToggle">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand fw-bold mb-0" href="index.html">
+        <span class="text-warning">FC</span> User Access Management
+      </a>
+    </div>
+    <div class="d-flex align-items-center">
+      <div class="dropdown">
+        <button class="btn btn-link text-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle me-1"></i><span id="currentUserName">Admin</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" onclick="logout()"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+      <a href="../index.html" class="btn btn-outline-light btn-sm ms-2">
+        <i class="bi bi-arrow-left me-1"></i>Back to Platform
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <nav class="uam-sidebar" id="uamSidebar">
+    <div class="sidebar-heading">Overview</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Management</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" href="users.html"><i class="bi bi-people"></i>All Users</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Audit</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="audit-log.html"><i class="bi bi-clock-history"></i>Activity Log</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Backdrop (mobile) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Main Content -->
+  <main class="uam-main">
+    <!-- Back Link -->
+    <a href="users.html" class="btn btn-link text-secondary ps-0 mb-3">
+      <i class="bi bi-arrow-left me-1"></i>Back to Users
+    </a>
+
+    <div class="row">
+      <!-- User Info Panel -->
+      <div class="col-lg-4 mb-4">
+        <div class="access-panel">
+          <div class="text-center mb-4">
+            <div class="user-avatar large mx-auto mb-3" id="userAvatar">?</div>
+            <h5 class="fw-bold mb-1" id="userName">Loading...</h5>
+            <p class="text-secondary mb-2" id="userEmail">-</p>
+            <div id="currentAccessBadge"></div>
+          </div>
+          
+          <hr>
+          
+          <div class="mb-3">
+            <label class="small text-secondary">Company</label>
+            <div class="fw-semibold" id="userCompany">-</div>
+          </div>
+          <div class="mb-3">
+            <label class="small text-secondary">Country</label>
+            <div class="fw-semibold" id="userCountry">-</div>
+          </div>
+          <div class="mb-3">
+            <label class="small text-secondary">Registered</label>
+            <div class="fw-semibold" id="userCreated">-</div>
+          </div>
+          <div class="mb-3">
+            <label class="small text-secondary">Last Login</label>
+            <div class="fw-semibold" id="userLastLogin">-</div>
+          </div>
+          <div class="mb-3">
+            <label class="small text-secondary">Status</label>
+            <div id="userStatus">-</div>
+          </div>
+          
+          <div id="accessGrantedInfo" class="d-none">
+            <hr>
+            <div class="mb-3">
+              <label class="small text-secondary">Portal Access Granted</label>
+              <div class="fw-semibold" id="accessGrantedDate">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Access Configuration -->
+      <div class="col-lg-8">
+        <!-- Platform Access Section -->
+        <div class="access-panel mb-4">
+          <h5 class="fw-bold mb-4"><i class="bi bi-device-hdd me-2"></i>Platform Access</h5>
+          <p class="text-secondary small mb-3">Control access to FieldClimate platform applications</p>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-check p-3 border rounded">
+                <input type="checkbox" class="form-check-input" id="platformWebAccess" checked>
+                <label class="form-check-label" for="platformWebAccess">
+                  <div class="d-flex align-items-center">
+                    <i class="bi bi-globe fs-4 text-primary me-2"></i>
+                    <div>
+                      <div class="fw-semibold">Platform (Web)</div>
+                      <div class="small text-secondary">Access via web browser</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check p-3 border rounded">
+                <input type="checkbox" class="form-check-input" id="platformMobileAccess" checked>
+                <label class="form-check-label" for="platformMobileAccess">
+                  <div class="d-flex align-items-center">
+                    <i class="bi bi-phone fs-4 text-success me-2"></i>
+                    <div>
+                      <div class="fw-semibold">Platform (Mobile)</div>
+                      <div class="small text-secondary">Access via mobile app</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subscription Portal Access Section -->
+        <div class="access-panel mb-4">
+          <div class="d-flex align-items-center mb-4">
+            <h5 class="fw-bold mb-0"><i class="bi bi-shield-lock me-2"></i>Subscription Portal Access</h5>
+            <div class="form-check form-switch ms-auto">
+              <input type="checkbox" class="form-check-input" id="enablePortalAccess" role="switch">
+              <label class="form-check-label small" for="enablePortalAccess">Enable Portal Access</label>
+            </div>
+          </div>
+          
+          <div id="portalAccessConfig" class="d-none">
+            <label class="form-label fw-semibold">Portal Role</label>
+            <p class="text-secondary small mb-3">Select the subscription portal role for this user</p>
+            
+            <div id="accessOptions">
+              <!-- Global Admin -->
+              <div class="access-option" data-level="subscription_global_admin">
+                <div class="d-flex align-items-start">
+                  <div class="access-icon bg-danger-subtle text-danger me-3">
+                    <i class="bi bi-shield-fill-check"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold">Global Admin</div>
+                    <div class="small text-secondary">Full access to all subscription management features globally.</div>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" name="portalRole" value="subscription_global_admin" class="form-check-input">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Global Analyst -->
+              <div class="access-option" data-level="subscription_global_analyst">
+                <div class="d-flex align-items-start">
+                  <div class="access-icon bg-info-subtle text-info me-3">
+                    <i class="bi bi-eye"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold">Global Analyst</div>
+                    <div class="small text-secondary">Read-only access to all subscription data globally.</div>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" name="portalRole" value="subscription_global_analyst" class="form-check-input">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Regional Manager -->
+              <div class="access-option" data-level="subscription_regional_manager">
+                <div class="d-flex align-items-start">
+                  <div class="access-icon bg-warning-subtle text-warning me-3">
+                    <i class="bi bi-geo-alt-fill"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold">Regional Manager</div>
+                    <div class="small text-secondary">Full access to subscription management for assigned regions.</div>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" name="portalRole" value="subscription_regional_manager" class="form-check-input">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Regional Analyst -->
+              <div class="access-option" data-level="subscription_regional_analyst">
+                <div class="d-flex align-items-start">
+                  <div class="access-icon bg-primary-subtle text-primary me-3">
+                    <i class="bi bi-binoculars"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold">Regional Analyst</div>
+                    <div class="small text-secondary">Read-only access to subscription data for assigned regions.</div>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" name="portalRole" value="subscription_regional_analyst" class="form-check-input">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Region Assignment (for regional roles) -->
+            <div id="regionSection" class="d-none mt-4">
+              <hr>
+              <label class="form-label fw-semibold">Assigned Regions</label>
+              <p class="text-secondary small mb-3">Select the countries/regions this user can access</p>
+              
+              <div class="row" id="regionCheckboxes">
+                <!-- Dynamic region checkboxes -->
+              </div>
+              
+              <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary me-2" onclick="selectAllRegions()">Select All</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllRegions()">Clear All</button>
+              </div>
+            </div>
+          </div>
+          
+          <div id="portalAccessDisabled" class="text-center py-4 text-secondary">
+            <i class="bi bi-shield-slash fs-1 opacity-50"></i>
+            <p class="mb-0 mt-2">Portal access is disabled for this user</p>
+            <small>Enable the toggle above to grant subscription portal access</small>
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <button id="revokeBtn" class="btn btn-outline-danger d-none" onclick="revokeAllAccess()">
+              <i class="bi bi-person-dash me-1"></i>Revoke All Access
+            </button>
+          </div>
+          <div>
+            <a href="users.html" class="btn btn-outline-secondary me-2">Cancel</a>
+            <button id="saveBtn" class="btn btn-uam" onclick="saveAccess()">
+              <i class="bi bi-check-lg me-1"></i>Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/uam-data.js"></script>
+  <script src="assets/uam.js"></script>
+  <script>
+    let currentUser = null;
+    let selectedPortalRole = null;
+    let selectedRegions = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      UAMData.requireAuth();
+      
+      const userId = getUrlParam('id');
+      if (!userId) {
+        window.location.href = 'users.html';
+        return;
+      }
+      
+      currentUser = UAMData.getUser(userId);
+      if (!currentUser) {
+        showToast('User not found', 'danger');
+        setTimeout(() => window.location.href = 'users.html', 1500);
+        return;
+      }
+      
+      // Populate regions
+      const regionContainer = document.getElementById('regionCheckboxes');
+      UAMData.REGIONS.forEach(region => {
+        const col = document.createElement('div');
+        col.className = 'col-md-4 col-6 mb-2';
+        col.innerHTML = `
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input region-check" value="${region}" id="region_${region.replace(/\s/g, '_')}">
+            <label class="form-check-label small" for="region_${region.replace(/\s/g, '_')}">${region}</label>
+          </div>
+        `;
+        regionContainer.appendChild(col);
+      });
+      
+      loadUserData();
+      setupEventListeners();
+    });
+
+    function loadUserData() {
+      // User info
+      document.getElementById('userAvatar').textContent = getInitials(currentUser.name);
+      document.getElementById('userName').textContent = currentUser.name;
+      document.getElementById('userEmail').textContent = currentUser.email;
+      document.getElementById('userCompany').textContent = currentUser.company || '-';
+      document.getElementById('userCountry').textContent = currentUser.country || '-';
+      document.getElementById('userCreated').textContent = formatDate(currentUser.createdAt);
+      document.getElementById('userLastLogin').textContent = currentUser.lastLogin ? timeAgo(currentUser.lastLogin) : 'Never';
+      document.getElementById('userStatus').innerHTML = renderStatus(currentUser.status);
+      document.getElementById('currentAccessBadge').innerHTML = renderPlatformAccess(currentUser) + ' ' + renderPortalBadge(currentUser.subscriptionPortalRole);
+      
+      // Platform access checkboxes
+      document.getElementById('platformWebAccess').checked = currentUser.platformWebAccess !== false;
+      document.getElementById('platformMobileAccess').checked = currentUser.platformMobileAccess !== false;
+      
+      // Portal access toggle and role
+      const hasPortalAccess = currentUser.subscriptionPortalAccess;
+      document.getElementById('enablePortalAccess').checked = hasPortalAccess;
+      updatePortalAccessVisibility();
+      
+      if (hasPortalAccess && currentUser.subscriptionPortalRole) {
+        selectedPortalRole = currentUser.subscriptionPortalRole;
+        const radio = document.querySelector(`input[name="portalRole"][value="${selectedPortalRole}"]`);
+        if (radio) {
+          radio.checked = true;
+          radio.closest('.access-option').classList.add('selected');
+        }
+      }
+      
+      // Access granted info
+      if (hasPortalAccess && currentUser.accessGrantedAt) {
+        document.getElementById('accessGrantedInfo').classList.remove('d-none');
+        document.getElementById('accessGrantedDate').textContent = formatDate(currentUser.accessGrantedAt);
+        document.getElementById('revokeBtn').classList.remove('d-none');
+      } else {
+        document.getElementById('accessGrantedInfo').classList.add('d-none');
+        document.getElementById('revokeBtn').classList.add('d-none');
+      }
+      
+      // Set assigned regions
+      selectedRegions = currentUser.assignedCountries || [];
+      selectedRegions.forEach(region => {
+        const checkbox = document.querySelector(`.region-check[value="${region}"]`);
+        if (checkbox) checkbox.checked = true;
+      });
+      
+      // Show/hide region section
+      updateRegionVisibility();
+      
+      // Update page title
+      document.title = `${currentUser.name} - Access Management`;
+    }
+
+    function setupEventListeners() {
+      // Portal access toggle
+      document.getElementById('enablePortalAccess').addEventListener('change', updatePortalAccessVisibility);
+      
+      // Portal role selection
+      document.querySelectorAll('.access-option').forEach(option => {
+        option.addEventListener('click', () => {
+          // Update selection
+          document.querySelectorAll('.access-option').forEach(o => o.classList.remove('selected'));
+          option.classList.add('selected');
+          
+          // Check radio
+          const radio = option.querySelector('input[type="radio"]');
+          radio.checked = true;
+          selectedPortalRole = radio.value;
+          
+          updateRegionVisibility();
+        });
+      });
+      
+      // Region checkboxes
+      document.querySelectorAll('.region-check').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) {
+            if (!selectedRegions.includes(checkbox.value)) {
+              selectedRegions.push(checkbox.value);
+            }
+          } else {
+            selectedRegions = selectedRegions.filter(r => r !== checkbox.value);
+          }
+        });
+      });
+    }
+
+    function updatePortalAccessVisibility() {
+      const isEnabled = document.getElementById('enablePortalAccess').checked;
+      document.getElementById('portalAccessConfig').classList.toggle('d-none', !isEnabled);
+      document.getElementById('portalAccessDisabled').classList.toggle('d-none', isEnabled);
+      
+      if (!isEnabled) {
+        // Clear selection when disabled
+        document.querySelectorAll('.access-option').forEach(o => o.classList.remove('selected'));
+        document.querySelectorAll('input[name="portalRole"]').forEach(r => r.checked = false);
+        selectedPortalRole = null;
+        clearAllRegions();
+      }
+    }
+
+    function updateRegionVisibility() {
+      const regionSection = document.getElementById('regionSection');
+      const isRegionalRole = selectedPortalRole && selectedPortalRole.includes('regional');
+      regionSection.classList.toggle('d-none', !isRegionalRole);
+    }
+
+    function selectAllRegions() {
+      document.querySelectorAll('.region-check').forEach(cb => {
+        cb.checked = true;
+        if (!selectedRegions.includes(cb.value)) {
+          selectedRegions.push(cb.value);
+        }
+      });
+    }
+
+    function clearAllRegions() {
+      document.querySelectorAll('.region-check').forEach(cb => cb.checked = false);
+      selectedRegions = [];
+    }
+
+    function saveAccess() {
+      // Get platform access values
+      const webAccess = document.getElementById('platformWebAccess').checked;
+      const mobileAccess = document.getElementById('platformMobileAccess').checked;
+      
+      // Get portal access values
+      const portalEnabled = document.getElementById('enablePortalAccess').checked;
+      const isRegionalRole = selectedPortalRole && selectedPortalRole.includes('regional');
+      
+      // Validate
+      if (!webAccess && !mobileAccess) {
+        showToast('User must have at least one platform access (Web or Mobile)', 'warning');
+        return;
+      }
+      
+      if (portalEnabled && !selectedPortalRole) {
+        showToast('Please select a portal role', 'warning');
+        return;
+      }
+      
+      if (portalEnabled && isRegionalRole && selectedRegions.length === 0) {
+        showToast('Please select at least one region for regional roles', 'warning');
+        return;
+      }
+      
+      // Update platform access
+      UAMData.updatePlatformAccess(currentUser.id, webAccess, mobileAccess);
+      
+      // Update portal access
+      if (portalEnabled) {
+        UAMData.grantSubscriptionAccess(currentUser.id, selectedPortalRole, isRegionalRole ? selectedRegions : []);
+        showToast('Access updated successfully', 'success');
+      } else {
+        if (currentUser.subscriptionPortalAccess) {
+          UAMData.revokeSubscriptionAccess(currentUser.id);
+          showToast('Portal access revoked', 'warning');
+        } else {
+          showToast('Access updated successfully', 'success');
+        }
+      }
+      
+      // Refresh data
+      currentUser = UAMData.getUser(currentUser.id);
+      loadUserData();
+    }
+
+    function revokeAllAccess() {
+      if (confirmAction(`Revoke ALL access for ${currentUser.name}?\n\nThis will disable web, mobile, and portal access.`)) {
+        UAMData.updatePlatformAccess(currentUser.id, false, false);
+        UAMData.revokeSubscriptionAccess(currentUser.id);
+        showToast('All access revoked', 'warning');
+        
+        // Refresh
+        currentUser = UAMData.getUser(currentUser.id);
+        loadUserData();
+        
+        // Reset UI
+        document.getElementById('platformWebAccess').checked = false;
+        document.getElementById('platformMobileAccess').checked = false;
+        document.getElementById('enablePortalAccess').checked = false;
+        updatePortalAccessVisibility();
+      }
+    }
+  </script>
+</body>
+</html>

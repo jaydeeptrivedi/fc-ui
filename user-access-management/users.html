@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Users - FC User Access Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="assets/uam.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="uam-topbar navbar navbar-dark d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-link text-light d-lg-none me-2" id="sidebarToggle">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand fw-bold mb-0" href="index.html">
+        <span class="text-warning">FC</span> User Access Management
+      </a>
+    </div>
+    <div class="d-flex align-items-center">
+      <div class="dropdown">
+        <button class="btn btn-link text-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle me-1"></i><span id="currentUserName">Admin</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" onclick="logout()"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+      <a href="../index.html" class="btn btn-outline-light btn-sm ms-2">
+        <i class="bi bi-arrow-left me-1"></i>Back to Platform
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <nav class="uam-sidebar" id="uamSidebar">
+    <div class="sidebar-heading">Overview</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Management</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" href="users.html"><i class="bi bi-people"></i>All Users</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Audit</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="audit-log.html"><i class="bi bi-clock-history"></i>Activity Log</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Backdrop (mobile) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Main Content -->
+  <main class="uam-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="fw-bold mb-0">User Management</h4>
+        <p class="text-secondary mb-0">Manage user access and privileges</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body py-3">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-4">
+            <div class="search-box">
+              <i class="bi bi-search search-icon"></i>
+              <input type="text" id="searchUsers" class="form-control" placeholder="Search users...">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <select id="filterAccess" class="form-select">
+              <option value="">All Users</option>
+              <option value="has_portal">Has Portal Access</option>
+              <option value="no_portal">No Portal Access</option>
+              <option value="subscription_global_admin">Global Admin</option>
+              <option value="subscription_global_analyst">Global Analyst</option>
+              <option value="subscription_regional_manager">Regional Manager</option>
+              <option value="subscription_regional_analyst">Regional Analyst</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select id="filterStatus" class="form-select">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select id="filterCountry" class="form-select">
+              <option value="">All Countries</option>
+            </select>
+          </div>
+          <div class="col-md-2 text-end">
+            <span id="userCount" class="text-secondary small"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="uam-table">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th class="ps-3">User</th>
+            <th>Company</th>
+            <th>Platform Access</th>
+            <th>Portal Access</th>
+            <th>Assigned Regions</th>
+            <th>Status</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <!-- Dynamic content -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/uam-data.js"></script>
+  <script src="assets/uam.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      UAMData.requireAuth();
+      
+      // Populate country filter
+      const countrySelect = document.getElementById('filterCountry');
+      UAMData.REGIONS.forEach(country => {
+        const opt = document.createElement('option');
+        opt.value = country;
+        opt.textContent = country;
+        countrySelect.appendChild(opt);
+      });
+      
+      renderUsers();
+      
+      // Filter listeners
+      document.getElementById('searchUsers').addEventListener('input', debounce(renderUsers, 300));
+      document.getElementById('filterAccess').addEventListener('change', renderUsers);
+      document.getElementById('filterStatus').addEventListener('change', renderUsers);
+      document.getElementById('filterCountry').addEventListener('change', renderUsers);
+    });
+
+    function renderUsers() {
+      const search = document.getElementById('searchUsers').value.toLowerCase();
+      const accessFilter = document.getElementById('filterAccess').value;
+      const statusFilter = document.getElementById('filterStatus').value;
+      const countryFilter = document.getElementById('filterCountry').value;
+      
+      let users = UAMData.getUsers();
+      
+      // Apply search
+      if (search) {
+        users = users.filter(u => 
+          u.name.toLowerCase().includes(search) ||
+          u.email.toLowerCase().includes(search) ||
+          (u.company || '').toLowerCase().includes(search)
+        );
+      }
+      
+      // Apply access filter
+      if (accessFilter) {
+        if (accessFilter === 'has_portal') {
+          users = users.filter(u => u.subscriptionPortalAccess);
+        } else if (accessFilter === 'no_portal') {
+          users = users.filter(u => !u.subscriptionPortalAccess);
+        } else {
+          users = users.filter(u => u.subscriptionPortalRole === accessFilter);
+        }
+      }
+      
+      // Apply status filter
+      if (statusFilter) {
+        users = users.filter(u => u.status === statusFilter);
+      }
+      
+      // Apply country filter
+      if (countryFilter) {
+        users = users.filter(u => 
+          u.country === countryFilter || 
+          (u.assignedCountries || []).includes(countryFilter)
+        );
+      }
+      
+      // Update count
+      document.getElementById('userCount').textContent = `${users.length} user${users.length !== 1 ? 's' : ''} found`;
+      
+      const tbody = document.getElementById('usersTableBody');
+      
+      if (users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <div class="empty-state">
+                <i class="bi bi-people"></i>
+                <p class="mb-0">No users found</p>
+                <small class="text-secondary">Try adjusting your filters</small>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tbody.innerHTML = users.map(user => `
+        <tr>
+          <td class="ps-3">
+            <div class="d-flex align-items-center">
+              <div class="user-avatar me-3">${getInitials(user.name)}</div>
+              <div>
+                <div class="fw-semibold">${escapeHtml(user.name)}</div>
+                <div class="small text-secondary">${escapeHtml(user.email)}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div>${escapeHtml(user.company || '-')}</div>
+            <div class="small text-secondary">${escapeHtml(user.country || '')}</div>
+          </td>
+          <td>${renderPlatformAccess(user)}</td>
+          <td>${renderPortalBadge(user.subscriptionPortalRole)}</td>
+          <td>${renderCountryTags(user.assignedCountries)}</td>
+          <td>${renderStatus(user.status)}</td>
+          </td>
+          <td class="text-end pe-3">
+            <a href="edit-user.html?id=${user.id}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-pencil-square me-1"></i>Manage
+            </a>
+          </td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

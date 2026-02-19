@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activity Log - FC User Access Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="assets/uam.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="uam-topbar navbar navbar-dark d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-link text-light d-lg-none me-2" id="sidebarToggle">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand fw-bold mb-0" href="index.html">
+        <span class="text-warning">FC</span> User Access Management
+      </a>
+    </div>
+    <div class="d-flex align-items-center">
+      <div class="dropdown">
+        <button class="btn btn-link text-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle me-1"></i><span id="currentUserName">Admin</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" onclick="logout()"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+      <a href="../index.html" class="btn btn-outline-light btn-sm ms-2">
+        <i class="bi bi-arrow-left me-1"></i>Back to Platform
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <nav class="uam-sidebar" id="uamSidebar">
+    <div class="sidebar-heading">Overview</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Management</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="users.html"><i class="bi bi-people"></i>All Users</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Audit</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" href="audit-log.html"><i class="bi bi-clock-history"></i>Activity Log</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Backdrop (mobile) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Main Content -->
+  <main class="uam-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="fw-bold mb-0">Activity Log</h4>
+        <p class="text-secondary mb-0">Track all access management activities</p>
+      </div>
+      <button class="btn btn-outline-secondary" onclick="exportLog()">
+        <i class="bi bi-download me-1"></i>Export CSV
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-value text-dark" id="totalActivities">0</div>
+              <div class="stat-label">Total Activities</div>
+            </div>
+            <div class="stat-icon bg-secondary-subtle text-secondary">
+              <i class="bi bi-list-ul"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-value text-success" id="accessGranted">0</div>
+              <div class="stat-label">Access Granted</div>
+            </div>
+            <div class="stat-icon bg-success-subtle text-success">
+              <i class="bi bi-person-check"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-value text-danger" id="accessRevoked">0</div>
+              <div class="stat-label">Access Revoked</div>
+            </div>
+            <div class="stat-icon bg-danger-subtle text-danger">
+              <i class="bi bi-person-dash"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-value text-info" id="todayActivities">0</div>
+              <div class="stat-label">Today</div>
+            </div>
+            <div class="stat-icon bg-info-subtle text-info">
+              <i class="bi bi-calendar-check"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label small text-secondary">Search</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-secondary"></i></span>
+              <input type="text" id="searchLog" class="form-control border-start-0 ps-0" placeholder="Search by user or email...">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small text-secondary">Action Type</label>
+            <select id="filterAction" class="form-select">
+              <option value="">All Actions</option>
+              <option value="GRANT_ACCESS">Access Granted</option>
+              <option value="REVOKE_ACCESS">Access Revoked</option>
+              <option value="UPDATE_PLATFORM_ACCESS">Platform Access Updated</option>
+              <option value="UPDATE_USER">User Updated</option>
+              <option value="CREATE_USER">User Created</option>
+              <option value="DELETE_USER">User Deleted</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small text-secondary">Performed By</label>
+            <select id="filterPerformedBy" class="form-select">
+              <option value="">All Admins</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small text-secondary">Date Range</label>
+            <select id="filterDateRange" class="form-select">
+              <option value="">All Time</option>
+              <option value="today">Today</option>
+              <option value="week">Last 7 Days</option>
+              <option value="month">Last 30 Days</option>
+            </select>
+          </div>
+          <div class="col-md-3 text-end">
+            <button class="btn btn-outline-secondary btn-sm me-2" onclick="clearFilters()">Clear Filters</button>
+            <span id="logCount" class="text-secondary small"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Log Table -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-3 border-0">Timestamp</th>
+                <th class="border-0">Action</th>
+                <th class="border-0">Target User</th>
+                <th class="border-0">Details</th>
+                <th class="border-0">Performed By</th>
+              </tr>
+            </thead>
+            <tbody id="logTable">
+              <!-- Dynamic content -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div class="text-secondary small" id="paginationInfo"></div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0" id="pagination">
+          <!-- Dynamic pagination -->
+        </ul>
+      </nav>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/uam-data.js"></script>
+  <script src="assets/uam.js"></script>
+  <script>
+    const PAGE_SIZE = 20;
+    let currentPage = 1;
+    let filteredLogs = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      UAMData.requireAuth();
+      
+      // Populate performed by filter
+      const logs = UAMData.getAuditLog();
+      const admins = [...new Set(logs.map(l => l.performedBy))];
+      const selectElement = document.getElementById('filterPerformedBy');
+      admins.forEach(admin => {
+        if (admin && admin !== 'system') {
+          const option = document.createElement('option');
+          option.value = admin;
+          option.textContent = admin;
+          selectElement.appendChild(option);
+        }
+      });
+      
+      loadStats();
+      renderLog();
+      
+      // Filter listeners
+      document.getElementById('searchLog').addEventListener('input', debounce(() => { currentPage = 1; renderLog(); }, 300));
+      document.getElementById('filterAction').addEventListener('change', () => { currentPage = 1; renderLog(); });
+      document.getElementById('filterPerformedBy').addEventListener('change', () => { currentPage = 1; renderLog(); });
+      document.getElementById('filterDateRange').addEventListener('change', () => { currentPage = 1; renderLog(); });
+    });
+
+    function loadStats() {
+      const logs = UAMData.getAuditLog();
+      const today = new Date().toDateString();
+      
+      document.getElementById('totalActivities').textContent = logs.length;
+      document.getElementById('accessGranted').textContent = logs.filter(l => l.action === 'GRANT_ACCESS').length;
+      document.getElementById('accessRevoked').textContent = logs.filter(l => l.action === 'REVOKE_ACCESS').length;
+      document.getElementById('todayActivities').textContent = logs.filter(l => new Date(l.timestamp).toDateString() === today).length;
+    }
+
+    function renderLog() {
+      const logs = UAMData.getAuditLog();
+      const search = document.getElementById('searchLog').value.toLowerCase();
+      const actionFilter = document.getElementById('filterAction').value;
+      const performedByFilter = document.getElementById('filterPerformedBy').value;
+      const dateFilter = document.getElementById('filterDateRange').value;
+      
+      // Get users for lookup
+      const users = UAMData.getUsers();
+      const userMap = {};
+      users.forEach(u => userMap[u.id] = u);
+      
+      // Filter logs
+      filteredLogs = logs.filter(log => {
+        const user = userMap[log.userId];
+        const userName = user?.name || '';
+        const userEmail = user?.email || '';
+        
+        // Search filter
+        if (search && !userName.toLowerCase().includes(search) && 
+            !userEmail.toLowerCase().includes(search) && 
+            !log.performedBy.toLowerCase().includes(search)) {
+          return false;
+        }
+        
+        // Action filter
+        if (actionFilter && log.action !== actionFilter) return false;
+        
+        // Performed by filter
+        if (performedByFilter && log.performedBy !== performedByFilter) return false;
+        
+        // Date range filter
+        if (dateFilter) {
+          const logDate = new Date(log.timestamp);
+          const now = new Date();
+          if (dateFilter === 'today') {
+            if (logDate.toDateString() !== now.toDateString()) return false;
+          } else if (dateFilter === 'week') {
+            const weekAgo = new Date(now.setDate(now.getDate() - 7));
+            if (logDate < weekAgo) return false;
+          } else if (dateFilter === 'month') {
+            const monthAgo = new Date(now.setDate(now.getDate() - 30));
+            if (logDate < monthAgo) return false;
+          }
+        }
+        
+        return true;
+      });
+      
+      // Pagination
+      const totalPages = Math.ceil(filteredLogs.length / PAGE_SIZE);
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const endIndex = startIndex + PAGE_SIZE;
+      const pageData = filteredLogs.slice(startIndex, endIndex);
+      
+      // Update count
+      document.getElementById('logCount').textContent = `${filteredLogs.length} activities`;
+      
+      // Render table
+      const tbody = document.getElementById('logTable');
+      if (pageData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-5 text-secondary">
+              <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+              No activities found
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = pageData.map(log => {
+          const user = userMap[log.userId];
+          return `
+            <tr>
+              <td class="ps-3">
+                <div class="small">${formatDateTime(log.timestamp)}</div>
+                <div class="smaller text-secondary">${timeAgo(log.timestamp)}</div>
+              </td>
+              <td>${renderActionBadge(log.action)}</td>
+              <td>
+                ${user ? `
+                  <div class="d-flex align-items-center">
+                    <div class="user-avatar small me-2">${getInitials(user.name)}</div>
+                    <div>
+                      <div class="small fw-semibold">${escapeHtml(user.name)}</div>
+                      <div class="smaller text-secondary">${escapeHtml(user.email)}</div>
+                    </div>
+                  </div>
+                ` : `<span class="text-secondary small">User ${log.userId}</span>`}
+              </td>
+              <td>${renderDetails(log)}</td>
+              <td>
+                <div class="small">${escapeHtml(log.performedBy)}</div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+      
+      // Render pagination
+      renderPagination(totalPages);
+      
+      // Update pagination info
+      const start = filteredLogs.length > 0 ? startIndex + 1 : 0;
+      const end = Math.min(endIndex, filteredLogs.length);
+      document.getElementById('paginationInfo').textContent = 
+        `Showing ${start}-${end} of ${filteredLogs.length} activities`;
+    }
+
+    function renderActionBadge(action) {
+      const actionMap = {
+        'GRANT_ACCESS': { label: 'Access Granted', class: 'bg-success-subtle text-success', icon: 'bi-person-check' },
+        'REVOKE_ACCESS': { label: 'Access Revoked', class: 'bg-danger-subtle text-danger', icon: 'bi-person-dash' },
+        'UPDATE_PLATFORM_ACCESS': { label: 'Platform Access', class: 'bg-info-subtle text-info', icon: 'bi-device-hdd' },
+        'UPDATE_USER': { label: 'User Updated', class: 'bg-warning-subtle text-warning', icon: 'bi-pencil' },
+        'CREATE_USER': { label: 'User Created', class: 'bg-primary-subtle text-primary', icon: 'bi-person-plus' },
+        'DELETE_USER': { label: 'User Deleted', class: 'bg-dark-subtle text-dark', icon: 'bi-person-x' }
+      };
+      const info = actionMap[action] || { label: action, class: 'bg-secondary-subtle text-secondary', icon: 'bi-activity' };
+      return `<span class="badge ${info.class} py-2 px-2"><i class="bi ${info.icon} me-1"></i>${info.label}</span>`;
+    }
+
+    function renderDetails(log) {
+      const details = log.details || {};
+      let html = '';
+      
+      switch (log.action) {
+        case 'GRANT_ACCESS':
+          const roleInfo = getPortalRoleInfo(details.role);
+          html = `<span class="small">Role: <strong>${roleInfo?.label || details.role}</strong></span>`;
+          if (details.countries?.length > 0) {
+            html += `<br><span class="smaller text-secondary">Regions: ${details.countries.slice(0, 3).join(', ')}${details.countries.length > 3 ? '...' : ''}</span>`;
+          }
+          break;
+        case 'REVOKE_ACCESS':
+          html = '<span class="small text-danger">Portal access removed</span>';
+          break;
+        case 'UPDATE_PLATFORM_ACCESS':
+          const platforms = [];
+          if (details.webAccess) platforms.push('Web');
+          if (details.mobileAccess) platforms.push('Mobile');
+          html = platforms.length > 0 
+            ? `<span class="small">Enabled: <strong>${platforms.join(', ')}</strong></span>`
+            : '<span class="small text-danger">All platform access disabled</span>';
+          break;
+        case 'CREATE_USER':
+        case 'UPDATE_USER':
+          if (details.email) {
+            html = `<span class="small">${escapeHtml(details.email)}</span>`;
+          }
+          break;
+        default:
+          html = details ? `<span class="smaller text-secondary">${JSON.stringify(details)}</span>` : '-';
+      }
+      
+      return html || '-';
+    }
+
+    function renderPagination(totalPages) {
+      const pagination = document.getElementById('pagination');
+      if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+      
+      let html = '';
+      
+      // Previous button
+      html += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="goToPage(${currentPage - 1}); return false;">&laquo;</a>
+        </li>
+      `;
+      
+      // Page numbers
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      
+      if (startPage > 1) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="goToPage(1); return false;">1</a></li>`;
+        if (startPage > 2) {
+          html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        html += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a>
+          </li>
+        `;
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="goToPage(${totalPages}); return false;">${totalPages}</a></li>`;
+      }
+      
+      // Next button
+      html += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="goToPage(${currentPage + 1}); return false;">&raquo;</a>
+        </li>
+      `;
+      
+      pagination.innerHTML = html;
+    }
+
+    function goToPage(page) {
+      const totalPages = Math.ceil(filteredLogs.length / PAGE_SIZE);
+      if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        renderLog();
+      }
+    }
+
+    function clearFilters() {
+      document.getElementById('searchLog').value = '';
+      document.getElementById('filterAction').value = '';
+      document.getElementById('filterPerformedBy').value = '';
+      document.getElementById('filterDateRange').value = '';
+      currentPage = 1;
+      renderLog();
+    }
+
+    function formatDateTime(isoString) {
+      const date = new Date(isoString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function exportLog() {
+      const logs = UAMData.getAuditLog();
+      const users = UAMData.getUsers();
+      const userMap = {};
+      users.forEach(u => userMap[u.id] = u);
+      
+      // Build CSV content
+      const headers = ['Timestamp', 'Action', 'User Name', 'User Email', 'Details', 'Performed By'];
+      const rows = filteredLogs.map(log => {
+        const user = userMap[log.userId];
+        return [
+          new Date(log.timestamp).toISOString(),
+          log.action,
+          user?.name || log.userId,
+          user?.email || '',
+          JSON.stringify(log.details || {}),
+          log.performedBy
+        ];
+      });
+      
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      ].join('\n');
+      
+      // Download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `uam-activity-log-${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      
+      showToast('Activity log exported successfully', 'success');
+    }
+  </script>
+</body>
+</html>
