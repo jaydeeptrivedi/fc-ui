@@ -11,6 +11,15 @@ const AdminData = {
     PROMOS: 'fc_admin_promos'
   },
 
+  // Available countries for promo targeting
+  COUNTRIES: [
+    'Germany', 'France', 'Spain', 'Italy', 'Netherlands', 
+    'Belgium', 'Austria', 'Switzerland', 'Poland', 'Czech Republic',
+    'United Kingdom', 'Ireland', 'Portugal', 'Greece', 'Hungary',
+    'USA', 'Canada', 'Mexico', 'Brazil', 'Argentina',
+    'Australia', 'New Zealand', 'Japan', 'South Korea', 'India'
+  ],
+
   // ==================== PRODUCTS ====================
   
   getProducts() {

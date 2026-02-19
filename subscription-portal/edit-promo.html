@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Promo Code - FC Subscription Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="assets/admin.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="admin-topbar navbar navbar-dark d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-link text-light d-lg-none me-2" id="sidebarToggle">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand fw-bold mb-0" href="index.html">
+        <span class="text-warning">FC</span> Subscription Portal
+      </a>
+    </div>
+    <div class="d-flex align-items-center">
+      <a href="promos.html" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Back to Promo Codes
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <nav class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-heading">Main</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Management</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="products.html"><i class="bi bi-box-seam"></i>Products</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="subscriptions.html"><i class="bi bi-card-checklist"></i>Subscriptions</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="promos.html"><i class="bi bi-tag"></i>Promo Codes</a>
+      </li>
+    </ul>
+    <div class="sidebar-heading">Settings</div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-gear"></i>Configuration</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-people"></i>Users</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Backdrop (mobile) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="fw-bold mb-0" id="pageTitle">Create Promo Code</h4>
+        <p class="text-secondary mb-0" id="pageSubtitle">Add a new discount promo code</p>
+      </div>
+      <a href="promos.html" class="btn btn-outline-secondary">
+        <i class="bi bi-x-lg me-1"></i>Cancel
+      </a>
+    </div>
+
+    <form id="promoForm" onsubmit="savePromo(event)">
+      <input type="hidden" id="promoId">
+      
+      <div class="row g-4">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+          <!-- Basic Info Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-tag me-2 text-primary"></i>Promo Details</h6>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Promo Code <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input type="text" id="promoCode" class="form-control text-uppercase" required 
+                           pattern="[A-Za-z0-9]+" maxlength="20" placeholder="e.g., SUMMER20">
+                    <button type="button" class="btn btn-outline-secondary" onclick="generateCode()">
+                      <i class="bi bi-shuffle"></i>
+                    </button>
+                  </div>
+                  <div class="form-text">Alphanumeric only, max 20 characters</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Discount Percentage <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input type="number" id="promoDiscount" class="form-control" required 
+                           min="1" max="100" placeholder="10">
+                    <span class="input-group-text">%</span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Description</label>
+                  <input type="text" id="promoDescription" class="form-control" 
+                         placeholder="e.g., Summer sale 2024 - 20% off all products">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Validity Period Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-calendar-range me-2 text-success"></i>Validity Period</h6>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                  <input type="date" id="promoStartDate" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">End Date <span class="text-danger">*</span></label>
+                  <input type="date" id="promoEndDate" class="form-control" required>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Targeting Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-geo-alt me-2 text-warning"></i>Targeting</h6>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Applicable Products</label>
+                  <select id="promoProducts" class="form-select">
+                    <option value="all">All Products</option>
+                    <option value="API">API Only</option>
+                    <option value="Disease Models">Disease Models Only</option>
+                    <option value="Weather Forecast">Weather Forecast Only</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Country Scope</label>
+                  <select id="countryScope" class="form-select" onchange="toggleCountrySelect()">
+                    <option value="global">Global (All Countries)</option>
+                    <option value="specific">Specific Countries</option>
+                  </select>
+                </div>
+                <div class="col-12" id="countrySelectWrapper" style="display: none;">
+                  <label class="form-label">Select Countries</label>
+                  <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                    <div id="countryCheckboxes" class="row g-2">
+                      <!-- Country checkboxes added dynamically -->
+                    </div>
+                  </div>
+                  <div class="form-text">Select the countries where this promo is valid</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Usage Limits Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-sliders me-2 text-info"></i>Usage Limits</h6>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Total Usage Limit</label>
+                  <input type="number" id="promoUsageLimit" class="form-control" min="0" 
+                         placeholder="Leave empty for unlimited">
+                  <div class="form-text">0 or empty = unlimited uses</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Per-Customer Limit</label>
+                  <input type="number" id="promoCustomerLimit" class="form-control" min="0" 
+                         placeholder="Leave empty for unlimited">
+                  <div class="form-text">How many times a single customer can use this code</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Minimum Order Value (€)</label>
+                  <input type="number" id="promoMinOrder" class="form-control" min="0" step="0.01" 
+                         placeholder="0">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Max Discount Amount (€)</label>
+                  <input type="number" id="promoMaxDiscount" class="form-control" min="0" step="0.01" 
+                         placeholder="Leave empty for no cap">
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check mt-2">
+                    <input type="checkbox" id="promoFirstTimeOnly" class="form-check-input">
+                    <label class="form-check-label" for="promoFirstTimeOnly">
+                      First-time customers only
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-sticky me-2 text-secondary"></i>Internal Notes</h6>
+            </div>
+            <div class="card-body">
+              <textarea id="promoNotes" class="form-control" rows="3" 
+                        placeholder="Internal admin notes about this promo..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Summary -->
+        <div class="col-lg-4">
+          <!-- Preview Card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-eye me-2 text-primary"></i>Preview</h6>
+            </div>
+            <div class="card-body">
+              <div class="text-center p-3 bg-light rounded mb-3">
+                <code class="fs-3" id="previewCode">CODE</code>
+                <div class="mt-2">
+                  <span class="badge text-bg-warning fs-6" id="previewDiscount">0%</span>
+                  <span class="badge text-bg-success ms-1" id="previewStatus">Active</span>
+                </div>
+              </div>
+              <div class="small text-secondary">
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span>Products:</span>
+                  <span id="previewProducts">All Products</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span>Region:</span>
+                  <span id="previewRegion">Global</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span>Valid from:</span>
+                  <span id="previewStart">-</span>
+                </div>
+                <div class="d-flex justify-content-between py-2">
+                  <span>Valid until:</span>
+                  <span id="previewEnd">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Usage Stats Card (shown when editing) -->
+          <div class="card border-0 shadow-sm mb-4" id="usageCard" style="display: none;">
+            <div class="card-header bg-white border-0 py-3">
+              <h6 class="mb-0"><i class="bi bi-bar-chart me-2 text-success"></i>Usage Statistics</h6>
+            </div>
+            <div class="card-body">
+              <div class="text-center">
+                <div class="fs-2 fw-bold text-success" id="usageCount">0</div>
+                <div class="text-secondary small">times used</div>
+              </div>
+              <div class="progress mt-3" style="height: 6px;" id="usageProgressWrapper">
+                <div class="progress-bar bg-success" id="usageProgress" style="width: 0%"></div>
+              </div>
+              <div class="text-center text-secondary small mt-2" id="usageLabel">Unlimited</div>
+            </div>
+          </div>
+
+          <!-- Actions Card -->
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-check-lg me-1"></i>Save Promo Code
+                </button>
+                <a href="promos.html" class="btn btn-outline-secondary">Cancel</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/admin-data.js"></script>
+  <script src="assets/admin.js"></script>
+  <script>
+    let editingPromoId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Populate country checkboxes
+      const countryCheckboxes = document.getElementById('countryCheckboxes');
+      AdminData.COUNTRIES.forEach(country => {
+        const col = document.createElement('div');
+        col.className = 'col-md-6';
+        col.innerHTML = `
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input country-checkbox" id="country_${country.replace(/\s+/g, '_')}" value="${country}">
+            <label class="form-check-label small" for="country_${country.replace(/\s+/g, '_')}">${country}</label>
+          </div>
+        `;
+        countryCheckboxes.appendChild(col);
+      });
+
+      // Set default dates
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('promoStartDate').value = today;
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      document.getElementById('promoEndDate').value = nextMonth.toISOString().split('T')[0];
+
+      // Check if editing
+      const urlParams = new URLSearchParams(window.location.search);
+      const promoId = urlParams.get('id');
+      
+      if (promoId) {
+        loadPromo(promoId);
+      }
+
+      // Add preview listeners
+      document.getElementById('promoCode').addEventListener('input', updatePreview);
+      document.getElementById('promoDiscount').addEventListener('input', updatePreview);
+      document.getElementById('promoProducts').addEventListener('change', updatePreview);
+      document.getElementById('countryScope').addEventListener('change', updatePreview);
+      document.getElementById('promoStartDate').addEventListener('change', updatePreview);
+      document.getElementById('promoEndDate').addEventListener('change', updatePreview);
+      
+      updatePreview();
+    });
+
+    function loadPromo(id) {
+      const promo = AdminData.getPromos().find(p => p.id === id);
+      if (!promo) {
+        showToast('Promo code not found', 'danger');
+        window.location.href = 'promos.html';
+        return;
+      }
+
+      editingPromoId = id;
+      
+      // Update page title
+      document.getElementById('pageTitle').textContent = 'Edit Promo Code';
+      document.getElementById('pageSubtitle').textContent = `Editing promo code: ${promo.code}`;
+
+      // Fill form
+      document.getElementById('promoId').value = promo.id;
+      document.getElementById('promoCode').value = promo.code;
+      document.getElementById('promoDiscount').value = promo.discount;
+      document.getElementById('promoDescription').value = promo.description || '';
+      document.getElementById('promoStartDate').value = promo.startDate;
+      document.getElementById('promoEndDate').value = promo.endDate;
+      document.getElementById('promoProducts').value = promo.applicableProducts || 'all';
+      document.getElementById('promoUsageLimit').value = promo.usageLimit || '';
+      document.getElementById('promoMinOrder').value = promo.minOrder || '';
+      document.getElementById('promoMaxDiscount').value = promo.maxDiscountAmount || '';
+      document.getElementById('promoCustomerLimit').value = promo.customerLimit || '';
+      document.getElementById('promoFirstTimeOnly').checked = promo.firstTimeOnly || false;
+      document.getElementById('promoNotes').value = promo.notes || '';
+
+      // Set country scope
+      if (promo.countries && promo.countries.length > 0) {
+        document.getElementById('countryScope').value = 'specific';
+        document.getElementById('countrySelectWrapper').style.display = 'block';
+        promo.countries.forEach(country => {
+          const checkbox = document.querySelector(`input.country-checkbox[value="${country}"]`);
+          if (checkbox) checkbox.checked = true;
+        });
+      }
+
+      // Show usage stats
+      document.getElementById('usageCard').style.display = 'block';
+      document.getElementById('usageCount').textContent = promo.usageCount || 0;
+      
+      if (promo.usageLimit) {
+        const percentage = ((promo.usageCount || 0) / promo.usageLimit * 100);
+        document.getElementById('usageProgress').style.width = `${percentage}%`;
+        document.getElementById('usageLabel').textContent = `${promo.usageCount || 0} / ${promo.usageLimit} uses`;
+      } else {
+        document.getElementById('usageProgressWrapper').style.display = 'none';
+      }
+
+      updatePreview();
+    }
+
+    function toggleCountrySelect() {
+      const isSpecific = document.getElementById('countryScope').value === 'specific';
+      document.getElementById('countrySelectWrapper').style.display = isSpecific ? 'block' : 'none';
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const code = document.getElementById('promoCode').value || 'CODE';
+      const discount = document.getElementById('promoDiscount').value || '0';
+      const products = document.getElementById('promoProducts').value;
+      const scope = document.getElementById('countryScope').value;
+      const startDate = document.getElementById('promoStartDate').value;
+      const endDate = document.getElementById('promoEndDate').value;
+
+      document.getElementById('previewCode').textContent = code.toUpperCase();
+      document.getElementById('previewDiscount').textContent = `${discount}%`;
+      document.getElementById('previewProducts').textContent = products === 'all' ? 'All Products' : products;
+      
+      if (scope === 'specific') {
+        const selected = document.querySelectorAll('.country-checkbox:checked');
+        document.getElementById('previewRegion').textContent = selected.length > 0 ? `${selected.length} countries` : 'Select countries';
+      } else {
+        document.getElementById('previewRegion').textContent = 'Global';
+      }
+
+      document.getElementById('previewStart').textContent = startDate || '-';
+      document.getElementById('previewEnd').textContent = endDate || '-';
+
+      // Update status badge
+      const today = new Date().toISOString().split('T')[0];
+      let status = 'Active';
+      let statusClass = 'text-bg-success';
+      if (startDate > today) {
+        status = 'Scheduled';
+        statusClass = 'text-bg-info';
+      } else if (endDate < today) {
+        status = 'Expired';
+        statusClass = 'text-bg-secondary';
+      }
+      document.getElementById('previewStatus').textContent = status;
+      document.getElementById('previewStatus').className = `badge ${statusClass} ms-1`;
+    }
+
+    function generateCode() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById('promoCode').value = code;
+      updatePreview();
+    }
+
+    function savePromo(event) {
+      event.preventDefault();
+      
+      const id = document.getElementById('promoId').value;
+      const existingPromo = id ? AdminData.getPromos().find(p => p.id === id) : null;
+      
+      // Get selected countries
+      const isGlobalScope = document.getElementById('countryScope').value === 'global';
+      let countries = [];
+      if (!isGlobalScope) {
+        countries = Array.from(document.querySelectorAll('.country-checkbox:checked')).map(cb => cb.value);
+        if (countries.length === 0) {
+          showToast('Please select at least one country', 'warning');
+          return;
+        }
+      }
+      
+      const promo = {
+        id: id || 'PROMO-' + Date.now(),
+        code: document.getElementById('promoCode').value.toUpperCase(),
+        discount: parseInt(document.getElementById('promoDiscount').value),
+        description: document.getElementById('promoDescription').value,
+        startDate: document.getElementById('promoStartDate').value,
+        endDate: document.getElementById('promoEndDate').value,
+        applicableProducts: document.getElementById('promoProducts').value,
+        usageLimit: parseInt(document.getElementById('promoUsageLimit').value) || null,
+        minOrder: parseFloat(document.getElementById('promoMinOrder').value) || 0,
+        maxDiscountAmount: parseFloat(document.getElementById('promoMaxDiscount').value) || null,
+        customerLimit: parseInt(document.getElementById('promoCustomerLimit').value) || null,
+        firstTimeOnly: document.getElementById('promoFirstTimeOnly').checked,
+        notes: document.getElementById('promoNotes').value,
+        countries: countries,
+        usageCount: existingPromo ? existingPromo.usageCount : 0
+      };
+      
+      // Validate code uniqueness
+      const existingCode = AdminData.getPromos().find(p => 
+        p.code.toUpperCase() === promo.code && p.id !== promo.id
+      );
+      if (existingCode) {
+        showToast('Promo code already exists', 'danger');
+        return;
+      }
+      
+      if (id) {
+        AdminData.updatePromo(promo);
+      } else {
+        AdminData.addPromo(promo);
+      }
+      
+      // Redirect back with success message
+      window.location.href = `promos.html?success=${id ? 'updated' : 'created'}`;
+    }
+  </script>
+</body>
+</html>
