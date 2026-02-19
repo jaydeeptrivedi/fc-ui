@@ -107,6 +107,9 @@ function initializeLayout() {
         </div>
         ` : ''}
         <div class="d-flex gap-2 align-items-center">
+          <a href="./demo.html" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to Demo Quicklinks
+          </a>
           ${!isLoggedIn ? `
           <a class="btn btn-sm btn-outline-light" href="./registration.html" title="Create Account">
             <span style="font-size: 14px;">+ Sign Up</span>
