@@ -1,5 +1,5 @@
 /**
- * Admin Portal - Data Management (Local Storage)
+ * Subscription Portal - Data Management (Local Storage)
  * Provides CRUD operations for Products, Subscriptions, and Promos
  */
 

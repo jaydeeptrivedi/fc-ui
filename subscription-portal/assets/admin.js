@@ -1,5 +1,5 @@
 /**
- * Admin Portal - Shared JavaScript Utilities
+ * Subscription Portal - Shared JavaScript Utilities
  */
 
 // Auth check and UI initialization
@@ -321,5 +321,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Console info
-console.log('%cFC Admin Portal', 'font-size: 20px; font-weight: bold; color: #0d6efd;');
+console.log('%cFC Subscription Portal', 'font-size: 20px; font-weight: bold; color: #0d6efd;');
 console.log('%cManage products, subscriptions, and promo codes', 'font-size: 12px; color: #6c757d;');
