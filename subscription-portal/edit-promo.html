@@ -438,8 +438,43 @@
     function savePromo(event) {
       event.preventDefault();
       
+      const form = document.getElementById('promoForm');
+      
+      // Clear previous validation states
+      form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      
+      let isValid = true;
+      
       const id = document.getElementById('promoId').value;
       const existingPromo = id ? AdminData.getPromos().find(p => p.id === id) : null;
+      
+      // Date validation
+      const startDate = document.getElementById('promoStartDate');
+      const endDate = document.getElementById('promoEndDate');
+      if (startDate.value && endDate.value && new Date(startDate.value) > new Date(endDate.value)) {
+        endDate.classList.add('is-invalid');
+        showToast('End date must be after start date', 'danger');
+        isValid = false;
+      }
+      
+      // Discount validation
+      const discountInput = document.getElementById('promoDiscount');
+      const discountValue = parseInt(discountInput.value);
+      if (discountValue < 1 || discountValue > 100) {
+        discountInput.classList.add('is-invalid');
+        showToast('Discount must be between 1% and 100%', 'danger');
+        isValid = false;
+      }
+      
+      // Check HTML5 validation
+      if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        isValid = false;
+      }
+      
+      if (!isValid) {
+        return;
+      }
       
       // Get selected countries
       const isGlobalScope = document.getElementById('countryScope').value === 'global';

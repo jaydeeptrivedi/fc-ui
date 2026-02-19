@@ -27,7 +27,7 @@
         <ul class="dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
           <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="../index.html"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
+          <li><a class="dropdown-item" href="#" onclick="AdminData.logout(); return false;"><i class="bi bi-box-arrow-left me-2"></i>Logout</a></li>
         </ul>
       </div>
       <a href="../index.html" class="btn btn-outline-light btn-sm ms-2">
@@ -74,9 +74,20 @@
         <h4 class="fw-bold mb-0">Promo Codes Management</h4>
         <p class="text-secondary mb-0">Create and manage discount promo codes</p>
       </div>
-      <a href="edit-promo.html" class="btn btn-primary" id="createPromoBtn" data-requires-edit>
-        <i class="bi bi-plus-lg me-1"></i>Create Promo Code
-      </a>
+      <div class="d-flex gap-2">
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-gear me-1"></i>Actions
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#" onclick="exportPromos(); return false;"><i class="bi bi-download me-2"></i>Export to CSV</a></li>
+            <!--<li><a class="dropdown-item" href="#" onclick="window.print(); return false;"><i class="bi bi-printer me-2"></i>Print</a></li>-->
+          </ul>
+        </div>
+        <a href="edit-promo.html" class="btn btn-primary" id="createPromoBtn" data-requires-edit>
+          <i class="bi bi-plus-lg me-1"></i>Create Promo Code
+        </a>
+      </div>
     </div>
 
     <!-- Filters -->
@@ -159,6 +170,19 @@
 
     <!-- Promos Table -->
     <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-2 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <label class="small text-secondary mb-0">Show</label>
+          <select id="pageSize" class="form-select form-select-sm" style="width: auto;" onchange="changePageSize()">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <span class="small text-secondary">entries</span>
+        </div>
+        <div class="small text-secondary" id="tableInfo">Showing 0 of 0</div>
+      </div>
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
@@ -180,6 +204,19 @@
             </tbody>
           </table>
         </div>
+      </div>
+      <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
+        <div class="small text-secondary" id="pageInfo">Page 1 of 1</div>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" id="prevPage">
+              <a class="page-link" href="#" onclick="changePage(-1); return false;"><i class="bi bi-chevron-left"></i></a>
+            </li>
+            <li class="page-item" id="nextPage">
+              <a class="page-link" href="#" onclick="changePage(1); return false;"><i class="bi bi-chevron-right"></i></a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
   </main>
@@ -212,6 +249,9 @@
   <script>
     let deleteModalInstance;
     let promoToDelete = null;
+    let currentPage = 1;
+    let pageSize = 25;
+    let filteredData = [];
 
     document.addEventListener('DOMContentLoaded', () => {
       deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteModal'));
@@ -247,12 +287,12 @@
       }
       
       // Filter listeners
-      document.getElementById('searchPromos').addEventListener('input', renderPromos);
-      document.getElementById('filterStatus').addEventListener('change', renderPromos);
-      document.getElementById('filterCountry')?.addEventListener('change', renderPromos);
-      document.getElementById('filterProduct').addEventListener('change', renderPromos);
-      document.getElementById('filterMinDiscount').addEventListener('input', renderPromos);
-      document.getElementById('filterMaxDiscount').addEventListener('input', renderPromos);
+      document.getElementById('searchPromos').addEventListener('input', () => { currentPage = 1; renderPromos(); });
+      document.getElementById('filterStatus').addEventListener('change', () => { currentPage = 1; renderPromos(); });
+      document.getElementById('filterCountry')?.addEventListener('change', () => { currentPage = 1; renderPromos(); });
+      document.getElementById('filterProduct').addEventListener('change', () => { currentPage = 1; renderPromos(); });
+      document.getElementById('filterMinDiscount').addEventListener('input', () => { currentPage = 1; renderPromos(); });
+      document.getElementById('filterMaxDiscount').addEventListener('input', () => { currentPage = 1; renderPromos(); });
       
       // Delete confirmation
       document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
@@ -264,6 +304,21 @@
         }
       });
     });
+
+    function changePageSize() {
+      pageSize = parseInt(document.getElementById('pageSize').value);
+      currentPage = 1;
+      renderPromos();
+    }
+
+    function changePage(delta) {
+      const totalPages = Math.ceil(filteredData.length / pageSize);
+      const newPage = currentPage + delta;
+      if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        renderPromos();
+      }
+    }
 
     function getPromoStatus(promo) {
       const today = new Date().toISOString().split('T')[0];
@@ -313,14 +368,29 @@
       document.getElementById('expiredCount').textContent = allPromos.filter(p => getPromoStatus(p) === 'expired').length;
       document.getElementById('totalUsage').textContent = allPromos.reduce((sum, p) => sum + (p.usageCount || 0), 0);
       
+      // Store filtered data for pagination
+      filteredData = promos;
+      const totalPages = Math.ceil(filteredData.length / pageSize);
+      const startIdx = (currentPage - 1) * pageSize;
+      const endIdx = startIdx + pageSize;
+      const pageData = filteredData.slice(startIdx, endIdx);
+      
+      // Update pagination info
+      document.getElementById('tableInfo').textContent = filteredData.length > 0 
+        ? `Showing ${startIdx + 1}-${Math.min(endIdx, filteredData.length)} of ${filteredData.length}`
+        : 'Showing 0 of 0';
+      document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages || 1}`;
+      document.getElementById('prevPage').classList.toggle('disabled', currentPage <= 1);
+      document.getElementById('nextPage').classList.toggle('disabled', currentPage >= totalPages);
+      
       const tbody = document.getElementById('promosTableBody');
       
-      if (promos.length === 0) {
+      if (filteredData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-secondary">No promo codes found</td></tr>';
         return;
       }
       
-      tbody.innerHTML = promos.map(p => {
+      tbody.innerHTML = pageData.map(p => {
         const status = getPromoStatus(p);
         const isGlobal = !p.countries || p.countries.length === 0;
         return `
@@ -417,6 +487,22 @@
       document.getElementById('filterMinDiscount').value = '';
       document.getElementById('filterMaxDiscount').value = '';
       renderPromos();
+    }
+
+    function exportPromos() {
+      const promos = AdminData.getAccessiblePromos();
+      const headers = ['Code', 'Discount %', 'Description', 'Start Date', 'End Date', 'Products', 'Countries', 'Usage'];
+      const data = promos.map(p => ({
+        code: p.code,
+        discount: p.discount,
+        description: p.description,
+        startDate: p.startDate,
+        endDate: p.endDate,
+        products: p.applicableProducts,
+        countries: p.countries ? p.countries.join(', ') : 'Global',
+        usage: `${p.usageCount || 0}${p.usageLimit ? '/' + p.usageLimit : ''}`
+      }));
+      exportToCSV(data, 'promo_codes', headers);
     }
   </script>
 </body>

@@ -184,18 +184,15 @@ const AdminData = {
     const endDate = nextYear.toISOString().split('T')[0];
 
     return [
+      // Austria - visible to Germany/Austria/Switzerland regional users
       {
         id: 'SUB-001',
-        // Product info
         product: 'Client API',
         productType: 'Client API',
         plan: 'Tier 1',
-        // Dates
         start: startDate,
         expiry: endDate,
-        // Devices
         devices: ['device001', 'device002'],
-        // Billing
         billing: 'Self Pay',
         billingProfile: {
           billName: 'Vineyard Solutions GmbH',
@@ -205,82 +202,265 @@ const AdminData = {
           billVat: 'ATU12345678',
           billMethod: 'Self Pay'
         },
-        // Status & Cost
         status: 'Active',
-        cost: 109,  // €49 tier + 2 devices × €30
+        cost: 109,
         promoCode: '',
         notes: 'Annual contract - 2 devices',
-        // Payment
         paymentMethod: 'Online',
         invoiceNumber: 'INV-2025-001'
       },
+      // Germany - visible to Germany/Austria/Switzerland regional users
       {
         id: 'SUB-002',
-        product: 'Disease Models - Apple (2 licenses)',
+        product: 'Disease Models - Apple (3 licenses)',
         productType: 'Disease Models',
         plan: 'DM License',
         crop: 'apple',
         cropName: 'Apple',
-        licenses: 2,
+        licenses: 3,
         start: startDate,
         expiry: endDate,
-        devices: ['device001', 'device003'],
+        devices: ['device010', 'device011', 'device012'],
         billing: 'Self Pay',
         billingProfile: {
-          billName: 'AgriTech Italia S.r.l.',
-          billEmail: 'billing@agritech.it',
-          billAddress: 'Via Roma 100, Milan, 20100',
+          billName: 'Bayern Obst GmbH',
+          billEmail: 'billing@bayern-obst.de',
+          billAddress: 'Obstweg 15, Munich, 80331',
+          billCountry: 'Germany',
+          billVat: 'DE123456789',
+          billMethod: 'Self Pay'
+        },
+        status: 'Active',
+        cost: 288,
+        promoCode: 'GERMANY15',
+        notes: 'German market - apple disease models',
+        paymentMethod: 'Invoice',
+        invoiceNumber: 'INV-2025-002'
+      },
+      // France - visible to France/Belgium regional users
+      {
+        id: 'SUB-003',
+        product: 'Client API',
+        productType: 'Client API',
+        plan: 'Tier 2',
+        start: startDate,
+        expiry: endDate,
+        devices: ['device020', 'device021', 'device022', 'device023'],
+        billing: 'Self Pay',
+        billingProfile: {
+          billName: 'Vignobles Bordeaux SARL',
+          billEmail: 'comptabilite@vignobles-bordeaux.fr',
+          billAddress: '45 Rue du Vin, Bordeaux, 33000',
+          billCountry: 'France',
+          billVat: 'FR12345678901',
+          billMethod: 'Self Pay'
+        },
+        status: 'Active',
+        cost: 369,
+        promoCode: 'FRANCE25',
+        notes: 'French vineyard - Tier 2 with 4 devices',
+        paymentMethod: 'Online',
+        invoiceNumber: 'INV-2025-003'
+      },
+      // France - visible to France/Belgium regional users
+      {
+        id: 'SUB-004',
+        product: 'Disease Models - Grape (5 licenses)',
+        productType: 'Disease Models',
+        plan: 'DM License',
+        crop: 'grape',
+        cropName: 'Grape / Vine',
+        licenses: 5,
+        start: startDate,
+        expiry: endDate,
+        devices: ['device024', 'device025', 'device026', 'device027', 'device028'],
+        billing: 'Self Pay',
+        billingProfile: {
+          billName: 'Champagne Laurent & Fils',
+          billEmail: 'admin@champagne-laurent.fr',
+          billAddress: '12 Avenue Champagne, Reims, 51100',
+          billCountry: 'France',
+          billVat: 'FR98765432109',
+          billMethod: 'Self Pay'
+        },
+        status: 'Active',
+        cost: 480,
+        promoCode: '',
+        notes: 'Champagne region - grape disease models',
+        paymentMethod: 'Invoice',
+        invoiceNumber: 'INV-2025-004'
+      },
+      // Belgium - visible to France/Belgium regional users
+      {
+        id: 'SUB-005',
+        product: 'FarmView with Satellite for 15 CropZones',
+        productType: 'FarmView',
+        plan: 'Standard',
+        cropZones: 15,
+        start: startDate,
+        expiry: endDate,
+        devices: [],
+        billing: 'Self Pay',
+        billingProfile: {
+          billName: 'Ferme Belge NV',
+          billEmail: 'info@ferme-belge.be',
+          billAddress: 'Landbouwstraat 88, Brussels, 1000',
+          billCountry: 'Belgium',
+          billVat: 'BE0123456789',
+          billMethod: 'Self Pay'
+        },
+        status: 'Active',
+        cost: 750,
+        promoCode: '',
+        notes: 'Belgian farm - FarmView subscription',
+        paymentMethod: 'Online',
+        invoiceNumber: 'INV-2025-005'
+      },
+      // Spain - visible to Spain/Portugal regional users
+      {
+        id: 'SUB-006',
+        product: 'Client API',
+        productType: 'Client API',
+        plan: 'Tier 3',
+        start: startDate,
+        expiry: endDate,
+        devices: ['device030', 'device031', 'device032', 'device033', 'device034', 'device035'],
+        billing: 'Self Pay',
+        billingProfile: {
+          billName: 'Olivares del Sol S.L.',
+          billEmail: 'contabilidad@olivares-sol.es',
+          billAddress: 'Calle Olivo 100, Sevilla, 41001',
+          billCountry: 'Spain',
+          billVat: 'ES12345678A',
+          billMethod: 'Self Pay'
+        },
+        status: 'Active',
+        cost: 679,
+        promoCode: 'SPAIN30',
+        notes: 'Spanish olive farm - Tier 3 enterprise',
+        paymentMethod: 'Invoice',
+        invoiceNumber: 'INV-2025-006'
+      },
+      // Spain - visible to Spain/Portugal regional users
+      {
+        id: 'SUB-007',
+        product: 'Disease Models - Citrus (8 licenses)',
+        productType: 'Disease Models',
+        plan: 'DM License',
+        crop: 'citrus',
+        cropName: 'Citrus',
+        licenses: 8,
+        start: startDate,
+        expiry: endDate,
+        devices: ['device040', 'device041', 'device042', 'device043', 'device044', 'device045', 'device046', 'device047'],
+        billing: 'Self Pay',
+        billingProfile: {
+          billName: 'Naranjas Valencia SL',
+          billEmail: 'admin@naranjas-valencia.es',
+          billAddress: 'Avenida Naranja 55, Valencia, 46001',
+          billCountry: 'Spain',
+          billVat: 'ESB87654321',
+          billMethod: 'Self Pay'
+        },
+        status: 'Active',
+        cost: 656,
+        promoCode: '',
+        notes: 'Valencia citrus - disease models',
+        paymentMethod: 'Online',
+        invoiceNumber: 'INV-2025-007'
+      },
+      // Portugal - visible to Spain/Portugal regional users
+      {
+        id: 'SUB-008',
+        product: 'Client API',
+        productType: 'Client API',
+        plan: 'Tier 2',
+        start: startDate,
+        expiry: endDate,
+        devices: ['device050', 'device051'],
+        billing: 'Self Pay',
+        billingProfile: {
+          billName: 'Vinhos do Douro Lda',
+          billEmail: 'financeiro@vinhos-douro.pt',
+          billAddress: 'Rua do Porto 200, Porto, 4050',
+          billCountry: 'Portugal',
+          billVat: 'PT123456789',
+          billMethod: 'Self Pay'
+        },
+        status: 'Active',
+        cost: 309,
+        promoCode: '',
+        notes: 'Portuguese vineyard - Douro region',
+        paymentMethod: 'Online',
+        invoiceNumber: 'INV-2025-008'
+      },
+      // Italy - visible to Italy regional users
+      {
+        id: 'SUB-009',
+        product: 'Client API',
+        productType: 'Client API',
+        plan: 'Tier 2',
+        start: startDate,
+        expiry: endDate,
+        devices: ['device060', 'device061', 'device062'],
+        billing: 'Self Pay',
+        billingProfile: {
+          billName: 'AgriTech Toscana S.r.l.',
+          billEmail: 'billing@agritech-toscana.it',
+          billAddress: 'Via Roma 100, Florence, 50100',
           billCountry: 'Italy',
           billVat: 'IT12345678901',
           billMethod: 'Self Pay'
         },
         status: 'Active',
-        cost: 192,  // 2 licenses × €96
-        promoCode: '',
-        notes: 'Apple disease models - 2 devices',
-        // Payment
+        cost: 339,
+        promoCode: 'ITALY20',
+        notes: 'Tuscan agriculture - API subscription',
         paymentMethod: 'Invoice',
-        invoiceNumber: 'INV-2025-002'
+        invoiceNumber: 'INV-2025-009'
       },
+      // Italy - visible to Italy regional users
       {
-        id: 'SUB-003',
-        product: 'FarmView with Satellite for 25 CropZones for 1 year',
-        productType: 'FarmView',
-        plan: 'Some Plan',
-        cropZones: 25,
-        start: '2025-06-17',
-        expiry: '2026-06-17',
-        devices: [],
+        id: 'SUB-010',
+        product: 'Disease Models - Grape (10 licenses)',
+        productType: 'Disease Models',
+        plan: 'DM License',
+        crop: 'grape',
+        cropName: 'Grape / Vine',
+        licenses: 10,
+        start: startDate,
+        expiry: endDate,
+        devices: ['device070', 'device071', 'device072', 'device073', 'device074', 'device075', 'device076', 'device077', 'device078', 'device079'],
         billing: 'Self Pay',
         billingProfile: {
-          billName: 'Farm Management Inc',
-          billEmail: 'billing@farmmanagement.com',
-          billAddress: '123 Farm Road, Munich, 80331',
-          billCountry: 'Germany',
-          billVat: '',
+          billName: 'Vini Piemonte SpA',
+          billEmail: 'contabilita@vini-piemonte.it',
+          billAddress: 'Strada del Vino 50, Turin, 10100',
+          billCountry: 'Italy',
+          billVat: 'IT98765432109',
           billMethod: 'Self Pay'
         },
         status: 'Active',
-        cost: 125,
+        cost: 820,
         promoCode: '',
-        notes: 'FarmView subscription',
-        // Payment
+        notes: 'Piedmont wines - grape disease models',
         paymentMethod: 'Online',
-        invoiceNumber: 'INV-2025-003'
+        invoiceNumber: 'INV-2025-010'
       },
+      // Switzerland - visible to Germany/Austria/Switzerland regional users
       {
-        id: 'SUB-004',
+        id: 'SUB-011',
         product: 'Weather Forecast',
         productType: 'Weather Forecast',
-        plan: 'Some Plan',
+        plan: 'Standard',
         start: '2025-10-27',
         expiry: '2026-10-27',
         devices: [],
         billing: 'Reseller',
         billingProfile: {
-          billName: 'Weather Analytics Corp',
-          billEmail: 'accounts@weatheranalytics.com',
-          billAddress: '500 Data Drive, Zurich, 8001',
+          billName: 'Weather Analytics AG',
+          billEmail: 'accounts@weatheranalytics.ch',
+          billAddress: 'Bahnhofstrasse 50, Zurich, 8001',
           billCountry: 'Switzerland',
           billVat: 'CHE-123.456.789',
           billMethod: 'Reseller'
@@ -288,8 +468,33 @@ const AdminData = {
         status: 'Pending',
         cost: 99,
         promoCode: 'WELCOME10',
-        notes: 'Reseller billing',
-        // Payment
+        notes: 'Swiss weather analytics - Reseller billing',
+        paymentMethod: 'Invoice',
+        invoiceNumber: ''
+      },
+      // Pending Client API - Tier 3 with 10 devices (Germany)
+      {
+        id: 'SUB-012',
+        product: 'Client API',
+        productType: 'Client API',
+        plan: 'Tier 3',
+        tier: 3,
+        start: '2026-03-01',
+        expiry: '2027-03-01',
+        devices: ['device100', 'device101', 'device102', 'device103', 'device104', 'device105', 'device106', 'device107', 'device108', 'device109'],
+        billing: 'Self Pay',
+        billingProfile: {
+          billName: 'Precision Farming Solutions GmbH',
+          billEmail: 'invoices@precision-farming.de',
+          billAddress: 'Agrarstrasse 88, Hamburg, 20095',
+          billCountry: 'Germany',
+          billVat: 'DE987654321',
+          billMethod: 'Self Pay'
+        },
+        status: 'Pending',
+        cost: 799,
+        promoCode: '',
+        notes: 'Enterprise client - Tier 3 (1500 calls/day) with 10 devices. Awaiting invoice payment.',
         paymentMethod: 'Invoice',
         invoiceNumber: ''
       }
@@ -419,6 +624,84 @@ const AdminData = {
         usageCount: 34,
         countries: ['Germany', 'Austria', 'Switzerland'], // Multi-country promo
         notes: 'Central Europe promotion'
+      },
+      {
+        id: 'PROMO-007',
+        code: 'ITALY20',
+        discount: 20,
+        description: '20% Italy vineyard special',
+        startDate: startDate,
+        endDate: endDate,
+        applicableProducts: 'Disease Models',
+        usageLimit: 75,
+        usageCount: 18,
+        countries: ['Italy'], // Italy-specific promo
+        notes: 'Italian vineyard campaign'
+      },
+      {
+        id: 'PROMO-008',
+        code: 'BENELUX15',
+        discount: 15,
+        description: '15% Benelux region offer',
+        startDate: startDate,
+        endDate: endDate,
+        applicableProducts: 'all',
+        usageLimit: 60,
+        usageCount: 22,
+        countries: ['Belgium', 'Netherlands'], // Benelux promo
+        notes: 'Benelux market promotion'
+      },
+      {
+        id: 'PROMO-009',
+        code: 'IBERIA25',
+        discount: 25,
+        description: '25% Iberian Peninsula offer',
+        startDate: startDate,
+        endDate: endDate,
+        applicableProducts: 'all',
+        usageLimit: 80,
+        usageCount: 15,
+        countries: ['Spain', 'Portugal'], // Iberia promo
+        notes: 'Spain & Portugal joint promotion'
+      },
+      {
+        id: 'PROMO-010',
+        code: 'FRANCEVINE20',
+        discount: 20,
+        description: '20% French vineyard special',
+        startDate: startDate,
+        endDate: endDate,
+        applicableProducts: 'Disease Models',
+        usageLimit: 100,
+        usageCount: 31,
+        countries: ['France'], // France disease models promo
+        notes: 'French wine region campaign'
+      },
+      {
+        id: 'PROMO-011',
+        code: 'PORTOWINE15',
+        discount: 15,
+        description: '15% Portugal wine region',
+        startDate: startDate,
+        endDate: endDate,
+        applicableProducts: 'all',
+        usageLimit: 40,
+        usageCount: 9,
+        countries: ['Portugal'], // Portugal promo
+        notes: 'Portuguese wine region offer'
+      },
+      {
+        id: 'PROMO-012',
+        code: 'AUSTRIA10',
+        discount: 10,
+        description: '10% Austria loyalty discount',
+        startDate: startDate,
+        endDate: endDate,
+        applicableProducts: 'Client API',
+        usageLimit: 50,
+        usageCount: 14,
+        countries: ['Austria'], // Austria promo
+        notes: 'Austrian customer loyalty program'
       }
     ];
   },
