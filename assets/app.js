@@ -330,12 +330,12 @@ function upgradeManage(){ mPlan.value = bumpTier(mPlan.value); }
 function cancelManage(){ mStatus.value = "Cancelled"; }
 function deleteManage(){
   if (manageIndex === null) return;
-  const ok = confirm("Delete this subscription entry? (demo only)");
-  if (!ok) return;
-  seed.splice(manageIndex, 1);
-  manageIndex = null;
-  render();
-  manageModal?.hide();
+  confirmAction('Delete this subscription entry?', () => {
+    seed.splice(manageIndex, 1);
+    manageIndex = null;
+    render();
+    manageModal?.hide();
+  }, { title: 'Delete Subscription', confirmText: 'Delete' });
 }
 mSave?.addEventListener("click", saveManage);
 mRenew?.addEventListener("click", renewManage);
@@ -975,6 +975,48 @@ document.addEventListener("input", (e) => {
 newBtn?.addEventListener("click", openWizard);
 refreshBtn?.addEventListener("click", render);
 
+// Actions dropdown functions
+function refreshData() {
+  render();
+  // Show brief feedback
+  const toast = document.createElement('div');
+  toast.className = 'position-fixed bottom-0 end-0 p-3';
+  toast.innerHTML = `
+    <div class="toast show" role="alert">
+      <div class="toast-body d-flex align-items-center">
+        <i class="bi bi-check-circle text-success me-2"></i>
+        Data refreshed
+      </div>
+    </div>
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+function exportToCSV() {
+  const headers = ['Product', 'Plan', 'Billing', 'Start Date', 'End Date', 'Status', 'Cost'];
+  const rows = seed.map(row => [
+    row.product || '',
+    row.plan || row.tier || '',
+    row.billing || '',
+    row.start || row.startDate || '',
+    row.expiry || row.endDate || '',
+    row.status || '',
+    row.cost || ''
+  ]);
+  
+  const csvContent = [headers, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `subscriptions_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
 // --- Manage modal wizard state & helpers ---
 let manageWizard = {
   step: 1,
@@ -1180,12 +1222,11 @@ function manageRenderStep() {
     if (upBtn) upBtn.onclick = () => { manageWizard.mode = 'upgrade-tier'; manageWizard.step = 2; manageRenderStep(); };
     if (quotaBtn) quotaBtn.onclick = () => { manageWizard.mode = 'check-quota'; manageWizard.step = 2; manageRenderStep(); };
     if (delBtn) delBtn.onclick = () => {
-      const ok = confirm(`Delete subscription "${sub.product}"? (demo only)`);
-      if (ok) {
+      confirmAction(`Delete subscription "${sub.product}"?`, () => {
         seed.splice(manageWizard.subId, 1);
         bootstrap.Modal.getInstance(manageModalEl)?.hide();
         render();
-      }
+      }, { title: 'Delete Subscription', confirmText: 'Delete' });
     };
     
     // Hide Back and Next buttons on step 1
@@ -1702,6 +1743,54 @@ function escapeHtml(str) {
     .replaceAll(">", "&gt;")
     .replaceAll("\"", "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+// Confirm action with Bootstrap modal
+function confirmAction(message, onConfirm, options = {}) {
+  const title = options.title || 'Confirm Action';
+  const confirmText = options.confirmText || 'Delete';
+  const confirmClass = options.confirmClass || 'btn-danger';
+  
+  let modalEl = document.getElementById('confirmActionModal');
+  if (!modalEl) {
+    modalEl = document.createElement('div');
+    modalEl.id = 'confirmActionModal';
+    modalEl.className = 'modal fade';
+    modalEl.tabIndex = -1;
+    modalEl.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title" id="confirmModalTitle"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="confirmModalBody"></div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn" id="confirmModalBtn"></button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modalEl);
+  }
+  
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalBody').textContent = message;
+  const confirmBtn = document.getElementById('confirmModalBtn');
+  confirmBtn.textContent = confirmText;
+  confirmBtn.className = `btn ${confirmClass}`;
+  
+  const handleConfirm = () => {
+    modal.hide();
+    onConfirm();
+  };
+  
+  confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+  document.getElementById('confirmModalBtn').addEventListener('click', handleConfirm);
+  
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
 }
 
 // Init

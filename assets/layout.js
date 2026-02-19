@@ -115,9 +115,9 @@ function initializeLayout() {
           ${isLoggedIn ? `
           <button class="btn btn-sm btn-outline-light" id="logoutBtn" type="button" title="Sign Out">Sign Out</button>
           ` : ''}
-          <button class="btn btn-sm btn-outline-light" type="button" title="Notifications">🔔</button>
-          <button class="btn btn-sm btn-outline-light" type="button" title="Profile">👤</button>
-          <button class="btn btn-sm btn-outline-light" type="button" title="Settings">⚙️</button>
+          <button class="btn btn-sm btn-outline-light" type="button" title="Notifications" aria-label="Notifications"><i class="bi bi-bell"></i></button>
+          <button class="btn btn-sm btn-outline-light" type="button" title="Profile" aria-label="Profile"><i class="bi bi-person-circle"></i></button>
+          <button class="btn btn-sm btn-outline-light" type="button" title="Settings" aria-label="Settings"><i class="bi bi-gear"></i></button>
         </div>
       </div>
     </nav>
@@ -137,12 +137,12 @@ function initializeLayout() {
 
   sidebar.innerHTML = `
     <div class="sidebar-rail d-flex flex-column align-items-center py-3 gap-2">
-      ${navItem('licenses', '🧾', 'User Licenses', './index.html', page)}
-      ${navItem('devices', '📡', 'Devices', '#', page)}
-      ${navItem('api', '🔌', 'API', '#', page)}
-      ${isOrg ? navItem('users', '👥', 'User Management', './user-management.html', page) : ''}
+      ${navItem('licenses', 'bi-card-checklist', 'User Licenses', './index.html', page)}
+      ${navItem('devices', 'bi-broadcast', 'Devices', '#', page)}
+      ${navItem('api', 'bi-plug', 'API', '#', page)}
+      ${isOrg ? navItem('users', 'bi-people', 'User Management', './user-management.html', page) : ''}
       <div class="flex-grow-1"></div>
-      ${navItem('help', '❓', 'Help', '#', page)}
+      ${navItem('help', 'bi-question-circle', 'Help', '#', page)}
     </div>
   `;
 
@@ -151,9 +151,71 @@ function initializeLayout() {
     return `
       <a class="btn ${active} sidebar-btn d-flex align-items-center justify-content-center"
          href="${href}" aria-label="${label}" title="${label}">
-        <span style="font-size:18px; line-height:1;">${icon}</span>
+        <i class="${icon}" style="font-size:18px;"></i>
       </a>
     `;
+  }
+}
+
+// Confirm action with Bootstrap modal
+function confirmAction(message, onConfirm, options = {}) {
+  const title = options.title || 'Confirm Action';
+  const confirmText = options.confirmText || 'Confirm';
+  const confirmClass = options.confirmClass || 'btn-danger';
+  
+  let modalEl = document.getElementById('confirmActionModal');
+  if (!modalEl) {
+    modalEl = document.createElement('div');
+    modalEl.id = 'confirmActionModal';
+    modalEl.className = 'modal fade';
+    modalEl.tabIndex = -1;
+    modalEl.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title" id="confirmModalTitle"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="confirmModalBody"></div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn" id="confirmModalBtn"></button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modalEl);
+  }
+  
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalBody').textContent = message;
+  const confirmBtn = document.getElementById('confirmModalBtn');
+  confirmBtn.textContent = confirmText;
+  confirmBtn.className = `btn ${confirmClass}`;
+  
+  const handleConfirm = () => {
+    modal.hide();
+    onConfirm();
+  };
+  
+  confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+  document.getElementById('confirmModalBtn').addEventListener('click', handleConfirm);
+  
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+}
+
+// Button loading state helpers
+function setButtonLoading(button, isLoading, loadingText = 'Loading...') {
+  if (!button) return;
+  
+  if (isLoading) {
+    button.dataset.originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span>${loadingText}`;
+  } else {
+    button.disabled = false;
+    button.innerHTML = button.dataset.originalText || button.innerHTML;
   }
 }
 
