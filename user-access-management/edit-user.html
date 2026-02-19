@@ -478,9 +478,8 @@
         }
       }
       
-      // Refresh data
-      currentUser = UAMData.getUser(currentUser.id);
-      loadUserData();
+      // Navigate back to users grid
+      setTimeout(() => window.location.href = 'users.html', 500);
     }
 
     function revokeAllAccess() {

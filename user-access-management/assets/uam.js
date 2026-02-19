@@ -239,9 +239,83 @@ function showToast(message, type = 'success') {
   });
 }
 
-// Confirm dialog
-function confirmAction(message) {
-  return confirm(message);
+// Confirm dialog with Bootstrap modal
+function confirmAction(message, onConfirm, options = {}) {
+  const title = options.title || 'Confirm Action';
+  const confirmText = options.confirmText || 'Delete';
+  const confirmClass = options.confirmClass || 'btn-danger';
+  
+  // Create modal if it doesn't exist
+  let modalEl = document.getElementById('confirmActionModal');
+  if (!modalEl) {
+    modalEl = document.createElement('div');
+    modalEl.id = 'confirmActionModal';
+    modalEl.className = 'modal fade';
+    modalEl.tabIndex = -1;
+    modalEl.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title" id="confirmModalTitle"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="confirmModalBody"></div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn" id="confirmModalBtn"></button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modalEl);
+  }
+  
+  // Update modal content
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalBody').textContent = message;
+  const confirmBtn = document.getElementById('confirmModalBtn');
+  confirmBtn.textContent = confirmText;
+  confirmBtn.className = `btn ${confirmClass}`;
+  
+  // Handle confirm
+  const handleConfirm = () => {
+    modal.hide();
+    if (onConfirm) onConfirm();
+  };
+  
+  // Remove old listener and add new one
+  confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+  document.getElementById('confirmModalBtn').addEventListener('click', handleConfirm);
+  
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+}
+
+// Button loading state helpers
+function setButtonLoading(button, isLoading, loadingText = 'Loading...') {
+  if (!button) return;
+  
+  if (isLoading) {
+    button.dataset.originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span>${loadingText}`;
+  } else {
+    button.disabled = false;
+    button.innerHTML = button.dataset.originalText || button.innerHTML;
+  }
+}
+
+// Table loading skeleton
+function showTableLoading(tbody, columns = 5, rows = 5) {
+  if (!tbody) return;
+  
+  const skeletonRows = Array(rows).fill(0).map(() => `
+    <tr>
+      ${Array(columns).fill(0).map(() => '<td><div class="skeleton-line"></div></td>').join('')}
+    </tr>
+  `).join('');
+  
+  tbody.innerHTML = skeletonRows;
 }
 
 // Copy to clipboard
@@ -276,6 +350,41 @@ function debounce(func, wait) {
 function logout() {
   UAMData.logout();
   window.location.href = 'signin.html';
+}
+
+// Export data to CSV
+function exportToCSV(data, filename, headers) {
+  if (!data || data.length === 0) {
+    showToast('No data to export', 'warning');
+    return;
+  }
+  
+  const csvRows = [];
+  
+  // Add headers
+  if (headers) {
+    csvRows.push(headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(','));
+  }
+  
+  // Add data rows
+  data.forEach(row => {
+    const values = Object.values(row).map(val => {
+      if (val === null || val === undefined) return '""';
+      if (typeof val === 'object') return `"${JSON.stringify(val).replace(/"/g, '""')}"`;
+      return `"${String(val).replace(/"/g, '""')}"`;
+    });
+    csvRows.push(values.join(','));
+  });
+  
+  const csvContent = csvRows.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+  
+  showToast('Export completed', 'success');
 }
 
 // Console branding

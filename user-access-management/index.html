@@ -313,7 +313,7 @@
             </div>
           </td>
           <td>${renderPortalBadge(user.subscriptionPortalRole)}</td>
-          <td>${renderCountryTags(user.assignedCountries, 2)}</td>
+          <td>${user.subscriptionPortalAccess ? renderCountryTags(user.assignedCountries, 2) : '<span class="text-secondary small">-</span>'}</td>
           <td class="small">${formatDate(user.accessGrantedAt)}</td>
           <td class="text-end pe-3">
             <a href="edit-user.html?id=${user.id}" class="btn btn-sm btn-outline-primary">
