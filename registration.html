@@ -6,6 +6,10 @@
   <title>Register - FC Platform</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="./assets/styles.css" />
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YJ0NXREMME"></script>
+  <script src="./assets/analytics.js"></script>
 </head>
 <body class="bg-light">
   <!-- Shared topbar -->
@@ -425,6 +429,11 @@
     };
 
     document.addEventListener('DOMContentLoaded', function() {
+      // Track registration flow start
+      if (typeof trackAuthEvent === 'function') {
+        trackAuthEvent('registration_start');
+      }
+
       document.getElementById('nextBtn').addEventListener('click', handleNext);
       document.getElementById('backBtn').addEventListener('click', handleBack);
       document.getElementById('submitBtn').addEventListener('click', handleSubmit);
@@ -562,12 +571,28 @@
     function handleNext() {
       if (!validateStep(currentStep)) return;
       
+      // Track step progression
+      if (typeof trackClick === 'function') {
+        trackClick('registration_next', {
+          current_step: currentStep,
+          next_step: currentStep + 1
+        });
+      }
+      
       saveStepData();
       currentStep++;
       updateUI();
     }
 
     function handleBack() {
+      // Track step regression
+      if (typeof trackClick === 'function') {
+        trackClick('registration_back', {
+          current_step: currentStep,
+          previous_step: currentStep - 1
+        });
+      }
+      
       currentStep--;
       updateUI();
     }
@@ -575,6 +600,13 @@
     function handleSubmit() {
       if (!document.getElementById('step4-terms').checked || !document.getElementById('step4-privacy').checked) {
         showError('step4', 'You must accept both terms and privacy policy');
+        // Track terms rejection
+        if (typeof trackError === 'function') {
+          trackError('registration_terms_not_accepted', {
+            terms_checked: document.getElementById('step4-terms').checked,
+            privacy_checked: document.getElementById('step4-privacy').checked
+          });
+        }
         return;
       }
 
@@ -599,31 +631,76 @@
 
         if (!username || !email || !password || !confirm) {
           showError('step1', 'All fields are required');
+          if (typeof trackError === 'function') {
+            trackError('registration_validation_error', {
+              step: 1,
+              reason: 'missing_required_fields',
+              fields: ['username', 'email', 'password', 'confirm_password'].filter(f => {
+                const val = f === 'username' ? username : f === 'email' ? email : f === 'password' ? password : confirm;
+                return !val;
+              })
+            });
+          }
           return false;
         }
 
         if (!isValidUsername(username)) {
           showError('step1', 'Username must be 3-20 characters (letters, numbers, underscores only)');
+          if (typeof trackError === 'function') {
+            trackError('registration_validation_error', {
+              step: 1,
+              field: 'username',
+              reason: 'invalid_format'
+            });
+          }
           return false;
         }
 
         if (!isValidEmail(email)) {
           showError('step1', 'Please enter a valid email address');
+          if (typeof trackError === 'function') {
+            trackError('registration_validation_error', {
+              step: 1,
+              field: 'email',
+              reason: 'invalid_format'
+            });
+          }
           return false;
         }
 
         if (password.length < 8 || password.length > 20) {
           showError('step1', 'Password must be 8-20 characters');
+          if (typeof trackError === 'function') {
+            trackError('registration_validation_error', {
+              step: 1,
+              field: 'password',
+              reason: 'invalid_length'
+            });
+          }
           return false;
         }
 
         if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
           showError('step1', 'Password must include uppercase, lowercase, and number');
+          if (typeof trackError === 'function') {
+            trackError('registration_validation_error', {
+              step: 1,
+              field: 'password',
+              reason: 'insufficient_complexity'
+            });
+          }
           return false;
         }
 
         if (password !== confirm) {
           showError('step1', 'Passwords do not match');
+          if (typeof trackError === 'function') {
+            trackError('registration_validation_error', {
+              step: 1,
+              field: 'password_confirm',
+              reason: 'mismatch'
+            });
+          }
           return false;
         }
         return true;
@@ -640,8 +717,23 @@
 
         if (!category || !focus || !firstName || !lastName || !country || !language) {
           showError('step2', 'All fields are required');
+          if (typeof trackError === 'function') {
+            trackError('registration_validation_error', {
+              step: 2,
+              reason: 'missing_required_fields'
+            });
+          }
           return false;
         }
+        
+        // Track category selection
+        if (typeof trackClick === 'function') {
+          trackClick('registration_category_selected', {
+            category: category,
+            focus: focus
+          });
+        }
+        
         return true;
       }
 
@@ -759,16 +851,43 @@
         otherRole: formData.otherRole
       };
 
+      // Track form submission
+      if (typeof trackFormSubmission === 'function') {
+        trackFormSubmission('registration_form', {
+          category: formData.category,
+          country: formData.country,
+          language: formData.language,
+          account_type: formData.accountType
+        });
+      }
+
       const result = storeUser(userData, formData.accountType);
 
       if (result.success) {
         document.getElementById('step4-success').textContent = `Registration successful! Redirecting to sign in...`;
         document.getElementById('step4-success').classList.remove('d-none');
+        
+        // Track registration completion
+        if (typeof trackAuthEvent === 'function') {
+          trackAuthEvent('registration_complete', {
+            email: userData.email,
+            category: userData.category,
+            country: userData.country
+          });
+        }
+        
         setTimeout(() => {
           window.location.href = 'signin.html?verified=true';
         }, 2000);
       } else {
         showError('step4', result.message);
+        // Track registration failure
+        if (typeof trackError === 'function') {
+          trackError('registration_submission_error', {
+            message: result.message,
+            category: formData.category
+          });
+        }
       }
     }
 

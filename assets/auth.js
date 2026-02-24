@@ -67,12 +67,26 @@ function storeUser(userData, type) {
     
     // Check if email already exists
     if (users.some(u => u.email === userData.email || (u.primaryContact && u.primaryContact.email === userData.email))) {
+      // Track registration failure due to duplicate email
+      if (typeof trackAuthEvent === 'function') {
+        trackAuthEvent('registration_failure', { 
+          reason: 'email_already_exists',
+          email: userData.email 
+        });
+      }
       return { success: false, message: 'Email already registered.' };
     }
 
     // Check if username already exists
     const username = userData.username || (userData.primaryContact && userData.primaryContact.username);
     if (username && users.some(u => u.username === username || (u.primaryContact && u.primaryContact.username === username))) {
+      // Track registration failure due to duplicate username
+      if (typeof trackAuthEvent === 'function') {
+        trackAuthEvent('registration_failure', { 
+          reason: 'username_already_taken',
+          username: username 
+        });
+      }
       return { success: false, message: 'Username already taken.' };
     }
     
@@ -91,8 +105,23 @@ function storeUser(userData, type) {
     // Also set current user session
     localStorage.setItem('fc_currentUser', JSON.stringify(newUser));
     
+    // Track successful registration
+    if (typeof trackAuthEvent === 'function') {
+      trackAuthEvent('registration_complete', { 
+        userType: type,
+        email: userData.email 
+      });
+    }
+    
     return { success: true, message: 'Account created successfully!', user: newUser };
   } catch (error) {
+    // Track registration error
+    if (typeof trackError === 'function') {
+      trackError('registration_error', { 
+        message: error.message,
+        userType: type 
+      });
+    }
     return { success: false, message: 'Error storing user data: ' + error.message };
   }
 }
@@ -113,7 +142,15 @@ function getCurrentUser() {
  * Logout user
  */
 function logoutUser() {
+  const currentUser = getCurrentUser();
   localStorage.removeItem('fc_currentUser');
+  
+  // Track logout event
+  if (typeof trackAuthEvent === 'function') {
+    trackAuthEvent('sign_out', { 
+      email: currentUser?.email || 'unknown' 
+    });
+  }
 }
 
 /**

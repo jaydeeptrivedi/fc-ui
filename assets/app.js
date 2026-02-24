@@ -347,6 +347,12 @@ mDelete?.addEventListener("click", deleteManage);
 function openWizard() {
   resetWizard();
   preloadBillingFromSettings();
+  
+  // Track new subscription attempt
+  if (typeof trackSubscriptionAction === 'function') {
+    trackSubscriptionAction('create_subscription');
+  }
+  
   wizard?.show();
 }
 
@@ -693,8 +699,10 @@ function completePayment() {
   const summary = buildSummary();
   const status = (summary.billing === "Self Pay") ? "Active" : "Pending";
   
+  let subscriptionData = {};
+  
   if (summary.type === 'DiseaseModel') {
-    seed.push({
+    subscriptionData = {
       product: `Disease Models - ${summary.cropName} (${summary.devs.length} license${summary.devs.length === 1 ? '' : 's'})`,
       start: summary.start,
       expiry: summary.end,
@@ -714,10 +722,10 @@ function completePayment() {
       },
       cost: Math.max(0, summary.cost - (currentDiscount ? calculateDiscount(summary.cost, currentDiscount) : 0)),
       discountApplied: currentPromoCode || null
-    });
+    };
   } else {
     // API subscription
-    seed.push({
+    subscriptionData = {
       product: `Client API (${summary.devs.length} device${summary.devs.length === 1 ? "" : "s"})`,
       start: summary.start,
       expiry: summary.end,
@@ -735,9 +743,23 @@ function completePayment() {
       },
       cost: Math.max(0, summary.cost - (currentDiscount ? calculateDiscount(summary.cost, currentDiscount) : 0)),
       discountApplied: currentPromoCode || null
-    });
+    };
   }
 
+  // Track subscription creation
+  if (typeof trackSubscriptionAction === 'function') {
+    trackSubscriptionAction('create_subscription', {
+      subscriptionType: summary.type,
+      plan: subscriptionData.plan,
+      deviceCount: subscriptionData.devices?.length || 0,
+      billing: subscriptionData.billing,
+      cost: subscriptionData.cost,
+      hasPromoCode: !!currentPromoCode,
+      status: status
+    });
+  }
+  
+  seed.push(subscriptionData);
   render();
   wizard?.hide();
 }
@@ -978,6 +1000,14 @@ refreshBtn?.addEventListener("click", render);
 // Actions dropdown functions
 function refreshData() {
   render();
+  
+  // Track refresh action
+  if (typeof trackClick === 'function') {
+    trackClick('refresh_subscriptions', {
+      category: 'subscription_management'
+    });
+  }
+  
   // Show brief feedback
   const toast = document.createElement('div');
   toast.className = 'position-fixed bottom-0 end-0 p-3';
@@ -1795,3 +1825,11 @@ function confirmAction(message, onConfirm, options = {}) {
 
 // Init
 render();
+
+// Track subscriptions page view
+if (typeof trackSubscriptionAction === 'function') {
+  trackSubscriptionAction('view_subscriptions', {
+    subscription_count: seed.length,
+    active_count: seed.filter(s => s.status === 'Active').length
+  });
+}
