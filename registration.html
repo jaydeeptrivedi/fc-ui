@@ -442,6 +442,7 @@
         trackRegistrationFunnelStep(1, null, {
           'funnel_name': 'registration_completion',
           'event_type': 'step_viewed',
+          'user_email': 'unknown',
           'event_source': 'registration_page_load',
           'timestamp': new Date().toISOString()
         });
@@ -595,11 +596,15 @@
       saveStepData();
       currentStep++;
       
+      // Get current email from form or formData
+      const email = formData.email || document.getElementById('step1-email').value || 'unknown';
+      
       // Track registration funnel progress - explicit step entry
       if (typeof trackRegistrationFunnelStep === 'function') {
         trackRegistrationFunnelStep(currentStep, null, {
           'funnel_name': 'registration_completion',
           'event_type': 'step_entered',
+          'user_email': email,
           'previous_step': currentStep - 1,
           'field_completion': 'valid'
         });
@@ -937,9 +942,11 @@
 
       // Track funnel step viewed
       if (typeof trackRegistrationFunnelStep === 'function') {
+        const email = formData.email || document.getElementById('step1-email').value || 'unknown';
         trackRegistrationFunnelStep(currentStep, null, {
           'funnel_name': 'registration_completion',
           'event_type': 'step_viewed',
+          'user_email': email,
           'step_display_time': new Date().toISOString()
         });
       }

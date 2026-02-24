@@ -391,9 +391,11 @@
       
       // Track first funnel step for profile completion
       if (typeof trackRegistrationFunnelStep === 'function') {
+        const email = currentUser?.email || 'unknown';
         trackRegistrationFunnelStep(1, 'Profile Completion - Step 1', {
           'funnel_name': 'profile_completion',
           'event_type': 'step_viewed',
+          'user_email': email,
           'event_source': 'profile_completion_page_load',
           'timestamp': new Date().toISOString()
         });
@@ -565,11 +567,15 @@
       saveStepData();
       currentStep++;
       
+      // Get current user email
+      const email = currentUser?.email || 'unknown';
+      
       // Track profile completion funnel progress
       if (typeof trackRegistrationFunnelStep === 'function') {
         trackRegistrationFunnelStep(currentStep, `Profile Completion - Step ${currentStep}`, {
           'funnel_name': 'profile_completion',
           'event_type': 'step_entered',
+          'user_email': email,
           'previous_step': currentStep - 1,
           'field_completion': 'valid'
         });
@@ -777,9 +783,11 @@
 
       // Track funnel step viewed for profile completion
       if (typeof trackRegistrationFunnelStep === 'function') {
+        const email = currentUser?.email || 'unknown';
         trackRegistrationFunnelStep(currentStep, `Profile Completion - Step ${currentStep}`, {
           'funnel_name': 'profile_completion',
           'event_type': 'step_viewed',
+          'user_email': email,
           'step_display_time': new Date().toISOString()
         });
       }
