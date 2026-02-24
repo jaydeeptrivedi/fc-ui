@@ -385,6 +385,18 @@
         window.location.href = './signin.html';
         return;
       }
+      
+      // Initialize profile completion timing for funnel tracking
+      window.profileCompletionStartTime = Date.now();
+      
+      // Track first funnel step for profile completion
+      if (typeof trackRegistrationFunnelStep === 'function') {
+        trackRegistrationFunnelStep(1, 'Profile Completion - Step 1', {
+          'event_type': 'profile_completion_started',
+          'funnel_name': 'profile_completion',
+          'timestamp': new Date().toISOString()
+        });
+      }
 
       // Initialize multi-tag input for crops
       const cropsTagInput = new MultiTagInput('#profile-crops', COMMON_CROPS);
@@ -551,6 +563,17 @@
       
       saveStepData();
       currentStep++;
+      
+      // Track profile completion funnel progress
+      if (typeof trackRegistrationFunnelStep === 'function') {
+        trackRegistrationFunnelStep(currentStep, `Profile Completion - Step ${currentStep}`, {
+          'previous_step': currentStep - 1,
+          'funnel_name': 'profile_completion',
+          'event_type': 'step_viewed',
+          'field_completion': 'valid'
+        });
+      }
+      
       updateUI();
     }
 
@@ -719,6 +742,16 @@
           localStorage.setItem('fc_users', JSON.stringify(users));
           localStorage.setItem('fc_currentUser', JSON.stringify(users[userIndex]));
 
+          // Track profile completion funnel completion
+          if (typeof trackRegistrationFunnelStep === 'function') {
+            trackRegistrationFunnelStep(4, 'Profile Completion - Done', {
+              'event_type': 'funnel_completion',
+              'funnel_name': 'profile_completion',
+              'completed': true,
+              'total_time_seconds': Math.round((Date.now() - window.profileCompletionStartTime) / 1000) || 0
+            });
+          }
+
           document.getElementById('step4-success').textContent = 'Profile updated successfully! Redirecting to dashboard...';
           document.getElementById('step4-success').classList.remove('d-none');
 
@@ -738,6 +771,15 @@
       // Hide all steps
       document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
       document.getElementById(`step${currentStep}`).style.display = 'block';
+
+      // Track funnel step viewed for profile completion
+      if (typeof trackRegistrationFunnelStep === 'function') {
+        trackRegistrationFunnelStep(currentStep, `Profile Completion - Step ${currentStep}`, {
+          'event_type': 'step_viewed',
+          'funnel_name': 'profile_completion',
+          'timestamp': new Date().toISOString()
+        });
+      }
 
       // Update Step 3 title and sections based on current category
       if (currentStep === 3) {

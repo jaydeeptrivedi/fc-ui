@@ -145,6 +145,58 @@ function trackTiming(timingName, timingMs, category = 'general') {
 }
 
 /**
+ * Track registration funnel steps
+ * GA4 funnels require consistent event naming and step parameters
+ */
+function trackRegistrationFunnelStep(stepNumber, stepName, details = {}) {
+  // Step names for registration flow
+  const stepNames = {
+    1: 'Account Setup',
+    2: 'Profile Information',
+    3: 'Operations Details',
+    4: 'Review & Terms'
+  };
+
+  const currentStepName = stepNames[stepNumber] || stepName;
+
+  // Track funnel step with both event and engagement metric
+  gtag('event', 'registration_funnel', {
+    'funnel_name': 'registration_completion',
+    'step_number': stepNumber,
+    'step_name': currentStepName,
+    'funnel_progress': (stepNumber / 4) * 100, // Progress percentage
+    'category': 'registration',
+    ...details
+  });
+
+  // Also track step progression events for alternative funnel analysis
+  gtag('event', `registration_step_${stepNumber}`, {
+    'step_name': currentStepName,
+    'step_number': stepNumber,
+    'category': 'registration_progress',
+    ...details
+  });
+
+  console.log(`Registration Funnel: Step ${stepNumber} - ${currentStepName}`);
+}
+
+/**
+ * Track registration funnel abandonment
+ * Called when user leaves registration without completing
+ */
+function trackRegistrationAbandon(lastCompletedStep, abandonmentReason = 'unknown') {
+  gtag('event', 'registration_abandoned', {
+    'funnel_name': 'registration_completion',
+    'last_completed_step': lastCompletedStep,
+    'abandonment_reason': abandonmentReason,
+    'category': 'registration_drop_off',
+    'value': lastCompletedStep // Track progress before abandonment
+  });
+
+  console.log(`Registration Abandoned: Last step ${lastCompletedStep}, Reason: ${abandonmentReason}`);
+}
+
+/**
  * Auto-track form submissions
  * Call this on pages with forms
  */

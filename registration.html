@@ -433,6 +433,17 @@
       if (typeof trackAuthEvent === 'function') {
         trackAuthEvent('registration_start');
       }
+      
+      // Initialize registration timing for funnel tracking
+      window.registrationStartTime = Date.now();
+      
+      // Track first funnel step
+      if (typeof trackRegistrationFunnelStep === 'function') {
+        trackRegistrationFunnelStep(1, null, {
+          'event_type': 'step_viewed',
+          'timestamp': new Date().toISOString()
+        });
+      }
 
       document.getElementById('nextBtn').addEventListener('click', handleNext);
       document.getElementById('backBtn').addEventListener('click', handleBack);
@@ -581,6 +592,15 @@
       
       saveStepData();
       currentStep++;
+      
+      // Track registration funnel progress
+      if (typeof trackRegistrationFunnelStep === 'function') {
+        trackRegistrationFunnelStep(currentStep, null, {
+          'previous_step': currentStep - 1,
+          'field_completion': 'valid'
+        });
+      }
+      
       updateUI();
     }
 
@@ -867,6 +887,18 @@
         document.getElementById('step4-success').textContent = `Registration successful! Redirecting to sign in...`;
         document.getElementById('step4-success').classList.remove('d-none');
         
+        // Track registration funnel completion
+        if (typeof trackRegistrationFunnelStep === 'function') {
+          trackRegistrationFunnelStep(4, 'Registration Complete', {
+            'event_type': 'funnel_completion',
+            'completed': true,
+            'email': userData.email,
+            'category': userData.category,
+            'country': userData.country,
+            'total_time_seconds': Math.round((Date.now() - window.registrationStartTime) / 1000) || 0
+          });
+        }
+        
         // Track registration completion
         if (typeof trackAuthEvent === 'function') {
           trackAuthEvent('registration_complete', {
@@ -895,6 +927,14 @@
       // Hide all steps
       document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
       document.getElementById(`step${currentStep}`).style.display = 'block';
+
+      // Track funnel step viewed
+      if (typeof trackRegistrationFunnelStep === 'function') {
+        trackRegistrationFunnelStep(currentStep, null, {
+          'event_type': 'step_viewed',
+          'timestamp': new Date().toISOString()
+        });
+      }
 
       // Update Step 3 title and sections based on current category
       if (currentStep === 3) {
