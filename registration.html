@@ -440,7 +440,9 @@
       // Track first funnel step
       if (typeof trackRegistrationFunnelStep === 'function') {
         trackRegistrationFunnelStep(1, null, {
+          'funnel_name': 'registration_completion',
           'event_type': 'step_viewed',
+          'event_source': 'registration_page_load',
           'timestamp': new Date().toISOString()
         });
       }
@@ -593,9 +595,11 @@
       saveStepData();
       currentStep++;
       
-      // Track registration funnel progress
+      // Track registration funnel progress - explicit step entry
       if (typeof trackRegistrationFunnelStep === 'function') {
         trackRegistrationFunnelStep(currentStep, null, {
+          'funnel_name': 'registration_completion',
+          'event_type': 'step_entered',
           'previous_step': currentStep - 1,
           'field_completion': 'valid'
         });
@@ -890,8 +894,11 @@
         // Track registration funnel completion
         if (typeof trackRegistrationFunnelStep === 'function') {
           trackRegistrationFunnelStep(4, 'Registration Complete', {
+            'funnel_name': 'registration_completion',
             'event_type': 'funnel_completion',
             'completed': true,
+            'completion_step': 4,
+            'exit_step': 4,
             'email': userData.email,
             'category': userData.category,
             'country': userData.country,
@@ -931,8 +938,9 @@
       // Track funnel step viewed
       if (typeof trackRegistrationFunnelStep === 'function') {
         trackRegistrationFunnelStep(currentStep, null, {
+          'funnel_name': 'registration_completion',
           'event_type': 'step_viewed',
-          'timestamp': new Date().toISOString()
+          'step_display_time': new Date().toISOString()
         });
       }
 

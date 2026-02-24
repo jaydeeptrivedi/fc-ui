@@ -392,8 +392,9 @@
       // Track first funnel step for profile completion
       if (typeof trackRegistrationFunnelStep === 'function') {
         trackRegistrationFunnelStep(1, 'Profile Completion - Step 1', {
-          'event_type': 'profile_completion_started',
           'funnel_name': 'profile_completion',
+          'event_type': 'step_viewed',
+          'event_source': 'profile_completion_page_load',
           'timestamp': new Date().toISOString()
         });
       }
@@ -567,9 +568,9 @@
       // Track profile completion funnel progress
       if (typeof trackRegistrationFunnelStep === 'function') {
         trackRegistrationFunnelStep(currentStep, `Profile Completion - Step ${currentStep}`, {
-          'previous_step': currentStep - 1,
           'funnel_name': 'profile_completion',
-          'event_type': 'step_viewed',
+          'event_type': 'step_entered',
+          'previous_step': currentStep - 1,
           'field_completion': 'valid'
         });
       }
@@ -745,8 +746,10 @@
           // Track profile completion funnel completion
           if (typeof trackRegistrationFunnelStep === 'function') {
             trackRegistrationFunnelStep(4, 'Profile Completion - Done', {
-              'event_type': 'funnel_completion',
               'funnel_name': 'profile_completion',
+              'event_type': 'funnel_completion',
+              'completion_step': 4,
+              'exit_step': 4,
               'completed': true,
               'total_time_seconds': Math.round((Date.now() - window.profileCompletionStartTime) / 1000) || 0
             });
@@ -775,9 +778,9 @@
       // Track funnel step viewed for profile completion
       if (typeof trackRegistrationFunnelStep === 'function') {
         trackRegistrationFunnelStep(currentStep, `Profile Completion - Step ${currentStep}`, {
-          'event_type': 'step_viewed',
           'funnel_name': 'profile_completion',
-          'timestamp': new Date().toISOString()
+          'event_type': 'step_viewed',
+          'step_display_time': new Date().toISOString()
         });
       }
 
