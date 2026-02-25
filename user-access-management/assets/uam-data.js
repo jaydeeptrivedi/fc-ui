@@ -25,19 +25,33 @@ const UAMData = {
       icon: 'bi-eye',
       color: 'info'
     },
-    SUBSCRIPTION_REGIONAL_MANAGER: {
-      id: 'subscription_regional_manager',
-      name: 'Subscription Portal - Regional Manager',
-      description: 'Full access to subscription management for assigned regions',
-      icon: 'bi-geo-alt-fill',
-      color: 'warning'
-    },
     SUBSCRIPTION_REGIONAL_ANALYST: {
       id: 'subscription_regional_analyst',
       name: 'Subscription Portal - Regional Analyst',
       description: 'Read-only access to subscription data for assigned regions',
       icon: 'bi-binoculars',
       color: 'primary'
+    },
+    SUBSCRIPTION_REGIONAL_MANAGER: {
+      id: 'subscription_regional_manager',
+      name: 'Subscription Portal - Regional Manager',
+      description: 'Can approve/reject subscriptions for assigned regions (read-only, no create/edit)',
+      icon: 'bi-check-circle',
+      color: 'success'
+    },
+    SUBSCRIPTION_ORGANIZATION: {
+      id: 'subscription_organization',
+      name: 'Subscription Portal - Organization Manager',
+      description: 'Can approve/reject subscriptions across all countries (read-only, no create/edit)',
+      icon: 'bi-building-gear',
+      color: 'warning'
+    },
+    SUBSCRIPTION_DISTRIBUTOR: {
+      id: 'subscription_distributor',
+      name: 'Subscription Portal - Distributor',
+      description: 'Can view own customers and subscriptions (cannot create subscriptions)',
+      icon: 'bi-building',
+      color: 'secondary'
     }
   },
 
@@ -49,6 +63,8 @@ const UAMData = {
     'USA', 'Canada', 'Mexico', 'Brazil', 'Argentina',
     'Australia', 'New Zealand', 'Japan', 'South Korea', 'India'
   ],
+
+
 
   // ==================== USER MANAGEMENT ====================
 
@@ -97,6 +113,11 @@ const UAMData = {
       subscriptionPortalAccess: false,
       subscriptionPortalRole: null,
       assignedCountries: [],
+      firstName: null,               // From registration
+      lastName: null,                // From registration
+      language: null,                // From registration
+      operationsCategory: null,      // From registration (agriculture, golf, software, etc.)
+      operationsDetails: null,       // From registration (category-specific data)
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       lastLogin: null,
@@ -194,6 +215,14 @@ const UAMData = {
       },
       {
         id: 'LOG-003',
+        action: 'APPROVE_SUBSCRIPTION',
+        userId: 'USR-014',
+        details: { subscriptionId: 'SUB-1001', country: 'Germany', approver: 'regional_manager', comments: 'Approved for corporate client' },
+        performedBy: 'germany.rm@fc.com',
+        timestamp: '2026-02-19T09:15:00Z'
+      },
+      {
+        id: 'LOG-004',
         action: 'GRANT_ACCESS',
         userId: 'USR-007',
         details: { role: 'subscription_global_analyst', countries: [] },
@@ -201,15 +230,15 @@ const UAMData = {
         timestamp: '2026-02-17T10:15:00Z'
       },
       {
-        id: 'LOG-004',
-        action: 'GRANT_ACCESS',
-        userId: 'USR-008',
-        details: { role: 'subscription_regional_manager', countries: ['Germany', 'Austria', 'Switzerland'] },
-        performedBy: 'superadmin@fc.com',
-        timestamp: '2026-02-16T09:00:00Z'
+        id: 'LOG-008',
+        action: 'REJECT_SUBSCRIPTION',
+        userId: 'USR-016',
+        details: { subscriptionId: 'SUB-1003', country: 'USA', reason: 'Incomplete payment information' },
+        performedBy: 'usa.rm@fc.com',
+        timestamp: '2026-02-16T18:20:00Z'
       },
       {
-        id: 'LOG-005',
+        id: 'LOG-009',
         action: 'GRANT_ACCESS',
         userId: 'USR-009',
         details: { role: 'subscription_regional_analyst', countries: ['France', 'Belgium', 'Netherlands'] },
@@ -217,7 +246,7 @@ const UAMData = {
         timestamp: '2026-02-15T16:45:00Z'
       },
       {
-        id: 'LOG-006',
+        id: 'LOG-011',
         action: 'REVOKE_ACCESS',
         userId: 'USR-002',
         details: {},
@@ -225,7 +254,15 @@ const UAMData = {
         timestamp: '2026-02-14T11:30:00Z'
       },
       {
-        id: 'LOG-007',
+        id: 'LOG-012',
+        action: 'DELETE_SUBSCRIPTION',
+        userId: 'USR-006',
+        details: { subscriptionId: 'SUB-0875', reason: 'Customer request', country: 'France' },
+        performedBy: 'global.admin@fc.com',
+        timestamp: '2026-02-13T09:50:00Z'
+      },
+      {
+        id: 'LOG-013',
         action: 'CREATE_USER',
         userId: 'USR-005',
         details: { email: 'marco.rossi@aziendaagricola.it' },
@@ -233,7 +270,7 @@ const UAMData = {
         timestamp: '2026-02-12T09:30:00Z'
       },
       {
-        id: 'LOG-008',
+        id: 'LOG-015',
         action: 'UPDATE_USER',
         userId: 'USR-003',
         details: { company: 'Wijngaard BV' },
@@ -241,7 +278,7 @@ const UAMData = {
         timestamp: '2026-02-10T14:00:00Z'
       },
       {
-        id: 'LOG-009',
+        id: 'LOG-016',
         action: 'GRANT_ACCESS',
         userId: 'USR-010',
         details: { role: 'subscription_regional_analyst', countries: ['Spain', 'Portugal'] },
@@ -249,7 +286,7 @@ const UAMData = {
         timestamp: '2026-02-08T10:20:00Z'
       },
       {
-        id: 'LOG-010',
+        id: 'LOG-017',
         action: 'UPDATE_PLATFORM_ACCESS',
         userId: 'USR-004',
         details: { webAccess: true, mobileAccess: true },
@@ -339,8 +376,10 @@ const UAMData = {
       noPortalAccess: users.filter(u => !u.subscriptionPortalAccess).length,
       globalAdmins: withPortalAccess.filter(u => u.subscriptionPortalRole === 'subscription_global_admin').length,
       globalAnalysts: withPortalAccess.filter(u => u.subscriptionPortalRole === 'subscription_global_analyst').length,
-      regionalManagers: withPortalAccess.filter(u => u.subscriptionPortalRole === 'subscription_regional_manager').length,
       regionalAnalysts: withPortalAccess.filter(u => u.subscriptionPortalRole === 'subscription_regional_analyst').length,
+      regionalManagers: withPortalAccess.filter(u => u.subscriptionPortalRole === 'subscription_regional_manager').length,
+      organizationManagers: withPortalAccess.filter(u => u.subscriptionPortalRole === 'subscription_organization').length,
+      distributors: withPortalAccess.filter(u => u.subscriptionPortalRole === 'subscription_distributor').length,
       activeUsers: users.filter(u => u.status === 'active').length
     };
   },
@@ -381,6 +420,16 @@ const UAMData = {
         subscriptionPortalAccess: false,
         subscriptionPortalRole: null,
         assignedCountries: [],
+        firstName: 'John',
+        lastName: 'Farmer',
+        language: 'English',
+        operationsCategory: 'agriculture',
+        operationsDetails: { 
+          crops: ['Wheat', 'Barley', 'Rye'], 
+          farmSize: '3',
+          irrigation: 'yes', 
+          pestManagement: 'integrated'
+        },
         createdAt: '2025-08-15T10:30:00Z',
         updatedAt: '2025-08-15T10:30:00Z',
         lastLogin: '2026-02-18T14:22:00Z',
@@ -398,6 +447,16 @@ const UAMData = {
         subscriptionPortalAccess: false,
         subscriptionPortalRole: null,
         assignedCountries: [],
+        firstName: 'Marie',
+        lastName: 'Dupont',
+        language: 'French',
+        operationsCategory: 'agriculture',
+        operationsDetails: { 
+          crops: ['Pinot Noir', 'Chardonnay', 'Sauvignon Blanc'], 
+          farmSize: '2',
+          irrigation: 'yes', 
+          pestManagement: 'organic'
+        },
         createdAt: '2025-09-20T08:15:00Z',
         updatedAt: '2025-09-20T08:15:00Z',
         lastLogin: '2026-02-17T09:45:00Z',
@@ -415,6 +474,16 @@ const UAMData = {
         subscriptionPortalAccess: false,
         subscriptionPortalRole: null,
         assignedCountries: [],
+        firstName: 'Carlos',
+        lastName: 'Silva',
+        language: 'Spanish',
+        operationsCategory: 'agriculture',
+        operationsDetails: { 
+          crops: ['Olives', 'Almonds'], 
+          farmSize: '4',
+          irrigation: 'no', 
+          pestManagement: 'conventional'
+        },
         createdAt: '2025-10-05T14:20:00Z',
         updatedAt: '2025-10-05T14:20:00Z',
         lastLogin: '2026-02-15T16:30:00Z',
@@ -432,6 +501,16 @@ const UAMData = {
         subscriptionPortalAccess: false,
         subscriptionPortalRole: null,
         assignedCountries: [],
+        firstName: 'Anna',
+        lastName: 'Müller',
+        language: 'German',
+        operationsCategory: 'agriculture',
+        operationsDetails: { 
+          crops: ['Vegetables', 'Herbs', 'Berries'], 
+          farmSize: '1',
+          irrigation: 'yes', 
+          pestManagement: 'organic'
+        },
         createdAt: '2025-11-12T11:00:00Z',
         updatedAt: '2025-11-12T11:00:00Z',
         lastLogin: '2026-02-19T08:00:00Z',
@@ -449,6 +528,16 @@ const UAMData = {
         subscriptionPortalAccess: false,
         subscriptionPortalRole: null,
         assignedCountries: [],
+        firstName: 'Luca',
+        lastName: 'Rossi',
+        language: 'Italian',
+        operationsCategory: 'agriculture',
+        operationsDetails: { 
+          crops: ['Corn', 'Soybeans', 'Wheat'], 
+          farmSize: '2',
+          irrigation: 'yes', 
+          pestManagement: 'integrated'
+        },
         createdAt: '2025-12-01T09:30:00Z',
         updatedAt: '2025-12-01T09:30:00Z',
         lastLogin: null,
@@ -467,6 +556,11 @@ const UAMData = {
         subscriptionPortalAccess: true,
         subscriptionPortalRole: 'subscription_global_admin',
         assignedCountries: [],
+        firstName: 'Thomas',
+        lastName: 'Weber',
+        language: 'German',
+        operationsCategory: null,
+        operationsDetails: null,
         createdAt: '2024-01-15T08:00:00Z',
         updatedAt: '2025-06-01T10:00:00Z',
         accessGrantedAt: '2024-01-15T08:00:00Z',
@@ -485,46 +579,15 @@ const UAMData = {
         subscriptionPortalAccess: true,
         subscriptionPortalRole: 'subscription_global_analyst',
         assignedCountries: [],
+        firstName: 'Sarah',
+        lastName: 'Schmidt',
+        language: 'German',
+        operationsCategory: null,
+        operationsDetails: null,
         createdAt: '2024-03-20T09:00:00Z',
         updatedAt: '2025-06-01T10:00:00Z',
         accessGrantedAt: '2024-03-20T09:00:00Z',
         lastLogin: '2026-02-18T15:20:00Z',
-        status: 'active',
-        registrationSource: 'internal'
-      },
-      {
-        id: 'USR-008',
-        email: 'germany.manager@fc.com',
-        name: 'Hans Braun',
-        company: 'FieldClimate Germany',
-        country: 'Germany',
-        platformWebAccess: true,
-        platformMobileAccess: true,
-        subscriptionPortalAccess: true,
-        subscriptionPortalRole: 'subscription_regional_manager',
-        assignedCountries: ['Germany', 'Austria', 'Switzerland'],
-        createdAt: '2024-06-10T10:00:00Z',
-        updatedAt: '2025-08-15T14:00:00Z',
-        accessGrantedAt: '2024-06-10T10:00:00Z',
-        lastLogin: '2026-02-19T08:45:00Z',
-        status: 'active',
-        registrationSource: 'internal'
-      },
-      {
-        id: 'USR-009',
-        email: 'france.manager@fc.com',
-        name: 'Claire Dubois',
-        company: 'FieldClimate France',
-        country: 'France',
-        platformWebAccess: true,
-        platformMobileAccess: true,
-        subscriptionPortalAccess: true,
-        subscriptionPortalRole: 'subscription_regional_manager',
-        assignedCountries: ['France', 'Belgium'],
-        createdAt: '2024-07-15T09:00:00Z',
-        updatedAt: '2025-07-15T09:00:00Z',
-        accessGrantedAt: '2024-07-15T09:00:00Z',
-        lastLogin: '2026-02-18T14:20:00Z',
         status: 'active',
         registrationSource: 'internal'
       },
@@ -539,46 +602,15 @@ const UAMData = {
         subscriptionPortalAccess: true,
         subscriptionPortalRole: 'subscription_regional_analyst',
         assignedCountries: ['France', 'Belgium'],
+        firstName: 'Pierre',
+        lastName: 'Martin',
+        language: 'French',
+        operationsCategory: null,
+        operationsDetails: null,
         createdAt: '2024-09-05T11:00:00Z',
         updatedAt: '2025-09-05T11:00:00Z',
         accessGrantedAt: '2024-09-05T11:00:00Z',
         lastLogin: '2026-02-17T10:30:00Z',
-        status: 'active',
-        registrationSource: 'internal'
-      },
-      {
-        id: 'USR-011',
-        email: 'spain.manager@fc.com',
-        name: 'Elena Garcia',
-        company: 'FieldClimate Iberia',
-        country: 'Spain',
-        platformWebAccess: true,
-        platformMobileAccess: true,
-        subscriptionPortalAccess: true,
-        subscriptionPortalRole: 'subscription_regional_manager',
-        assignedCountries: ['Spain', 'Portugal'],
-        createdAt: '2025-01-20T09:00:00Z',
-        updatedAt: '2025-10-20T09:00:00Z',
-        accessGrantedAt: '2025-01-20T09:00:00Z',
-        lastLogin: '2026-02-18T11:15:00Z',
-        status: 'active',
-        registrationSource: 'internal'
-      },
-      {
-        id: 'USR-012',
-        email: 'italy.manager@fc.com',
-        name: 'Marco Bianchi',
-        company: 'FieldClimate Italy',
-        country: 'Italy',
-        platformWebAccess: true,
-        platformMobileAccess: true,
-        subscriptionPortalAccess: true,
-        subscriptionPortalRole: 'subscription_regional_manager',
-        assignedCountries: ['Italy'],
-        createdAt: '2024-11-10T10:00:00Z',
-        updatedAt: '2025-11-10T10:00:00Z',
-        accessGrantedAt: '2024-11-10T10:00:00Z',
-        lastLogin: '2026-02-19T09:00:00Z',
         status: 'active',
         registrationSource: 'internal'
       },
@@ -593,10 +625,115 @@ const UAMData = {
         subscriptionPortalAccess: true,
         subscriptionPortalRole: 'subscription_regional_analyst',
         assignedCountries: ['Germany', 'Austria', 'Switzerland'],
+        firstName: 'Lisa',
+        lastName: 'Weber',
+        language: 'German',
+        operationsCategory: 'golf',
+        operationsDetails: { 
+          turfArea: '3',
+          turfIrrigation: 'automated'
+        },
         createdAt: '2024-08-20T08:30:00Z',
         updatedAt: '2025-08-20T08:30:00Z',
         accessGrantedAt: '2024-08-20T08:30:00Z',
         lastLogin: '2026-02-18T16:45:00Z',
+        status: 'active',
+        registrationSource: 'internal'
+      },
+      {
+        id: 'USR-014',
+        email: 'germany.rm@fc.com',
+        name: 'Klaus Fischer',
+        company: 'FieldClimate Germany',
+        country: 'Germany',
+        platformWebAccess: true,
+        platformMobileAccess: true,
+        subscriptionPortalAccess: true,
+        subscriptionPortalRole: 'subscription_regional_manager',
+        assignedCountries: ['Germany'],
+        firstName: 'Klaus',
+        lastName: 'Fischer',
+        language: 'German',
+        operationsCategory: null,
+        operationsDetails: null,
+        createdAt: '2025-05-10T09:00:00Z',
+        updatedAt: '2025-12-10T09:00:00Z',
+        accessGrantedAt: '2025-05-10T09:00:00Z',
+        lastLogin: '2026-02-19T07:15:00Z',
+        status: 'active',
+        registrationSource: 'internal'
+      },
+      {
+        id: 'USR-015',
+        email: 'agropartner@example.com',
+        name: 'Michael Schneider',
+        company: 'AgroPartner GmbH',
+        country: 'Germany',
+        platformWebAccess: true,
+        platformMobileAccess: true,
+        subscriptionPortalAccess: true,
+        subscriptionPortalRole: 'subscription_distributor',
+        assignedCountries: [],
+        firstName: 'Michael',
+        lastName: 'Schneider',
+        language: 'German',
+        operationsCategory: 'agriculture',
+        operationsDetails: { 
+          crops: ['Various'],
+          farmSize: '4',
+          irrigation: 'yes',
+          pestManagement: 'integrated'
+        },
+        createdAt: '2025-03-15T10:00:00Z',
+        updatedAt: '2025-11-15T10:00:00Z',
+        accessGrantedAt: '2025-03-15T10:00:00Z',
+        lastLogin: '2026-02-18T13:30:00Z',
+        status: 'active',
+        registrationSource: 'distributor'
+      },
+      {
+        id: 'USR-016',
+        email: 'usa.rm@fc.com',
+        name: 'Jennifer Martinez',
+        company: 'FieldClimate USA',
+        country: 'USA',
+        platformWebAccess: true,
+        platformMobileAccess: true,
+        subscriptionPortalAccess: true,
+        subscriptionPortalRole: 'subscription_regional_manager',
+        assignedCountries: ['USA'],
+        firstName: 'Jennifer',
+        lastName: 'Martinez',
+        language: 'English',
+        operationsCategory: null,
+        operationsDetails: null,
+        createdAt: '2025-06-01T08:00:00Z',
+        updatedAt: '2025-12-01T08:00:00Z',
+        accessGrantedAt: '2025-06-01T08:00:00Z',
+        lastLogin: '2026-02-18T19:45:00Z',
+        status: 'active',
+        registrationSource: 'internal'
+      },
+      {
+        id: 'USR-017',
+        email: 'org.manager@fc.com',
+        name: 'Sophia Bergström',
+        company: 'FieldClimate HQ',
+        country: 'Sweden',
+        platformWebAccess: true,
+        platformMobileAccess: true,
+        subscriptionPortalAccess: true,
+        subscriptionPortalRole: 'subscription_organization',
+        assignedCountries: [],
+        firstName: 'Sophia',
+        lastName: 'Bergström',
+        language: 'English',
+        operationsCategory: null,
+        operationsDetails: null,
+        createdAt: '2025-07-15T10:30:00Z',
+        updatedAt: '2026-01-20T14:00:00Z',
+        accessGrantedAt: '2025-07-15T10:30:00Z',
+        lastLogin: '2026-02-19T11:20:00Z',
         status: 'active',
         registrationSource: 'internal'
       }

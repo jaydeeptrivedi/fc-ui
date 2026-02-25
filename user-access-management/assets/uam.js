@@ -126,6 +126,18 @@ function getPortalRoleInfo(role) {
       badge: 'regional-analyst',
       icon: 'bi-binoculars',
       color: 'primary'
+    },
+    'subscription_organization': {
+      label: 'Organization Manager',
+      badge: 'organization-manager',
+      icon: 'bi-building-gear',
+      color: 'warning'
+    },
+    'subscription_distributor': {
+      label: 'Distributor',
+      badge: 'distributor',
+      icon: 'bi-building',
+      color: 'secondary'
     }
   };
   return roles[role] || null;

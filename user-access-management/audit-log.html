@@ -144,12 +144,21 @@
             <label class="form-label small text-secondary">Action Type</label>
             <select id="filterAction" class="form-select">
               <option value="">All Actions</option>
-              <option value="GRANT_ACCESS">Access Granted</option>
-              <option value="REVOKE_ACCESS">Access Revoked</option>
-              <option value="UPDATE_PLATFORM_ACCESS">Platform Access Updated</option>
-              <option value="UPDATE_USER">User Updated</option>
-              <option value="CREATE_USER">User Created</option>
-              <option value="DELETE_USER">User Deleted</option>
+              <optgroup label="User Access">
+                <option value="GRANT_ACCESS">Access Granted</option>
+                <option value="REVOKE_ACCESS">Access Revoked</option>
+                <option value="UPDATE_PLATFORM_ACCESS">Platform Access Updated</option>
+                <option value="UPDATE_USER">User Updated</option>
+                <option value="CREATE_USER">User Created</option>
+                <option value="DELETE_USER">User Deleted</option>
+              </optgroup>
+              <optgroup label="Subscriptions">
+                <option value="CREATE_SUBSCRIPTION">Subscription Created</option>
+                <option value="UPDATE_SUBSCRIPTION">Subscription Updated</option>
+                <option value="DELETE_SUBSCRIPTION">Subscription Deleted</option>
+                <option value="APPROVE_SUBSCRIPTION">Subscription Approved</option>
+                <option value="REJECT_SUBSCRIPTION">Subscription Rejected</option>
+              </optgroup>
             </select>
           </div>
           <div class="col-md-2">
@@ -368,7 +377,12 @@
         'UPDATE_PLATFORM_ACCESS': { label: 'Platform Access', class: 'bg-info-subtle text-info', icon: 'bi-device-hdd' },
         'UPDATE_USER': { label: 'User Updated', class: 'bg-warning-subtle text-warning', icon: 'bi-pencil' },
         'CREATE_USER': { label: 'User Created', class: 'bg-primary-subtle text-primary', icon: 'bi-person-plus' },
-        'DELETE_USER': { label: 'User Deleted', class: 'bg-dark-subtle text-dark', icon: 'bi-person-x' }
+        'DELETE_USER': { label: 'User Deleted', class: 'bg-dark-subtle text-dark', icon: 'bi-person-x' },
+        'CREATE_SUBSCRIPTION': { label: 'Subscription Created', class: 'bg-primary-subtle text-primary', icon: 'bi-plus-circle' },
+        'UPDATE_SUBSCRIPTION': { label: 'Subscription Updated', class: 'bg-info-subtle text-info', icon: 'bi-pencil-square' },
+        'DELETE_SUBSCRIPTION': { label: 'Subscription Deleted', class: 'bg-danger-subtle text-danger', icon: 'bi-trash' },
+        'APPROVE_SUBSCRIPTION': { label: 'Subscription Approved', class: 'bg-success-subtle text-success', icon: 'bi-check-circle' },
+        'REJECT_SUBSCRIPTION': { label: 'Subscription Rejected', class: 'bg-warning-subtle text-warning', icon: 'bi-x-circle' }
       };
       const info = actionMap[action] || { label: action, class: 'bg-secondary-subtle text-secondary', icon: 'bi-activity' };
       return `<span class="badge ${info.class} py-2 px-2"><i class="bi ${info.icon} me-1"></i>${info.label}</span>`;
@@ -402,6 +416,28 @@
           if (details.email) {
             html = `<span class="small">${escapeHtml(details.email)}</span>`;
           }
+          break;
+        case 'CREATE_SUBSCRIPTION':
+          html = `<span class="small">ID: <strong>${details.subscriptionId || 'N/A'}</strong></span>`;
+          if (details.country) html += `<br><span class="smaller text-secondary">Country: ${details.country}</span>`;
+          if (details.product) html += `<br><span class="smaller text-secondary">Product: ${details.product}</span>`;
+          break;
+        case 'UPDATE_SUBSCRIPTION':
+          html = `<span class="small">ID: <strong>${details.subscriptionId || 'N/A'}</strong></span>`;
+          if (details.changes) html += `<br><span class="smaller text-secondary">Changes: ${details.changes}</span>`;
+          break;
+        case 'DELETE_SUBSCRIPTION':
+          html = `<span class="small">ID: <strong>${details.subscriptionId || 'N/A'}</strong></span>`;
+          if (details.reason) html += `<br><span class="smaller text-secondary">Reason: ${details.reason}</span>`;
+          break;
+        case 'APPROVE_SUBSCRIPTION':
+          html = `<span class="small">ID: <strong>${details.subscriptionId || 'N/A'}</strong></span>`;
+          if (details.country) html += `<br><span class="smaller text-secondary">Country: ${details.country}</span>`;
+          if (details.approver) html += `<br><span class="smaller text-secondary">Approver: ${details.approver}</span>`;
+          break;
+        case 'REJECT_SUBSCRIPTION':
+          html = `<span class="small">ID: <strong>${details.subscriptionId || 'N/A'}</strong></span>`;
+          if (details.reason) html += `<br><span class="smaller text-secondary text-danger">Reason: ${details.reason}</span>`;
           break;
         default:
           html = details ? `<span class="smaller text-secondary">${JSON.stringify(details)}</span>` : '-';

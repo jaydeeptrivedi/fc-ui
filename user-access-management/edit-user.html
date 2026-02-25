@@ -198,22 +198,6 @@
                 </div>
               </div>
               
-              <!-- Regional Manager -->
-              <div class="access-option" data-level="subscription_regional_manager">
-                <div class="d-flex align-items-start">
-                  <div class="access-icon bg-warning-subtle text-warning me-3">
-                    <i class="bi bi-geo-alt-fill"></i>
-                  </div>
-                  <div class="flex-grow-1">
-                    <div class="fw-semibold">Regional Manager</div>
-                    <div class="small text-secondary">Full access to subscription management for assigned regions.</div>
-                  </div>
-                  <div class="form-check">
-                    <input type="radio" name="portalRole" value="subscription_regional_manager" class="form-check-input">
-                  </div>
-                </div>
-              </div>
-              
               <!-- Regional Analyst -->
               <div class="access-option" data-level="subscription_regional_analyst">
                 <div class="d-flex align-items-start">
@@ -226,6 +210,54 @@
                   </div>
                   <div class="form-check">
                     <input type="radio" name="portalRole" value="subscription_regional_analyst" class="form-check-input">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Regional Manager -->
+              <div class="access-option" data-level="subscription_regional_manager">
+                <div class="d-flex align-items-start">
+                  <div class="access-icon bg-success-subtle text-success me-3">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold">Regional Manager</div>
+                    <div class="small text-secondary">Can approve/reject subscriptions for assigned regions (read-only, no create/edit).</div>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" name="portalRole" value="subscription_regional_manager" class="form-check-input">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Organization Manager -->
+              <div class="access-option" data-level="subscription_organization">
+                <div class="d-flex align-items-start">
+                  <div class="access-icon bg-warning-subtle text-warning me-3">
+                    <i class="bi bi-building-gear"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold">Organization Manager</div>
+                    <div class="small text-secondary">Can approve/reject subscriptions across all countries (read-only, no create/edit).</div>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" name="portalRole" value="subscription_organization" class="form-check-input">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Distributor -->
+              <div class="access-option" data-level="subscription_distributor">
+                <div class="d-flex align-items-start">
+                  <div class="access-icon bg-secondary-subtle text-secondary me-3">
+                    <i class="bi bi-building"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold">Distributor</div>
+                    <div class="small text-secondary">Can view own customers and subscriptions (cannot create subscriptions).</div>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" name="portalRole" value="subscription_distributor" class="form-check-input">
                   </div>
                 </div>
               </div>
@@ -253,6 +285,39 @@
             <p class="mb-0 mt-2">Portal access is disabled for this user</p>
             <small>Enable the toggle above to grant subscription portal access</small>
           </div>
+        </div>
+        
+        <!-- Registration Information (read-only) - Independent Card -->
+        <div class="access-panel mb-4">
+          <h5 class="fw-bold mb-4"><i class="bi bi-file-earmark-text me-2"></i>Registration Information</h5>
+          
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <label class="form-label small text-secondary">Name</label>
+              <div class="p-2 bg-light rounded small fw-semibold">
+                <span id="registrationFirstName">-</span>
+                <span id="registrationLastName">-</span>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small text-secondary">Language</label>
+              <div class="p-2 bg-light rounded small" id="registrationLanguage">-</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small text-secondary">Operations Category</label>
+              <div class="p-2 bg-light rounded small" id="registrationCategory">-</div>
+            </div>
+          </div>
+
+          <!-- Operations Details Section -->
+          <div id="operationsDetailsSection" style="display: none;">
+            <div class="border-top pt-3">
+              <label class="form-label small fw-semibold text-secondary mb-3 d-block">Operations Details</label>
+              <div id="operationsDetailsContent" class="row g-3"></div>
+            </div>
+          </div>
+
+          <div id="noOperationsDetails" class="text-secondary small fst-italic">No operations details on file</div>
         </div>
         
         <!-- Action Buttons -->
@@ -362,8 +427,17 @@
         if (checkbox) checkbox.checked = true;
       });
       
-      // Show/hide region section
-      updateRegionVisibility();
+      // Load registration info fields (read-only)
+      document.getElementById('registrationFirstName').textContent = currentUser.firstName || '-';
+      document.getElementById('registrationLastName').textContent = currentUser.lastName || '-';
+      document.getElementById('registrationLanguage').textContent = currentUser.language || '-';
+      document.getElementById('registrationCategory').textContent = currentUser.operationsCategory ? formatOperationsCategory(currentUser.operationsCategory) : '-';
+      
+      // Load operations details
+      displayOperationsDetails(currentUser.operationsCategory, currentUser.operationsDetails);
+      
+      // Show/hide sections based on role
+      updateRoleSections();
       
       // Update page title
       document.title = `${currentUser.name} - Access Management`;
@@ -385,7 +459,7 @@
           radio.checked = true;
           selectedPortalRole = radio.value;
           
-          updateRegionVisibility();
+          updateRoleSections();
         });
       });
       
@@ -401,6 +475,7 @@
           }
         });
       });
+      
     }
 
     function updatePortalAccessVisibility() {
@@ -417,10 +492,13 @@
       }
     }
 
-    function updateRegionVisibility() {
+    function updateRoleSections() {
       const regionSection = document.getElementById('regionSection');
-      const isRegionalRole = selectedPortalRole && selectedPortalRole.includes('regional');
-      regionSection.classList.toggle('d-none', !isRegionalRole);
+      
+      // Show region section for regional roles only (Regional Manager and Regional Analyst)
+      // Organization manager doesn't need region selection as they manage across all countries
+      const needsRegionSelection = selectedPortalRole && selectedPortalRole.includes('regional');
+      regionSection.classList.toggle('d-none', !needsRegionSelection);
     }
 
     function selectAllRegions() {
@@ -444,7 +522,9 @@
       
       // Get portal access values
       const portalEnabled = document.getElementById('enablePortalAccess').checked;
-      const isRegionalRole = selectedPortalRole && selectedPortalRole.includes('regional');
+      const needsRegionSelection = selectedPortalRole && selectedPortalRole.includes('regional');
+      
+      // Get additional info
       
       // Validate
       if (!webAccess && !mobileAccess) {
@@ -457,7 +537,7 @@
         return;
       }
       
-      if (portalEnabled && isRegionalRole && selectedRegions.length === 0) {
+      if (portalEnabled && needsRegionSelection && selectedRegions.length === 0) {
         showToast('Please select at least one region for regional roles', 'warning');
         return;
       }
@@ -467,7 +547,7 @@
       
       // Update portal access
       if (portalEnabled) {
-        UAMData.grantSubscriptionAccess(currentUser.id, selectedPortalRole, isRegionalRole ? selectedRegions : []);
+        UAMData.grantSubscriptionAccess(currentUser.id, selectedPortalRole, needsRegionSelection ? selectedRegions : []);
         showToast('Access updated successfully', 'success');
       } else {
         if (currentUser.subscriptionPortalAccess) {
@@ -497,6 +577,83 @@
         document.getElementById('platformMobileAccess').checked = false;
         document.getElementById('enablePortalAccess').checked = false;
         updatePortalAccessVisibility();
+      }
+    }
+
+    function formatOperationsCategory(category) {
+      const categoryMap = {
+        'agriculture': 'Agriculture',
+        'golf': 'Golf & Turf Management',
+        'software': 'Software Company',
+        'research': 'Research Institution',
+        'ngo': 'Non-Governmental Organization',
+        'government': 'Government Agency',
+        'other': 'Other'
+      };
+      return categoryMap[category] || category;
+    }
+
+    function displayOperationsDetails(category, details) {
+      const section = document.getElementById('operationsDetailsSection');
+      const content = document.getElementById('operationsDetailsContent');
+      const noDetails = document.getElementById('noOperationsDetails');
+      
+      if (!details || Object.keys(details).length === 0 || (Object.keys(details).length === 1 && details.crops === 'Various')) {
+        section.style.display = 'none';
+        noDetails.style.display = 'block';
+        return;
+      }
+      
+      section.style.display = 'block';
+      noDetails.style.display = 'none';
+      content.innerHTML = '';
+      
+      // Define field mappings with icons for each category
+      const fieldMappings = {
+        agriculture: {
+          'crops': { label: '<i class="bi bi-leaf"></i> Crops/Produce', icon: 'bi-leaf' },
+          'farmSize': { label: '<i class="bi bi-diagram-2"></i> Farm Size', icon: 'bi-diagram-2', map: { '1': '< 5 hectares', '2': '5-20 hectares', '3': '20-50 hectares', '4': '> 50 hectares' } },
+          'irrigation': { label: '<i class="bi bi-droplet"></i> Irrigation', icon: 'bi-droplet', map: { 'yes': '✓ Yes', 'no': '✗ No (Rain-fed)' } },
+          'pestManagement': { label: '<i class="bi bi-shield-check"></i> Pest Management', icon: 'bi-shield-check', map: { 'organic': 'Organic', 'conventional': 'Conventional', 'integrated': 'Integrated (Mixed)' } }
+        },
+        golf: {
+          'turfArea': { label: '<i class="bi bi-square"></i> Turf Area', icon: 'bi-square', map: { '1': '< 2 hectares', '2': '2-10 hectares', '3': '10-50 hectares', '4': '> 50 hectares' } },
+          'turfIrrigation': { label: '<i class="bi bi-droplet"></i> Irrigation System', icon: 'bi-droplet', map: { 'automated': 'Automated/Sprinkler', 'manual': 'Manual', 'hybrid': 'Hybrid', 'none': 'None/Minimal' } }
+        },
+        software: {
+          'softwareWorkArea': { label: '<i class="bi bi-code-square"></i> Area of Work', icon: 'bi-code-square' }
+        },
+        'other-industry': {
+          'otherIndustry': { label: '<i class="bi bi-briefcase"></i> Industry/Sector', icon: 'bi-briefcase' },
+          'otherRole': { label: '<i class="bi bi-person-badge"></i> Position/Role', icon: 'bi-person-badge' }
+        }
+      };
+      
+      const categoryFields = fieldMappings[category] || {};
+      
+      for (const [key, value] of Object.entries(details)) {
+        if (value === null || value === undefined || value === '') continue;
+        
+        const fieldConfig = categoryFields[key] || { label: key.replace(/([A-Z])/g, ' $1').trim() };
+        let displayValue = '';
+        
+        if (Array.isArray(value)) {
+          displayValue = value.join(', ');
+        } else if (fieldConfig.map && fieldConfig.map[value]) {
+          displayValue = fieldConfig.map[value];
+        } else {
+          displayValue = value;
+        }
+        
+        const col = document.createElement('div');
+        col.className = 'col-md-6';
+        col.innerHTML = `
+          <div>
+            <label class="form-label small text-secondary">${fieldConfig.label}</label>
+            <div class="p-2 bg-light rounded small">${displayValue}</div>
+          </div>
+        `;
+        content.appendChild(col);
       }
     }
   </script>
